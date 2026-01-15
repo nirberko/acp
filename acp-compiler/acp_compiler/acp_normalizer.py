@@ -11,7 +11,6 @@ from acp_compiler.acp_ast import (
     AndExpr,
     ComparisonExpr,
     ConditionalExpr,
-    EnvCall,
     NestedBlock,
     NotExpr,
     OrExpr,
@@ -20,6 +19,8 @@ from acp_compiler.acp_ast import (
     StateRef,
     StepBlock,
     Value,
+    VariableBlock,
+    VarRef,
 )
 from acp_compiler.acp_resolver import ResolutionResult
 from acp_schema.models import (
@@ -57,9 +58,19 @@ class NormalizationError(Exception):
 class ACPNormalizer:
     """Transforms ACP AST to SpecRoot."""
 
-    def __init__(self, acp_file: ACPFile, resolution: ResolutionResult):
+    def __init__(
+        self,
+        acp_file: ACPFile,
+        resolution: ResolutionResult,
+        variables: dict[str, Any] | None = None,
+    ):
         self.acp_file = acp_file
         self.resolution = resolution
+        self.variables = variables or {}
+        # Build variable defaults from declarations
+        self._variable_defs: dict[str, VariableBlock] = {
+            v.name: v for v in acp_file.variables
+        }
         # Cache for resolved model info
         self._model_cache: dict[str, tuple[str, str, LLMProviderParams | None]] = {}
 
@@ -99,6 +110,43 @@ class ACPNormalizer:
             name = self.acp_file.acp.project
         return ProjectConfig(name=name)
 
+    def _resolve_variable(self, var_ref: VarRef) -> tuple[str, bool]:
+        """Resolve a variable reference to its value.
+
+        Args:
+            var_ref: Variable reference to resolve
+
+        Returns:
+            Tuple of (resolved_value, is_sensitive)
+
+        Raises:
+            NormalizationError: If variable is not declared or value not provided
+        """
+        var_name = var_ref.var_name
+        var_def = self._variable_defs.get(var_name)
+
+        if var_def is None:
+            raise NormalizationError(
+                f"Undefined variable: {var_name}",
+                var_ref.location,
+            )
+
+        # Check if value is provided at runtime
+        if var_name in self.variables:
+            value = self.variables[var_name]
+            return str(value) if not isinstance(value, str) else value, var_def.sensitive
+
+        # Use default if available
+        if var_def.default is not None:
+            value = var_def.default
+            return str(value) if not isinstance(value, str) else value, var_def.sensitive
+
+        # No value provided and no default
+        raise NormalizationError(
+            f"Variable '{var_name}' has no value (no default and not provided at runtime)",
+            var_ref.location,
+        )
+
     def _normalize_providers(self) -> ProvidersConfig:
         """Normalize provider blocks to ProvidersConfig."""
         llm_providers: dict[str, LLMProviderConfig] = {}
@@ -113,8 +161,8 @@ class ACPNormalizer:
 
                 # Get api_key
                 api_key_val = provider.get_attribute("api_key")
-                if isinstance(api_key_val, EnvCall):
-                    api_key = f"env:{api_key_val.var_name}"
+                if isinstance(api_key_val, VarRef):
+                    api_key, _ = self._resolve_variable(api_key_val)
                 else:
                     api_key = str(api_key_val) if api_key_val else ""
 
@@ -159,8 +207,9 @@ class ACPNormalizer:
             for block in server.blocks:
                 if block.block_type == "auth":
                     token = block.get_attribute("token")
-                    if isinstance(token, EnvCall):
-                        auth = ServerAuthConfig(token=f"env:{token.var_name}")
+                    if isinstance(token, VarRef):
+                        resolved_token, _ = self._resolve_variable(token)
+                        auth = ServerAuthConfig(token=resolved_token)
                     elif isinstance(token, str):
                         auth = ServerAuthConfig(token=token)
                     break
@@ -561,8 +610,9 @@ class ACPNormalizer:
             return self._expr_to_string(value)
         elif isinstance(value, list):
             return [self._value_to_expr(v) for v in value]
-        elif isinstance(value, EnvCall):
-            return f"env:{value.var_name}"
+        elif isinstance(value, VarRef):
+            resolved, _ = self._resolve_variable(value)
+            return resolved
         else:
             return value
 
@@ -582,7 +632,7 @@ class ACPNormalizer:
             return all(self._is_static_expr(op) for op in expr.operands)
         elif isinstance(expr, NotExpr):
             return self._is_static_expr(expr.operand)
-        elif isinstance(expr, (Reference, EnvCall)):
+        elif isinstance(expr, (Reference, VarRef)):
             return True  # These don't depend on runtime state
         elif isinstance(expr, (str, int, float, bool)):
             return True
@@ -672,18 +722,24 @@ class ACPNormalizer:
         """Convert value to string."""
         if isinstance(value, Reference):
             return value.path
-        elif isinstance(value, EnvCall):
-            return f"env:{value.var_name}"
+        elif isinstance(value, VarRef):
+            resolved, _ = self._resolve_variable(value)
+            return resolved
         else:
             return str(value)
 
 
-def normalize_acp(acp_file: ACPFile, resolution: ResolutionResult) -> SpecRoot:
+def normalize_acp(
+    acp_file: ACPFile,
+    resolution: ResolutionResult,
+    variables: dict[str, Any] | None = None,
+) -> SpecRoot:
     """Normalize ACP AST to SpecRoot.
 
     Args:
         acp_file: Parsed ACP AST
         resolution: Result from reference resolution
+        variables: Dictionary of variable values to substitute
 
     Returns:
         SpecRoot model compatible with existing pipeline
@@ -691,5 +747,5 @@ def normalize_acp(acp_file: ACPFile, resolution: ResolutionResult) -> SpecRoot:
     Raises:
         NormalizationError: If normalization fails
     """
-    normalizer = ACPNormalizer(acp_file, resolution)
+    normalizer = ACPNormalizer(acp_file, resolution, variables)
     return normalizer.normalize()

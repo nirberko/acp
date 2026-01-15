@@ -1,6 +1,7 @@
 """Main compiler module that ties together parsing, validation, and IR generation."""
 
 from pathlib import Path
+from typing import Any
 
 from acp_compiler.ir_generator import generate_ir
 from acp_compiler.validator import ValidationResult, validate_spec
@@ -25,12 +26,17 @@ def _is_acp_file(path: Path) -> bool:
     return path.suffix.lower() in ACP_EXTENSIONS
 
 
-def parse_acp_to_spec(content: str, file_path: str | None = None) -> SpecRoot:
+def parse_acp_to_spec(
+    content: str,
+    file_path: str | None = None,
+    variables: dict[str, Any] | None = None,
+) -> SpecRoot:
     """Parse ACP content to SpecRoot.
 
     Args:
         content: ACP file content as string
         file_path: Optional file path for error messages
+        variables: Dictionary of variable values to substitute
 
     Returns:
         SpecRoot model
@@ -56,14 +62,14 @@ def parse_acp_to_spec(content: str, file_path: str | None = None) -> SpecRoot:
         raise CompilationError(f"Reference resolution failed:\n{errors_str}")
 
     # Validate
-    validation = validate_acp(acp_file, resolution, check_env=False)
+    validation = validate_acp(acp_file, resolution)
     if not validation.is_valid:
         errors_str = "\n".join(f"  - {e}" for e in validation.errors)
         raise CompilationError(f"Validation failed:\n{errors_str}")
 
     # Normalize to SpecRoot
     try:
-        return normalize_acp(acp_file, resolution)
+        return normalize_acp(acp_file, resolution, variables)
     except NormalizationError as e:
         raise CompilationError(f"Normalization error: {e}") from e
 
@@ -73,6 +79,7 @@ def compile_acp(
     file_path: str | None = None,
     check_env: bool = True,
     resolve_credentials: bool = True,
+    variables: dict[str, Any] | None = None,
 ) -> CompiledSpec:
     """Compile ACP content to IR.
 
@@ -81,6 +88,7 @@ def compile_acp(
         file_path: Optional file path for error messages
         check_env: Whether to check env vars exist during validation
         resolve_credentials: Whether to resolve credentials to actual values
+        variables: Dictionary of variable values to substitute
 
     Returns:
         Compiled specification (IR)
@@ -89,7 +97,7 @@ def compile_acp(
         CompilationError: If compilation fails
     """
     # Parse and normalize to SpecRoot
-    spec = parse_acp_to_spec(content, file_path)
+    spec = parse_acp_to_spec(content, file_path, variables)
 
     # Validate using existing validator
     result = validate_spec(spec, check_env=check_env)
@@ -105,6 +113,7 @@ def compile_acp_file(
     path: str | Path,
     check_env: bool = True,
     resolve_credentials: bool = True,
+    variables: dict[str, Any] | None = None,
 ) -> CompiledSpec:
     """Compile an ACP file to IR.
 
@@ -112,6 +121,7 @@ def compile_acp_file(
         path: Path to ACP file
         check_env: Whether to check env vars exist during validation
         resolve_credentials: Whether to resolve credentials to actual values
+        variables: Dictionary of variable values to substitute
 
     Returns:
         Compiled specification (IR)
@@ -135,15 +145,21 @@ def compile_acp_file(
         file_path=str(path),
         check_env=check_env,
         resolve_credentials=resolve_credentials,
+        variables=variables,
     )
 
 
-def validate_acp_file(path: str | Path, check_env: bool = True) -> ValidationResult:
+def validate_acp_file(
+    path: str | Path,
+    check_env: bool = True,
+    variables: dict[str, Any] | None = None,
+) -> ValidationResult:
     """Validate an ACP file without full compilation.
 
     Args:
         path: Path to ACP file
         check_env: Whether to check env vars exist
+        variables: Dictionary of variable values to substitute
 
     Returns:
         ValidationResult with errors and warnings
@@ -174,7 +190,7 @@ def validate_acp_file(path: str | Path, check_env: bool = True) -> ValidationRes
         raise CompilationError(f"Reference resolution failed:\n{errors_str}")
 
     # ACP-specific validation
-    acp_validation = validate_acp(acp_file, resolution, check_env=check_env)
+    acp_validation = validate_acp(acp_file, resolution)
 
     # Convert to ValidationResult format
     result = ValidationResult()
@@ -188,7 +204,7 @@ def validate_acp_file(path: str | Path, check_env: bool = True) -> ValidationRes
 
     # Normalize and run standard validation
     try:
-        spec = normalize_acp(acp_file, resolution)
+        spec = normalize_acp(acp_file, resolution, variables)
     except NormalizationError as e:
         result.add_error("normalization", str(e))
         return result
@@ -212,6 +228,7 @@ def compile_file(
     path: str | Path,
     check_env: bool = True,
     resolve_credentials: bool = True,
+    variables: dict[str, Any] | None = None,
 ) -> CompiledSpec:
     """Compile an ACP file to IR.
 
@@ -219,6 +236,7 @@ def compile_file(
         path: Path to .acp spec file
         check_env: Whether to check env vars exist during validation
         resolve_credentials: Whether to resolve credentials to actual values
+        variables: Dictionary of variable values to substitute
 
     Returns:
         Compiled specification (IR)
@@ -233,15 +251,20 @@ def compile_file(
             f"Expected .acp file, got: {path.suffix}. Only .acp files are supported."
         )
 
-    return compile_acp_file(path, check_env, resolve_credentials)
+    return compile_acp_file(path, check_env, resolve_credentials, variables)
 
 
-def validate_file(path: str | Path, check_env: bool = True) -> ValidationResult:
+def validate_file(
+    path: str | Path,
+    check_env: bool = True,
+    variables: dict[str, Any] | None = None,
+) -> ValidationResult:
     """Validate an ACP file.
 
     Args:
         path: Path to .acp spec file
         check_env: Whether to check env vars exist
+        variables: Dictionary of variable values to substitute
 
     Returns:
         ValidationResult with errors and warnings
@@ -256,4 +279,4 @@ def validate_file(path: str | Path, check_env: bool = True) -> ValidationResult:
             f"Expected .acp file, got: {path.suffix}. Only .acp files are supported."
         )
 
-    return validate_acp_file(path, check_env)
+    return validate_acp_file(path, check_env, variables)

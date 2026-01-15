@@ -13,6 +13,44 @@ from acp_compiler.compiler import CompilationError
 console = Console()
 
 
+def _parse_var(var_str: str) -> tuple[str, str]:
+    """Parse a variable string in the form 'name=value'."""
+    if "=" not in var_str:
+        raise typer.BadParameter(f"Invalid variable format: {var_str}. Expected 'name=value'")
+    name, value = var_str.split("=", 1)
+    return name.strip(), value.strip()
+
+
+def _load_variables(
+    var_args: list[str] | None,
+    var_file_path: Path | None,
+) -> dict[str, str]:
+    """Load variables from --var arguments and --var-file.
+
+    CLI --var arguments take precedence over --var-file values.
+    """
+    variables: dict[str, str] = {}
+
+    # Load from var-file first
+    if var_file_path and var_file_path.exists():
+        try:
+            file_vars = json.loads(var_file_path.read_text())
+            if isinstance(file_vars, dict):
+                variables.update({k: str(v) for k, v in file_vars.items()})
+            else:
+                raise typer.BadParameter(f"Variable file must contain a JSON object: {var_file_path}")
+        except json.JSONDecodeError as e:
+            raise typer.BadParameter(f"Error parsing variable file {var_file_path}: {e}") from None
+
+    # Override with CLI --var arguments
+    if var_args:
+        for var_str in var_args:
+            name, value = _parse_var(var_str)
+            variables[name] = value
+
+    return variables
+
+
 def compile_cmd(
     spec_file: Path = typer.Argument(help="Path to the .acp specification file"),
     output: Path | None = typer.Option(
@@ -41,6 +79,16 @@ def compile_cmd(
         "--resolve-credentials",
         help="Resolve environment variables to actual values (security risk!)",
     ),
+    var: list[str] | None = typer.Option(
+        None,
+        "--var",
+        help="Set a variable (can be repeated). Format: name=value",
+    ),
+    var_file: Path | None = typer.Option(
+        None,
+        "--var-file",
+        help="Path to JSON file with variables",
+    ),
 ) -> None:
     """Compile an ACP specification to IR (Intermediate Representation).
 
@@ -56,12 +104,20 @@ def compile_cmd(
         console.print(f"[red]✗[/red] File not found: {spec_file}")
         raise typer.Exit(1)
 
+    # Load variables
+    try:
+        variables = _load_variables(var, var_file)
+    except typer.BadParameter as e:
+        console.print(f"[red]Error loading variables:[/red] {e}")
+        raise typer.Exit(1) from None
+
     # Compile
     try:
         compiled = compile_file(
             spec_file,
             check_env=should_check_env,
             resolve_credentials=resolve_credentials,
+            variables=variables,
         )
         console.print("[green]✓[/green] Compilation successful")
     except CompilationError as e:

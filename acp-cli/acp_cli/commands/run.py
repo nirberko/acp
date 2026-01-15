@@ -105,6 +105,44 @@ def _find_default_spec_file() -> Path:
     return Path("acp.acp")  # Default fallback
 
 
+def _parse_var(var_str: str) -> tuple[str, str]:
+    """Parse a variable string in the form 'name=value'."""
+    if "=" not in var_str:
+        raise typer.BadParameter(f"Invalid variable format: {var_str}. Expected 'name=value'")
+    name, value = var_str.split("=", 1)
+    return name.strip(), value.strip()
+
+
+def _load_variables(
+    var_args: list[str] | None,
+    var_file: Path | None,
+) -> dict[str, str]:
+    """Load variables from --var arguments and --var-file.
+
+    CLI --var arguments take precedence over --var-file values.
+    """
+    variables: dict[str, str] = {}
+
+    # Load from var-file first
+    if var_file and var_file.exists():
+        try:
+            file_vars = json.loads(var_file.read_text())
+            if isinstance(file_vars, dict):
+                variables.update({k: str(v) for k, v in file_vars.items()})
+            else:
+                raise typer.BadParameter(f"Variable file must contain a JSON object: {var_file}")
+        except json.JSONDecodeError as e:
+            raise typer.BadParameter(f"Error parsing variable file {var_file}: {e}") from None
+
+    # Override with CLI --var arguments
+    if var_args:
+        for var_str in var_args:
+            name, value = _parse_var(var_str)
+            variables[name] = value
+
+    return variables
+
+
 def run(
     workflow: str = typer.Argument(help="Name of the workflow to run"),
     spec_file: Path = typer.Option(
@@ -136,6 +174,16 @@ def run(
         "--trace",
         "-t",
         help="Write execution trace to file",
+    ),
+    var: list[str] | None = typer.Option(
+        None,
+        "--var",
+        help="Set a variable (can be repeated). Format: name=value",
+    ),
+    var_file: Path | None = typer.Option(
+        None,
+        "--var-file",
+        help="Path to JSON file with variables",
     ),
     verbose: bool = typer.Option(
         False,
@@ -170,6 +218,18 @@ def run(
         logger.error("spec_file_not_found", spec_file=str(spec_file))
         console.print(f"[red]Spec file not found:[/red] {spec_file}")
         raise typer.Exit(1)
+
+    # Load variables
+    try:
+        variables = _load_variables(var, var_file)
+    except typer.BadParameter as e:
+        console.print(f"[red]Error loading variables:[/red] {e}")
+        raise typer.Exit(1) from None
+
+    if variables and verbose:
+        # Mask sensitive values in output
+        display_vars = {k: "***" if "key" in k.lower() or "secret" in k.lower() or "password" in k.lower() else v for k, v in variables.items()}
+        console.print(f"[bold]Variables:[/bold] {display_vars}\n")
 
     # Parse input data
     parsed_input: dict = {}
@@ -217,7 +277,12 @@ def run(
         progress.add_task("Compiling specification...", total=None)
 
         try:
-            compiled = compile_file(spec_file, check_env=True, resolve_credentials=True)
+            compiled = compile_file(
+                spec_file,
+                check_env=True,
+                resolve_credentials=True,
+                variables=variables,
+            )
             logger.info(
                 "compilation_success",
                 workflows=list(compiled.workflows.keys()),

@@ -6,8 +6,20 @@ acp {
   project = "multi-agent-example"
 }
 
+variable "openai_api_key" {
+  type        = string
+  description = "OpenAI API key"
+  sensitive   = true
+}
+
+variable "anthropic_api_key" {
+  type        = string
+  description = "Anthropic API key"
+  sensitive   = true
+}
+
 provider "llm.openai" "default" {
-  api_key = env("OPENAI_API_KEY")
+  api_key = var.openai_api_key
   default_params {
     temperature = 0.7
     max_tokens  = 2000
@@ -15,7 +27,7 @@ provider "llm.openai" "default" {
 }
 
 provider "llm.anthropic" "default" {
-  api_key = env("ANTHROPIC_API_KEY")
+  api_key = var.anthropic_api_key
   default_params {
     temperature = 0.5
     max_tokens  = 4000

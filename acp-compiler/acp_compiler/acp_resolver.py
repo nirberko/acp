@@ -9,12 +9,16 @@ from dataclasses import dataclass, field
 from acp_compiler.acp_ast import (
     ACPFile,
     AgentBlock,
+    Attribute,
     CapabilityBlock,
     ModelBlock,
     NestedBlock,
+    ProviderBlock,
     Reference,
     SourceLocation,
     StepBlock,
+    VariableBlock,
+    VarRef,
     WorkflowBlock,
 )
 
@@ -24,7 +28,7 @@ class Symbol:
     """A symbol in the symbol table."""
 
     name: str
-    kind: str  # "provider", "model", "agent", "policy", "workflow", "step", "server", "capability"
+    kind: str  # "provider", "model", "agent", "policy", "workflow", "step", "server", "capability", "variable"
     location: SourceLocation | None = None
     parent: str | None = None  # For nested symbols (e.g., steps belong to workflows)
     block: object | None = None  # Reference to the actual block
@@ -93,6 +97,24 @@ class ReferenceResolver:
 
     def _build_symbol_table(self) -> None:
         """Build the symbol table from all named blocks."""
+        # Variables: var.name
+        for variable in self.acp_file.variables:
+            full_name = f"var.{variable.name}"
+            if full_name in self.result.symbols:
+                self.result.add_error(
+                    f"Duplicate variable: {variable.name}",
+                    variable.location,
+                )
+            else:
+                self.result.add_symbol(
+                    Symbol(
+                        name=full_name,
+                        kind="variable",
+                        location=variable.location,
+                        block=variable,
+                    )
+                )
+
         # Providers: provider.llm.openai.default
         for provider in self.acp_file.providers:
             full_name = f"provider.{provider.full_name}"
@@ -244,6 +266,10 @@ class ReferenceResolver:
 
     def _resolve_references(self) -> None:
         """Resolve all references in the AST."""
+        # Resolve provider references (variable references in api_key)
+        for provider in self.acp_file.providers:
+            self._resolve_provider_references(provider)
+
         # Resolve model references (provider)
         for model in self.acp_file.models:
             self._resolve_model_references(model)
@@ -259,6 +285,17 @@ class ReferenceResolver:
         # Resolve workflow references (steps, agents)
         for workflow in self.acp_file.workflows:
             self._resolve_workflow_references(workflow)
+
+    def _resolve_provider_references(self, provider: ProviderBlock) -> None:
+        """Resolve references in a provider block."""
+        # Check api_key variable reference
+        api_key_attr = provider.get_attribute("api_key")
+        if isinstance(api_key_attr, VarRef):
+            self._check_var_ref(api_key_attr, provider.location)
+
+        # Check nested blocks for variable references
+        for block in provider.blocks:
+            self._resolve_nested_block_var_refs(block)
 
     def _resolve_model_references(self, model: ModelBlock) -> None:
         """Resolve references in a model block."""
@@ -358,6 +395,12 @@ class ReferenceResolver:
                     continue
                 # Other references should be validated
                 self._check_reference_exists(value)
+            elif isinstance(value, VarRef):
+                self._check_var_ref(value, attr.location)
+            elif isinstance(value, list):
+                for item in value:
+                    if isinstance(item, VarRef):
+                        self._check_var_ref(item, attr.location)
 
     def _check_reference(
         self,
@@ -388,6 +431,40 @@ class ReferenceResolver:
                 f"Unresolved reference: {ref_path}",
                 ref.location,
             )
+
+    def _check_var_ref(
+        self,
+        var_ref: VarRef,
+        context_location: SourceLocation | None,
+    ) -> None:
+        """Check that a variable reference points to a declared variable."""
+        ref_path = f"var.{var_ref.var_name}"
+        symbol = self.result.symbols.get(ref_path)
+
+        if symbol is None:
+            self.result.add_error(
+                f"Unresolved variable reference: {ref_path}",
+                var_ref.location or context_location,
+            )
+        elif symbol.kind != "variable":
+            self.result.add_error(
+                f"Reference '{ref_path}' is a {symbol.kind}, expected variable",
+                var_ref.location or context_location,
+            )
+
+    def _resolve_nested_block_var_refs(self, block: NestedBlock) -> None:
+        """Resolve variable references in nested blocks."""
+        for attr in block.attributes:
+            if isinstance(attr.value, VarRef):
+                self._check_var_ref(attr.value, attr.location)
+            elif isinstance(attr.value, list):
+                for item in attr.value:
+                    if isinstance(item, VarRef):
+                        self._check_var_ref(item, attr.location)
+
+        # Recursively check nested blocks
+        for nested in block.blocks:
+            self._resolve_nested_block_var_refs(nested)
 
 
 def resolve_references(acp_file: ACPFile) -> ResolutionResult:

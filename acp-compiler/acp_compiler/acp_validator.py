@@ -10,16 +10,20 @@ from acp_compiler.acp_ast import (
     ACPFile,
     AgentBlock,
     CapabilityBlock,
-    EnvCall,
     ModelBlock,
     PolicyBlock,
     ProviderBlock,
     ServerBlock,
     SourceLocation,
     StepBlock,
+    VariableBlock,
+    VarRef,
     WorkflowBlock,
 )
 from acp_compiler.acp_resolver import ResolutionResult
+
+# Valid variable types
+VALID_VAR_TYPES = {"string", "number", "bool", "list"}
 
 
 @dataclass
@@ -84,11 +88,9 @@ class ACPValidator:
         self,
         acp_file: ACPFile,
         resolution: ResolutionResult,
-        check_env: bool = True,
     ):
         self.acp_file = acp_file
         self.resolution = resolution
-        self.check_env = check_env
         self.result = ACPValidationResult()
 
     def validate(self) -> ACPValidationResult:
@@ -99,6 +101,10 @@ class ACPValidator:
         """
         # Check acp block
         self._validate_acp_block()
+
+        # Check variables
+        for variable in self.acp_file.variables:
+            self._validate_variable(variable)
 
         # Check providers
         for provider in self.acp_file.providers:
@@ -128,10 +134,6 @@ class ACPValidator:
         for workflow in self.acp_file.workflows:
             self._validate_workflow(workflow)
 
-        # Check environment variables if requested
-        if self.check_env:
-            self._validate_env_vars()
-
         return self.result
 
     def _validate_acp_block(self) -> None:
@@ -148,11 +150,57 @@ class ACPValidator:
         if not acp.project:
             self.result.add_error("acp.project", "Missing required 'project' field", acp.location)
 
+    def _validate_variable(self, variable: VariableBlock) -> None:
+        """Validate a variable declaration."""
+        path = f"variable.{variable.name}"
+
+        # Validate type if specified
+        if variable.var_type is not None and variable.var_type not in VALID_VAR_TYPES:
+            self.result.add_error(
+                f"{path}.type",
+                f"Invalid variable type: {variable.var_type}. Valid types: {', '.join(sorted(VALID_VAR_TYPES))}",
+                variable.location,
+            )
+
+        # Warn if no default and not marked sensitive (might be required)
+        if variable.default is None and not variable.sensitive:
+            self.result.add_warning(
+                path,
+                f"Variable '{variable.name}' has no default value and must be provided at runtime",
+                variable.location,
+            )
+
+        # Validate default value matches type if both specified
+        if variable.var_type is not None and variable.default is not None:
+            self._validate_variable_type(variable, path)
+
+    def _validate_variable_type(self, variable: VariableBlock, path: str) -> None:
+        """Validate that a variable's default value matches its declared type."""
+        default = variable.default
+        var_type = variable.var_type
+
+        type_valid = True
+        if var_type == "string":
+            type_valid = isinstance(default, str)
+        elif var_type == "number":
+            type_valid = isinstance(default, (int, float)) and not isinstance(default, bool)
+        elif var_type == "bool":
+            type_valid = isinstance(default, bool)
+        elif var_type == "list":
+            type_valid = isinstance(default, list)
+
+        if not type_valid:
+            self.result.add_error(
+                f"{path}.default",
+                f"Default value type does not match declared type '{var_type}'",
+                variable.location,
+            )
+
     def _validate_provider(self, provider: ProviderBlock) -> None:
         """Validate a provider block."""
         path = f"provider.{provider.full_name}"
 
-        # Check api_key is present and is an env call
+        # Check api_key is present and is a variable reference
         api_key = provider.get_attribute("api_key")
         if api_key is None:
             self.result.add_error(
@@ -160,10 +208,10 @@ class ACPValidator:
                 "Missing required 'api_key' field",
                 provider.location,
             )
-        elif not isinstance(api_key, EnvCall):
+        elif not isinstance(api_key, VarRef):
             self.result.add_error(
                 f"{path}.api_key",
-                "api_key must use env() function",
+                "api_key must be a variable reference (var.variable_name)",
                 provider.location,
             )
 
@@ -419,55 +467,19 @@ class ACPValidator:
                 step.location,
             )
 
-    def _validate_env_vars(self) -> None:
-        """Check that referenced environment variables are set."""
-        import os
-
-        env_refs = self._collect_env_refs()
-        for path, var_name in env_refs:
-            if var_name not in os.environ:
-                self.result.add_warning(
-                    path,
-                    f"Environment variable '{var_name}' is not set",
-                )
-
-    def _collect_env_refs(self) -> list[tuple[str, str]]:
-        """Collect all env() references from the AST."""
-        refs: list[tuple[str, str]] = []
-
-        # From providers
-        for provider in self.acp_file.providers:
-            path = f"provider.{provider.full_name}"
-            api_key = provider.get_attribute("api_key")
-            if isinstance(api_key, EnvCall):
-                refs.append((f"{path}.api_key", api_key.var_name))
-
-        # From servers (auth tokens)
-        for server in self.acp_file.servers:
-            path = f"server.{server.name}"
-            for block in server.blocks:
-                if block.block_type == "auth":
-                    token = block.get_attribute("token")
-                    if isinstance(token, EnvCall):
-                        refs.append((f"{path}.auth.token", token.var_name))
-
-        return refs
-
 
 def validate_acp(
     acp_file: ACPFile,
     resolution: ResolutionResult,
-    check_env: bool = True,
 ) -> ACPValidationResult:
     """Validate an ACP AST.
 
     Args:
         acp_file: Parsed ACP AST
         resolution: Result from reference resolution
-        check_env: Whether to check environment variables exist
 
     Returns:
         ACPValidationResult with errors and warnings
     """
-    validator = ACPValidator(acp_file, resolution, check_env)
+    validator = ACPValidator(acp_file, resolution)
     return validator.validate()

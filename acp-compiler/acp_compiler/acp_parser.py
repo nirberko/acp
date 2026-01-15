@@ -19,7 +19,6 @@ from acp_compiler.acp_ast import (
     CapabilityBlock,
     ComparisonExpr,
     ConditionalExpr,
-    EnvCall,
     ModelBlock,
     NestedBlock,
     NotExpr,
@@ -32,6 +31,8 @@ from acp_compiler.acp_ast import (
     StateRef,
     StepBlock,
     Value,
+    VariableBlock,
+    VarRef,
     WorkflowBlock,
 )
 
@@ -128,6 +129,8 @@ class ACPTransformer(Transformer):
         for block in blocks:
             if isinstance(block, ACPBlock):
                 acp_file.acp = block
+            elif isinstance(block, VariableBlock):
+                acp_file.variables.append(block)
             elif isinstance(block, ProviderBlock):
                 acp_file.providers.append(block)
             elif isinstance(block, ServerBlock):
@@ -164,6 +167,40 @@ class ACPTransformer(Transformer):
         return block
 
     def acp_body(self, meta: Any, children: list) -> list[Attribute]:
+        return [c for c in children if isinstance(c, Attribute)]
+
+    # Variable block
+    def variable_block(self, meta: Any, children: list) -> VariableBlock:
+        name = _unquote(str(children[0]))
+        body = children[1] if len(children) > 1 else []
+
+        # Extract attributes from body
+        var_type = None
+        default = None
+        description = None
+        sensitive = False
+
+        for attr in body:
+            if isinstance(attr, Attribute):
+                if attr.name == "type" and isinstance(attr.value, str):
+                    var_type = attr.value
+                elif attr.name == "default":
+                    default = attr.value
+                elif attr.name == "description" and isinstance(attr.value, str):
+                    description = attr.value
+                elif attr.name == "sensitive" and isinstance(attr.value, bool):
+                    sensitive = attr.value
+
+        return VariableBlock(
+            name=name,
+            var_type=var_type,
+            default=default,
+            description=description,
+            sensitive=sensitive,
+            location=self._loc(meta),
+        )
+
+    def variable_body(self, meta: Any, children: list) -> list[Attribute]:
         return [c for c in children if isinstance(c, Attribute)]
 
     # Provider block
@@ -376,6 +413,10 @@ class ACPTransformer(Transformer):
     def boolean_value(self, meta: Any, children: list) -> bool:
         return str(children[0]).lower() == "true"
 
+    def identifier_value(self, meta: Any, children: list) -> str:
+        """Parse a bare identifier as a string value (e.g., type = string)."""
+        return str(children[0])
+
     def reference_value(self, meta: Any, children: list) -> Reference:
         result = children[0]
         assert isinstance(result, Reference)
@@ -386,9 +427,9 @@ class ACPTransformer(Transformer):
         assert isinstance(result, list)
         return result
 
-    def env_value(self, meta: Any, children: list) -> EnvCall:
+    def var_ref_value(self, meta: Any, children: list) -> VarRef:
         result = children[0]
-        assert isinstance(result, EnvCall)
+        assert isinstance(result, VarRef)
         return result
 
     def paren_expr(self, meta: Any, children: list) -> Any:
@@ -467,10 +508,10 @@ class ACPTransformer(Transformer):
     def array(self, meta: Any, children: list) -> list[Value]:
         return list(children)
 
-    # Env call
-    def env_call(self, meta: Any, children: list) -> EnvCall:
-        var_name = _unquote(str(children[0]))
-        return EnvCall(var_name=var_name, location=self._loc(meta))
+    # Variable reference
+    def var_ref(self, meta: Any, children: list) -> VarRef:
+        var_name = str(children[0])
+        return VarRef(var_name=var_name, location=self._loc(meta))
 
     # Terminals
     def STRING(self, token: Token) -> Token:

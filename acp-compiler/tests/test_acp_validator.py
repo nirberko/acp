@@ -11,13 +11,14 @@ class TestACPBlockValidation:
     def test_missing_acp_block(self) -> None:
         """Test error when acp block is missing."""
         content = """
+        variable "api_key" { type = string }
         provider "llm.openai" "default" {
-            api_key = env("KEY")
+            api_key = var.api_key
         }
         """
         acp_file = parse_acp(content)
         resolution = resolve_references(acp_file)
-        result = validate_acp(acp_file, resolution, check_env=False)
+        result = validate_acp(acp_file, resolution)
 
         assert not result.is_valid
         assert any("Missing required 'acp' block" in e.message for e in result.errors)
@@ -29,7 +30,7 @@ class TestACPBlockValidation:
         """
         acp_file = parse_acp(content)
         resolution = resolve_references(acp_file)
-        result = validate_acp(acp_file, resolution, check_env=False)
+        result = validate_acp(acp_file, resolution)
 
         assert not result.is_valid
         assert any("version" in e.path for e in result.errors)
@@ -41,7 +42,7 @@ class TestACPBlockValidation:
         """
         acp_file = parse_acp(content)
         resolution = resolve_references(acp_file)
-        result = validate_acp(acp_file, resolution, check_env=False)
+        result = validate_acp(acp_file, resolution)
 
         assert not result.is_valid
         assert any("project" in e.path for e in result.errors)
@@ -60,13 +61,13 @@ class TestProviderValidation:
         """
         acp_file = parse_acp(content)
         resolution = resolve_references(acp_file)
-        result = validate_acp(acp_file, resolution, check_env=False)
+        result = validate_acp(acp_file, resolution)
 
         assert not result.is_valid
         assert any("api_key" in e.path for e in result.errors)
 
-    def test_api_key_must_use_env(self) -> None:
-        """Test error when api_key doesn't use env()."""
+    def test_api_key_must_use_var_ref(self) -> None:
+        """Test error when api_key doesn't use var reference."""
         content = """
         acp { version = "0.1" project = "test" }
 
@@ -76,10 +77,10 @@ class TestProviderValidation:
         """
         acp_file = parse_acp(content)
         resolution = resolve_references(acp_file)
-        result = validate_acp(acp_file, resolution, check_env=False)
+        result = validate_acp(acp_file, resolution)
 
         assert not result.is_valid
-        assert any("env()" in e.message for e in result.errors)
+        assert any("variable reference" in e.message for e in result.errors)
 
 
 class TestModelValidation:
@@ -96,7 +97,7 @@ class TestModelValidation:
         """
         acp_file = parse_acp(content)
         resolution = resolve_references(acp_file)
-        result = validate_acp(acp_file, resolution, check_env=False)
+        result = validate_acp(acp_file, resolution)
 
         assert not result.is_valid
         assert any("provider" in e.path for e in result.errors)
@@ -112,7 +113,7 @@ class TestModelValidation:
         """
         acp_file = parse_acp(content)
         resolution = resolve_references(acp_file)
-        result = validate_acp(acp_file, resolution, check_env=False)
+        result = validate_acp(acp_file, resolution)
 
         assert not result.is_valid
         assert any("id" in e.path for e in result.errors)
@@ -132,7 +133,7 @@ class TestAgentValidation:
         """
         acp_file = parse_acp(content)
         resolution = resolve_references(acp_file)
-        result = validate_acp(acp_file, resolution, check_env=False)
+        result = validate_acp(acp_file, resolution)
 
         assert not result.is_valid
         assert any("model" in e.path for e in result.errors)
@@ -148,7 +149,7 @@ class TestAgentValidation:
         """
         acp_file = parse_acp(content)
         resolution = resolve_references(acp_file)
-        result = validate_acp(acp_file, resolution, check_env=False)
+        result = validate_acp(acp_file, resolution)
 
         assert not result.is_valid
         assert any("instructions" in e.path for e in result.errors)
@@ -168,7 +169,7 @@ class TestWorkflowValidation:
         """
         acp_file = parse_acp(content)
         resolution = resolve_references(acp_file)
-        result = validate_acp(acp_file, resolution, check_env=False)
+        result = validate_acp(acp_file, resolution)
 
         assert not result.is_valid
         assert any("entry" in e.path for e in result.errors)
@@ -184,7 +185,7 @@ class TestWorkflowValidation:
         """
         acp_file = parse_acp(content)
         resolution = resolve_references(acp_file)
-        result = validate_acp(acp_file, resolution, check_env=False)
+        result = validate_acp(acp_file, resolution)
 
         assert not result.is_valid
         assert any("at least one step" in e.message for e in result.errors)
@@ -207,7 +208,7 @@ class TestStepValidation:
         """
         acp_file = parse_acp(content)
         resolution = resolve_references(acp_file)
-        result = validate_acp(acp_file, resolution, check_env=False)
+        result = validate_acp(acp_file, resolution)
 
         assert not result.is_valid
         assert any("type" in e.path for e in result.errors)
@@ -226,7 +227,7 @@ class TestStepValidation:
         """
         acp_file = parse_acp(content)
         resolution = resolve_references(acp_file)
-        result = validate_acp(acp_file, resolution, check_env=False)
+        result = validate_acp(acp_file, resolution)
 
         assert not result.is_valid
         assert any("Invalid step type" in e.message for e in result.errors)
@@ -245,7 +246,7 @@ class TestStepValidation:
         """
         acp_file = parse_acp(content)
         resolution = resolve_references(acp_file)
-        result = validate_acp(acp_file, resolution, check_env=False)
+        result = validate_acp(acp_file, resolution)
 
         assert not result.is_valid
         assert any("agent" in e.path for e in result.errors)
@@ -264,7 +265,7 @@ class TestStepValidation:
         """
         acp_file = parse_acp(content)
         resolution = resolve_references(acp_file)
-        result = validate_acp(acp_file, resolution, check_env=False)
+        result = validate_acp(acp_file, resolution)
 
         assert not result.is_valid
         assert any("capability" in e.path for e in result.errors)
@@ -287,7 +288,7 @@ class TestStepValidation:
         """
         acp_file = parse_acp(content)
         resolution = resolve_references(acp_file)
-        result = validate_acp(acp_file, resolution, check_env=False)
+        result = validate_acp(acp_file, resolution)
 
         assert not result.is_valid
         assert any("condition" in e.path for e in result.errors)
@@ -301,8 +302,13 @@ class TestValidSpec:
         content = """
         acp { version = "0.1" project = "test" }
 
+        variable "openai_api_key" {
+            type = string
+            sensitive = true
+        }
+
         provider "llm.openai" "default" {
-            api_key = env("OPENAI_API_KEY")
+            api_key = var.openai_api_key
         }
 
         model "gpt4" {
@@ -327,7 +333,7 @@ class TestValidSpec:
         """
         acp_file = parse_acp(content)
         resolution = resolve_references(acp_file)
-        result = validate_acp(acp_file, resolution, check_env=False)
+        result = validate_acp(acp_file, resolution)
 
         assert result.is_valid
         assert len(result.errors) == 0
@@ -337,8 +343,13 @@ class TestValidSpec:
         content = """
         acp { version = "0.2" project = "complete-test" }
 
+        variable "openai_api_key" {
+            type = string
+            sensitive = true
+        }
+
         provider "llm.openai" "default" {
-            api_key = env("OPENAI_API_KEY")
+            api_key = var.openai_api_key
         }
 
         server "filesystem" {
@@ -387,7 +398,60 @@ class TestValidSpec:
         """
         acp_file = parse_acp(content)
         resolution = resolve_references(acp_file)
-        result = validate_acp(acp_file, resolution, check_env=False)
+        result = validate_acp(acp_file, resolution)
 
         assert result.is_valid
         assert len(result.errors) == 0
+
+
+class TestVariableValidation:
+    """Test validation of variable blocks."""
+
+    def test_invalid_variable_type(self) -> None:
+        """Test error when variable type is invalid."""
+        content = """
+        acp { version = "0.1" project = "test" }
+
+        variable "test" {
+            type = invalid_type
+        }
+        """
+        acp_file = parse_acp(content)
+        resolution = resolve_references(acp_file)
+        result = validate_acp(acp_file, resolution)
+
+        assert not result.is_valid
+        assert any("Invalid variable type" in e.message for e in result.errors)
+
+    def test_warning_for_required_variable(self) -> None:
+        """Test warning when variable has no default and is not sensitive."""
+        content = """
+        acp { version = "0.1" project = "test" }
+
+        variable "test" {
+            type = string
+        }
+        """
+        acp_file = parse_acp(content)
+        resolution = resolve_references(acp_file)
+        result = validate_acp(acp_file, resolution)
+
+        # Should have a warning about no default value
+        assert any("no default value" in w.message for w in result.warnings)
+
+    def test_valid_variable_with_default(self) -> None:
+        """Test that a variable with default passes."""
+        content = """
+        acp { version = "0.1" project = "test" }
+
+        variable "temperature" {
+            type = number
+            default = 0.7
+        }
+        """
+        acp_file = parse_acp(content)
+        resolution = resolve_references(acp_file)
+        result = validate_acp(acp_file, resolution)
+
+        # Should pass without errors
+        assert result.is_valid

@@ -7,11 +7,11 @@ from acp_compiler.acp_ast import (
     AndExpr,
     ComparisonExpr,
     ConditionalExpr,
-    EnvCall,
     NotExpr,
     OrExpr,
     Reference,
     StateRef,
+    VarRef,
 )
 from acp_compiler.acp_parser import ACPParseError, parse_acp
 
@@ -34,8 +34,13 @@ class TestBasicParsing:
         content = """
         acp { version = "0.1" project = "test" }
 
+        variable "openai_api_key" {
+            type = string
+            sensitive = true
+        }
+
         provider "llm.openai" "default" {
-            api_key = env("OPENAI_API_KEY")
+            api_key = var.openai_api_key
         }
         """
         result = parse_acp(content)
@@ -47,8 +52,8 @@ class TestBasicParsing:
         assert provider.full_name == "llm.openai.default"
 
         api_key = provider.get_attribute("api_key")
-        assert isinstance(api_key, EnvCall)
-        assert api_key.var_name == "OPENAI_API_KEY"
+        assert isinstance(api_key, VarRef)
+        assert api_key.var_name == "openai_api_key"
 
     def test_parse_model_block(self) -> None:
         """Test parsing a model block."""
@@ -250,20 +255,25 @@ class TestValueParsing:
         assert isinstance(model_ref, Reference)
         assert model_ref.parts == ["model", "gpt4"]
 
-    def test_parse_env_call(self) -> None:
-        """Test parsing env() function calls."""
+    def test_parse_var_ref(self) -> None:
+        """Test parsing variable references."""
         content = """
         acp { version = "0.1" project = "test" }
 
+        variable "anthropic_api_key" {
+            type = string
+            sensitive = true
+        }
+
         provider "llm.anthropic" "default" {
-            api_key = env("ANTHROPIC_API_KEY")
+            api_key = var.anthropic_api_key
         }
         """
         result = parse_acp(content)
         provider = result.providers[0]
         api_key = provider.get_attribute("api_key")
-        assert isinstance(api_key, EnvCall)
-        assert api_key.var_name == "ANTHROPIC_API_KEY"
+        assert isinstance(api_key, VarRef)
+        assert api_key.var_name == "anthropic_api_key"
 
 
 class TestNestedBlocks:
@@ -380,8 +390,13 @@ class TestFullExample:
             project = "models-demo"
         }
 
+        variable "openai_api_key" {
+            type = string
+            sensitive = true
+        }
+
         provider "llm.openai" "default" {
-            api_key = env("OPENAI_API_KEY")
+            api_key = var.openai_api_key
         }
 
         policy "default" {
@@ -434,11 +449,103 @@ class TestFullExample:
         assert result.acp.version == "0.2"
         assert result.acp.project == "models-demo"
 
+        assert len(result.variables) == 1
         assert len(result.providers) == 1
         assert len(result.policies) == 1
         assert len(result.models) == 2
         assert len(result.agents) == 1
         assert len(result.workflows) == 1
+
+
+class TestVariableParsing:
+    """Test parsing of variable blocks."""
+
+    def test_parse_variable_block(self) -> None:
+        """Test parsing a variable block."""
+        content = """
+        acp { version = "0.1" project = "test" }
+
+        variable "api_key" {
+            type = string
+            description = "The API key"
+            sensitive = true
+        }
+        """
+        result = parse_acp(content)
+
+        assert len(result.variables) == 1
+        var = result.variables[0]
+        assert var.name == "api_key"
+        assert var.var_type == "string"
+        assert var.description == "The API key"
+        assert var.sensitive is True
+
+    def test_parse_variable_with_default(self) -> None:
+        """Test parsing a variable with default value."""
+        content = """
+        acp { version = "0.1" project = "test" }
+
+        variable "temperature" {
+            type = number
+            default = 0.7
+        }
+        """
+        result = parse_acp(content)
+
+        assert len(result.variables) == 1
+        var = result.variables[0]
+        assert var.name == "temperature"
+        assert var.var_type == "number"
+        assert var.default == 0.7
+        assert var.sensitive is False
+
+    def test_parse_multiple_variables(self) -> None:
+        """Test parsing multiple variable blocks."""
+        content = """
+        acp { version = "0.1" project = "test" }
+
+        variable "openai_api_key" {
+            type = string
+            sensitive = true
+        }
+
+        variable "anthropic_api_key" {
+            type = string
+            sensitive = true
+        }
+
+        variable "max_tokens" {
+            type = number
+            default = 2000
+        }
+        """
+        result = parse_acp(content)
+
+        assert len(result.variables) == 3
+        assert result.variables[0].name == "openai_api_key"
+        assert result.variables[1].name == "anthropic_api_key"
+        assert result.variables[2].name == "max_tokens"
+
+    def test_parse_var_ref(self) -> None:
+        """Test parsing variable references in attributes."""
+        content = """
+        acp { version = "0.1" project = "test" }
+
+        variable "api_key" {
+            type = string
+            sensitive = true
+        }
+
+        provider "llm.openai" "default" {
+            api_key = var.api_key
+        }
+        """
+        result = parse_acp(content)
+
+        provider = result.providers[0]
+        api_key = provider.get_attribute("api_key")
+        assert isinstance(api_key, VarRef)
+        assert api_key.var_name == "api_key"
 
 
 class TestConditionalExpressions:

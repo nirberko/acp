@@ -24,8 +24,13 @@ class TestCompileACP:
         content = """
         acp { version = "0.1" project = "test" }
 
+        variable "openai_api_key" {
+            type = string
+            sensitive = true
+        }
+
         provider "llm.openai" "default" {
-            api_key = env("OPENAI_API_KEY")
+            api_key = var.openai_api_key
         }
 
         model "gpt4" {
@@ -48,18 +53,18 @@ class TestCompileACP:
             step "end" { type = "end" }
         }
         """
-        # Set env var for test
-        os.environ["OPENAI_API_KEY"] = "test-key"
-        try:
-            compiled = compile_acp(content, check_env=False, resolve_credentials=False)
+        compiled = compile_acp(
+            content,
+            check_env=False,
+            resolve_credentials=False,
+            variables={"openai_api_key": "test-key"},
+        )
 
-            assert compiled.version == "0.1"
-            assert compiled.project_name == "test"
-            assert "openai" in compiled.providers
-            assert "assistant" in compiled.agents
-            assert "ask" in compiled.workflows
-        finally:
-            del os.environ["OPENAI_API_KEY"]
+        assert compiled.version == "0.1"
+        assert compiled.project_name == "test"
+        assert "openai" in compiled.providers
+        assert "assistant" in compiled.agents
+        assert "ask" in compiled.workflows
 
     def test_compile_error_on_invalid_acp(self) -> None:
         """Test that invalid ACP raises CompilationError."""
@@ -85,8 +90,13 @@ class TestCompileACPFile:
         content = """
         acp { version = "0.1" project = "file-test" }
 
+        variable "openai_api_key" {
+            type = string
+            sensitive = true
+        }
+
         provider "llm.openai" "default" {
-            api_key = env("OPENAI_API_KEY")
+            api_key = var.openai_api_key
         }
 
         model "gpt4" {
@@ -109,7 +119,12 @@ class TestCompileACPFile:
             f.flush()
 
             try:
-                compiled = compile_acp_file(f.name, check_env=False, resolve_credentials=False)
+                compiled = compile_acp_file(
+                    f.name,
+                    check_env=False,
+                    resolve_credentials=False,
+                    variables={"openai_api_key": "test-key"},
+                )
                 assert compiled.project_name == "file-test"
             finally:
                 Path(f.name).unlink()
@@ -130,8 +145,13 @@ class TestValidateACPFile:
         content = """
         acp { version = "0.1" project = "test" }
 
+        variable "openai_api_key" {
+            type = string
+            sensitive = true
+        }
+
         provider "llm.openai" "default" {
-            api_key = env("OPENAI_API_KEY")
+            api_key = var.openai_api_key
         }
 
         model "gpt4" {
@@ -154,7 +174,11 @@ class TestValidateACPFile:
             f.flush()
 
             try:
-                result = validate_acp_file(f.name, check_env=False)
+                result = validate_acp_file(
+                    f.name,
+                    check_env=False,
+                    variables={"openai_api_key": "test-key"},
+                )
                 assert result.is_valid
             finally:
                 Path(f.name).unlink()
@@ -188,8 +212,13 @@ class TestUnifiedCompileFile:
         content = """
         acp { version = "0.1" project = "acp-test" }
 
+        variable "openai_api_key" {
+            type = string
+            sensitive = true
+        }
+
         provider "llm.openai" "default" {
-            api_key = env("OPENAI_API_KEY")
+            api_key = var.openai_api_key
         }
 
         model "gpt4" {
@@ -212,7 +241,12 @@ class TestUnifiedCompileFile:
             f.flush()
 
             try:
-                compiled = compile_file(f.name, check_env=False, resolve_credentials=False)
+                compiled = compile_file(
+                    f.name,
+                    check_env=False,
+                    resolve_credentials=False,
+                    variables={"openai_api_key": "test-key"},
+                )
                 assert compiled.project_name == "acp-test"
             finally:
                 Path(f.name).unlink()
@@ -260,8 +294,13 @@ class TestUnifiedValidateFile:
         content = """
         acp { version = "0.1" project = "test" }
 
+        variable "openai_api_key" {
+            type = string
+            sensitive = true
+        }
+
         provider "llm.openai" "default" {
-            api_key = env("OPENAI_API_KEY")
+            api_key = var.openai_api_key
         }
 
         model "gpt4" {
@@ -284,7 +323,11 @@ class TestUnifiedValidateFile:
             f.flush()
 
             try:
-                result = validate_file(f.name, check_env=False)
+                result = validate_file(
+                    f.name,
+                    check_env=False,
+                    variables={"openai_api_key": "test-key"},
+                )
                 assert result.is_valid
             finally:
                 Path(f.name).unlink()
@@ -316,8 +359,13 @@ class TestIROutput:
         content = """
         acp { version = "0.2" project = "ir-test" }
 
+        variable "openai_api_key" {
+            type = string
+            sensitive = true
+        }
+
         provider "llm.openai" "default" {
-            api_key = env("OPENAI_API_KEY")
+            api_key = var.openai_api_key
         }
 
         policy "default" {
@@ -350,7 +398,12 @@ class TestIROutput:
             step "end" { type = "end" }
         }
         """
-        compiled = compile_acp(content, check_env=False, resolve_credentials=False)
+        compiled = compile_acp(
+            content,
+            check_env=False,
+            resolve_credentials=False,
+            variables={"openai_api_key": "test-key"},
+        )
 
         # Check structure
         assert compiled.version == "0.2"

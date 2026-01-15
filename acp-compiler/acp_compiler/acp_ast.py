@@ -32,10 +32,16 @@ class ASTNode(BaseModel):
     location: SourceLocation | None = None
 
 
-class EnvCall(ASTNode):
-    """Environment variable reference: env("VAR_NAME")."""
+class VarRef(ASTNode):
+    """Variable reference: var.variable_name.
+
+    Used to reference declared variables in the specification.
+    """
 
     var_name: str
+
+    def __str__(self) -> str:
+        return f"var.{self.var_name}"
 
 
 class Reference(ASTNode):
@@ -125,7 +131,7 @@ Value = (
     | int
     | float
     | bool
-    | EnvCall
+    | VarRef
     | Reference
     | StateRef
     | ComparisonExpr
@@ -170,6 +176,28 @@ class NestedBlock(ASTNode):
         return {attr.name: attr.value for attr in self.attributes}
 
 
+class VariableBlock(ASTNode):
+    """Variable declaration block.
+
+    variable "openai_api_key" {
+        type        = string
+        description = "OpenAI API key"
+        sensitive   = true
+    }
+
+    variable "temperature" {
+        type    = number
+        default = 0.7
+    }
+    """
+
+    name: str
+    var_type: str | None = None  # string, number, bool, list
+    default: Any | None = None
+    description: str | None = None
+    sensitive: bool = False
+
+
 class ACPBlock(ASTNode):
     """ACP metadata block.
 
@@ -187,7 +215,7 @@ class ProviderBlock(ASTNode):
     """Provider definition block.
 
     provider "llm.openai" "default" {
-        api_key = env("OPENAI_API_KEY")
+        api_key = var.openai_api_key
     }
     """
 
@@ -405,6 +433,7 @@ class ACPFile(ASTNode):
     """
 
     acp: ACPBlock | None = None
+    variables: list[VariableBlock] = Field(default_factory=list)
     providers: list[ProviderBlock] = Field(default_factory=list)
     servers: list[ServerBlock] = Field(default_factory=list)
     capabilities: list[CapabilityBlock] = Field(default_factory=list)
@@ -460,4 +489,11 @@ class ACPFile(ASTNode):
         for capability in self.capabilities:
             if capability.name == name:
                 return capability
+        return None
+
+    def get_variable(self, name: str) -> VariableBlock | None:
+        """Get variable by name."""
+        for variable in self.variables:
+            if variable.name == name:
+                return variable
         return None

@@ -5,6 +5,7 @@ start: block+
 
 // Top-level blocks
 block: acp_block
+     | variable_block
      | provider_block
      | server_block
      | capability_block
@@ -12,6 +13,10 @@ block: acp_block
      | model_block
      | agent_block
      | workflow_block
+
+// Variable block: variable "name" { type = string, default = ..., ... }
+variable_block: "variable" STRING "{" variable_body "}"
+variable_body: attribute*
 
 // ACP metadata block
 acp_block: "acp" "{" acp_body "}"
@@ -82,11 +87,12 @@ value: HEREDOC          -> heredoc_value
      | STRING           -> string_value
      | SIGNED_NUMBER    -> number_value
      | BOOLEAN          -> boolean_value
+     | var_ref          -> var_ref_value
      | reference        -> reference_value
      | state_ref        -> state_ref_value
      | array            -> array_value
-     | env_call         -> env_value
      | "(" expr ")"     -> paren_expr
+     | IDENTIFIER       -> identifier_value
 
 // State reference: $input.field or $state.step.field
 state_ref: STATE_REF
@@ -97,8 +103,8 @@ reference: IDENTIFIER ("." IDENTIFIER)+
 // Array: [ value, value, ... ]
 array: "[" [expr ("," expr)* ","?] "]"
 
-// Environment variable function
-env_call: "env" "(" STRING ")"
+// Variable reference: var.variable_name
+var_ref: "var" "." IDENTIFIER
 
 // Comparison operators
 COMP_OP: "==" | "!=" | "<=" | ">=" | "<" | ">"
