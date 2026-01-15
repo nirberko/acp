@@ -7,24 +7,12 @@ from rich.console import Console
 from rich.panel import Panel
 
 from acp_compiler import CompilationError, validate_file
-from acp_compiler.parser import ParseError
 
 console = Console()
 
-# Supported file extensions
-ACP_EXTENSIONS = {".acp"}
-YAML_EXTENSIONS = {".yaml", ".yml"}
-
-
-def _get_file_type(path: Path) -> str:
-    """Get file type description for display."""
-    if path.suffix.lower() in ACP_EXTENSIONS:
-        return "ACP"
-    return "YAML"
-
 
 def validate(
-    spec_file: Path = typer.Argument(help="Path to the specification file (.acp, .yaml, or .yml)"),
+    spec_file: Path = typer.Argument(help="Path to the .acp specification file"),
     check_env: bool = typer.Option(
         True,
         "--check-env",
@@ -38,9 +26,6 @@ def validate(
 ) -> None:
     """Validate an ACP specification file.
 
-    Supports both .acp (native schema) and .yaml/.yml (YAML) formats.
-    Auto-detects format based on file extension.
-
     This performs:
     - Syntax validation
     - Schema validation (Pydantic)
@@ -52,23 +37,19 @@ def validate(
     # Handle the two flags
     should_check_env = check_env and not no_check_env
 
-    file_type = _get_file_type(spec_file)
-    console.print(f"\n[bold]Validating ({file_type}):[/bold] {spec_file}\n")
+    console.print(f"\n[bold]Validating:[/bold] {spec_file}\n")
 
     # Check file exists
     if not spec_file.exists():
         console.print(f"[red]✗[/red] File not found: {spec_file}")
         raise typer.Exit(1)
 
-    # Validate using unified function
+    # Validate
     try:
         result = validate_file(spec_file, check_env=should_check_env)
-        console.print(f"[green]✓[/green] {file_type} syntax valid")
+        console.print("[green]✓[/green] ACP syntax valid")
         console.print("[green]✓[/green] Schema validation passed")
     except CompilationError as e:
-        console.print(f"[red]✗[/red] Parse error:\n{e}")
-        raise typer.Exit(1) from None
-    except ParseError as e:
         console.print(f"[red]✗[/red] Parse error:\n{e}")
         raise typer.Exit(1) from None
 
@@ -91,6 +72,7 @@ def validate(
         # Print summary by compiling and inspecting the spec
         try:
             from acp_compiler import compile_file
+            from rich.panel import Panel
 
             compiled = compile_file(spec_file, check_env=False, resolve_credentials=False)
 
@@ -107,8 +89,6 @@ def validate(
                 summary.append(f"Workflows: {len(compiled.workflows)}")
 
             if summary:
-                from rich.panel import Panel
-
                 console.print(Panel("\n".join(summary), title="Specification Summary"))
         except Exception:
             # If compilation fails for any reason, just skip the summary

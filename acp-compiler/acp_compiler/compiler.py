@@ -3,7 +3,6 @@
 from pathlib import Path
 
 from acp_compiler.ir_generator import generate_ir
-from acp_compiler.parser import ParseError, parse_yaml, parse_yaml_file
 from acp_compiler.validator import ValidationResult, validate_spec
 from acp_schema.ir import CompiledSpec
 from acp_schema.models import SpecRoot
@@ -19,114 +18,11 @@ class CompilationError(Exception):
 
 # File extension detection
 ACP_EXTENSIONS = {".acp"}
-YAML_EXTENSIONS = {".yaml", ".yml"}
 
 
 def _is_acp_file(path: Path) -> bool:
     """Check if a file is an ACP native schema file."""
     return path.suffix.lower() in ACP_EXTENSIONS
-
-
-def _is_yaml_file(path: Path) -> bool:
-    """Check if a file is a YAML file."""
-    return path.suffix.lower() in YAML_EXTENSIONS
-
-
-def compile_spec(
-    content: str,
-    check_env: bool = True,
-    resolve_credentials: bool = True,
-) -> CompiledSpec:
-    """Compile YAML content to IR.
-
-    Args:
-        content: YAML string content
-        check_env: Whether to check env vars exist during validation
-        resolve_credentials: Whether to resolve credentials to actual values
-
-    Returns:
-        Compiled specification (IR)
-
-    Raises:
-        CompilationError: If compilation fails
-    """
-    # Parse
-    try:
-        spec = parse_yaml(content)
-    except ParseError as e:
-        raise CompilationError(f"Parse error: {e}") from e
-
-    # Validate
-    result = validate_spec(spec, check_env=check_env)
-    if not result.is_valid:
-        errors_str = "\n".join(f"  - {e.path}: {e.message}" for e in result.errors)
-        raise CompilationError(f"Validation failed:\n{errors_str}", result)
-
-    # Generate IR
-    return generate_ir(spec, resolve_credentials=resolve_credentials)
-
-
-def compile_spec_file(
-    path: str | Path,
-    check_env: bool = True,
-    resolve_credentials: bool = True,
-) -> CompiledSpec:
-    """Compile a YAML file to IR.
-
-    Args:
-        path: Path to YAML file
-        check_env: Whether to check env vars exist during validation
-        resolve_credentials: Whether to resolve credentials to actual values
-
-    Returns:
-        Compiled specification (IR)
-
-    Raises:
-        CompilationError: If compilation fails
-    """
-    # Parse
-    try:
-        spec = parse_yaml_file(path)
-    except ParseError as e:
-        raise CompilationError(f"Parse error: {e}") from e
-
-    # Validate
-    result = validate_spec(spec, check_env=check_env)
-    if not result.is_valid:
-        errors_str = "\n".join(f"  - {e.path}: {e.message}" for e in result.errors)
-        raise CompilationError(f"Validation failed:\n{errors_str}", result)
-
-    # Generate IR
-    return generate_ir(spec, resolve_credentials=resolve_credentials)
-
-
-def validate_spec_file(path: str | Path, check_env: bool = True) -> ValidationResult:
-    """Validate a YAML file without full compilation.
-
-    This is faster than compile_spec_file as it doesn't generate IR
-    or connect to MCP servers.
-
-    Args:
-        path: Path to YAML file
-        check_env: Whether to check env vars exist
-
-    Returns:
-        ValidationResult with errors and warnings
-
-    Raises:
-        CompilationError: If parsing fails
-    """
-    try:
-        spec = parse_yaml_file(path)
-    except ParseError as e:
-        raise CompilationError(f"Parse error: {e}") from e
-
-    return validate_spec(spec, check_env=check_env)
-
-
-# ============================================================================
-# ACP Native Schema Support
-# ============================================================================
 
 
 def parse_acp_to_spec(content: str, file_path: str | None = None) -> SpecRoot:
@@ -309,7 +205,7 @@ def validate_acp_file(path: str | Path, check_env: bool = True) -> ValidationRes
 
 
 # ============================================================================
-# Unified Interface (Auto-detect file format)
+# Unified Interface
 # ============================================================================
 
 
@@ -318,12 +214,10 @@ def compile_file(
     check_env: bool = True,
     resolve_credentials: bool = True,
 ) -> CompiledSpec:
-    """Compile a spec file to IR, auto-detecting format by extension.
-
-    Supports both .acp (native schema) and .yaml/.yml (YAML) files.
+    """Compile an ACP file to IR.
 
     Args:
-        path: Path to spec file
+        path: Path to .acp spec file
         check_env: Whether to check env vars exist during validation
         resolve_credentials: Whether to resolve credentials to actual values
 
@@ -335,24 +229,20 @@ def compile_file(
     """
     path = Path(path)
 
-    if _is_acp_file(path):
-        return compile_acp_file(path, check_env, resolve_credentials)
-    elif _is_yaml_file(path):
-        return compile_spec_file(path, check_env, resolve_credentials)
-    else:
+    if not _is_acp_file(path):
         raise CompilationError(
-            f"Unknown file extension: {path.suffix}. "
-            f"Supported: {', '.join(ACP_EXTENSIONS | YAML_EXTENSIONS)}"
+            f"Expected .acp file, got: {path.suffix}. "
+            f"Only .acp files are supported."
         )
+
+    return compile_acp_file(path, check_env, resolve_credentials)
 
 
 def validate_file(path: str | Path, check_env: bool = True) -> ValidationResult:
-    """Validate a spec file, auto-detecting format by extension.
-
-    Supports both .acp (native schema) and .yaml/.yml (YAML) files.
+    """Validate an ACP file.
 
     Args:
-        path: Path to spec file
+        path: Path to .acp spec file
         check_env: Whether to check env vars exist
 
     Returns:
@@ -363,12 +253,10 @@ def validate_file(path: str | Path, check_env: bool = True) -> ValidationResult:
     """
     path = Path(path)
 
-    if _is_acp_file(path):
-        return validate_acp_file(path, check_env)
-    elif _is_yaml_file(path):
-        return validate_spec_file(path, check_env)
-    else:
+    if not _is_acp_file(path):
         raise CompilationError(
-            f"Unknown file extension: {path.suffix}. "
-            f"Supported: {', '.join(ACP_EXTENSIONS | YAML_EXTENSIONS)}"
+            f"Expected .acp file, got: {path.suffix}. "
+            f"Only .acp files are supported."
         )
+
+    return validate_acp_file(path, check_env)

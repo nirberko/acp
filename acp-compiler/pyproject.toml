@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "acp-compiler"
 version = "0.0.1"
-description = "YAML compilation and validation for ACP"
+description = "ACP native schema compilation and validation"
 authors = ["ACP Team"]
 readme = "README.md"
 license = "MIT"

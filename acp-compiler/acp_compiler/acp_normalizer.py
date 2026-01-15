@@ -1,8 +1,7 @@
-"""Normalizer that transforms ACP AST to existing SpecRoot format.
+"""Normalizer that transforms ACP AST to SpecRoot format.
 
-This module bridges the new ACP native schema with the existing
-YAML-based infrastructure by converting the parsed AST into
-the same SpecRoot model used by YAML parsing.
+This module converts the parsed ACP AST into the SpecRoot model
+for validation and IR generation.
 """
 
 from typing import Any

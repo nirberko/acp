@@ -12,20 +12,9 @@ from acp_compiler.compiler import CompilationError
 
 console = Console()
 
-# Supported file extensions
-ACP_EXTENSIONS = {".acp"}
-YAML_EXTENSIONS = {".yaml", ".yml"}
-
-
-def _get_file_type(path: Path) -> str:
-    """Get file type description for display."""
-    if path.suffix.lower() in ACP_EXTENSIONS:
-        return "ACP"
-    return "YAML"
-
 
 def compile_cmd(
-    spec_file: Path = typer.Argument(help="Path to the specification file (.acp, .yaml, or .yml)"),
+    spec_file: Path = typer.Argument(help="Path to the .acp specification file"),
     output: Path | None = typer.Option(
         None,
         "--output",
@@ -55,16 +44,12 @@ def compile_cmd(
 ) -> None:
     """Compile an ACP specification to IR (Intermediate Representation).
 
-    Supports both .acp (native schema) and .yaml/.yml (YAML) formats.
-    Auto-detects format based on file extension.
-
     Outputs the compiled IR as JSON, useful for debugging and tooling.
     """
     # Handle the two flags
     should_check_env = check_env and not no_check_env
 
-    file_type = _get_file_type(spec_file)
-    console.print(f"\n[bold]Compiling ({file_type}):[/bold] {spec_file}\n")
+    console.print(f"\n[bold]Compiling:[/bold] {spec_file}\n")
 
     # Check file exists
     if not spec_file.exists():

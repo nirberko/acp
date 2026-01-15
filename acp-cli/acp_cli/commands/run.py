@@ -19,10 +19,6 @@ from acp_schema.ir import ResolvedWorkflow
 
 console = Console()
 
-# Supported file extensions
-ACP_EXTENSIONS = {".acp"}
-YAML_EXTENSIONS = {".yaml", ".yml"}
-
 
 def extract_input_fields(workflow: ResolvedWorkflow) -> set[str]:
     """Extract all $input.field references from a workflow.
@@ -100,13 +96,13 @@ def prompt_for_inputs(required_fields: set[str], existing_input: dict) -> dict:
 def _find_default_spec_file() -> Path:
     """Find the default spec file in current directory.
 
-    Looks for acp.acp first, then acp.yaml, then spec.acp, then spec.yaml.
+    Looks for acp.acp first, then spec.acp.
     """
-    for name in ["acp.acp", "acp.yaml", "spec.acp", "spec.yaml"]:
+    for name in ["acp.acp", "spec.acp"]:
         path = Path(name)
         if path.exists():
             return path
-    return Path("acp.yaml")  # Default fallback
+    return Path("acp.acp")  # Default fallback
 
 
 def run(
@@ -115,7 +111,7 @@ def run(
         None,
         "--spec",
         "-s",
-        help="Path to the specification file (.acp, .yaml, or .yml). Auto-detected if not provided.",
+        help="Path to the .acp specification file. Auto-detected if not provided.",
     ),
     input_data: str | None = typer.Option(
         None,
@@ -150,11 +146,8 @@ def run(
 ) -> None:
     """Run an ACP workflow.
 
-    Supports both .acp (native schema) and .yaml/.yml (YAML) formats.
-    Auto-detects format based on file extension.
-
     This will:
-    1. Compile the specification (auto-detecting format)
+    1. Compile the .acp specification
     2. Connect to MCP servers (if any)
     3. Execute the specified workflow
     4. Output the result
@@ -169,10 +162,8 @@ def run(
 
     logger.info("workflow_run_start", workflow=workflow, spec_file=str(spec_file), verbose=verbose)
 
-    # Determine file type for display
-    file_type = "ACP" if spec_file.suffix.lower() in ACP_EXTENSIONS else "YAML"
     console.print(f"\n[bold]Running workflow:[/bold] {workflow}")
-    console.print(f"[bold]Spec file ({file_type}):[/bold] {spec_file}\n")
+    console.print(f"[bold]Spec file:[/bold] {spec_file}\n")
 
     # Check spec file exists
     if not spec_file.exists():
