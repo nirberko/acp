@@ -1,11 +1,12 @@
 """Tests for ACP YAML parser."""
 
-import pytest
 import tempfile
 from pathlib import Path
 
-from acp_compiler.parser import parse_yaml, parse_yaml_file, ParseError
-from acp_schema.models import StepType, SideEffect
+import pytest
+
+from acp_compiler.parser import ParseError, parse_yaml, parse_yaml_file
+from acp_schema.models import SideEffect, StepType
 
 
 class TestParseYaml:
@@ -94,30 +95,30 @@ workflows:
         type: end
 """
         spec = parse_yaml(yaml_content)
-        
+
         assert spec.project.name == "full-project"
         assert "openai" in spec.providers.llm
         assert spec.providers.llm["openai"].api_key == "env:OPENAI_API_KEY"
         assert spec.providers.llm["openai"].default_params.temperature == 0.7
-        
+
         assert len(spec.servers) == 1
         assert spec.servers[0].name == "filesystem"
-        
+
         assert len(spec.capabilities) == 2
         assert spec.capabilities[0].name == "read_file"
         assert spec.capabilities[0].side_effect == SideEffect.READ
         assert spec.capabilities[1].side_effect == SideEffect.WRITE
         assert spec.capabilities[1].requires_approval is True
-        
+
         assert len(spec.policies) == 1
         assert spec.policies[0].budgets.timeout_seconds == 60
-        
+
         assert len(spec.agents) == 1
         assert spec.agents[0].name == "assistant"
         assert spec.agents[0].model.preference == "gpt-4o-mini"
         assert spec.agents[0].model.fallback == "gpt-4o"
         assert len(spec.agents[0].allow) == 2
-        
+
         assert len(spec.workflows) == 1
         assert spec.workflows[0].name == "main"
         assert spec.workflows[0].entry == "start"
@@ -210,7 +211,7 @@ workflows:
 """
         spec = parse_yaml(yaml_content)
         workflow = spec.workflows[0]
-        
+
         condition_step = next(s for s in workflow.steps if s.id == "decide")
         assert condition_step.type == StepType.CONDITION
         assert condition_step.condition == "$state.result == 'yes'"
@@ -240,7 +241,7 @@ workflows:
 """
         spec = parse_yaml(yaml_content)
         workflow = spec.workflows[0]
-        
+
         approval_step = workflow.steps[0]
         assert approval_step.type == StepType.HUMAN_APPROVAL
         assert approval_step.payload == "$input.data"
@@ -258,15 +259,13 @@ version: "0.1"
 project:
   name: file-test
 """
-        with tempfile.NamedTemporaryFile(
-            mode="w", suffix=".yaml", delete=False
-        ) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
             f.write(yaml_content)
             f.flush()
-            
+
             spec = parse_yaml_file(f.name)
             assert spec.project.name == "file-test"
-            
+
             # Cleanup
             Path(f.name).unlink()
 
@@ -283,15 +282,12 @@ version: "0.1"
 project:
   name: path-test
 """
-        with tempfile.NamedTemporaryFile(
-            mode="w", suffix=".yaml", delete=False
-        ) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
             f.write(yaml_content)
             f.flush()
-            
+
             spec = parse_yaml_file(Path(f.name))
             assert spec.project.name == "path-test"
-            
+
             # Cleanup
             Path(f.name).unlink()
-

@@ -1,7 +1,5 @@
 """Tests for MCP protocol types."""
 
-import pytest
-
 from acp_mcp.types import (
     MCPCallToolParams,
     MCPError,
@@ -235,4 +233,3 @@ class TestMCPToolResult:
             ]
         )
         assert len(result.content) == 3
-

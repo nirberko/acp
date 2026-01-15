@@ -1,7 +1,8 @@
 """Tests for policy enforcement."""
 
-import pytest
 import time
+
+import pytest
 
 from acp_runtime.policy import (
     PolicyContext,
@@ -27,10 +28,10 @@ class TestPolicyContext:
         """Test recording capability calls."""
         context = PolicyContext()
         assert context.capability_calls == 0
-        
+
         context.add_capability_call()
         assert context.capability_calls == 1
-        
+
         context.add_capability_call()
         context.add_capability_call()
         assert context.capability_calls == 3
@@ -38,23 +39,23 @@ class TestPolicyContext:
     def test_add_cost(self):
         """Test recording costs."""
         context = PolicyContext()
-        
+
         context.add_cost(0.01)
         assert context.total_cost_usd == 0.01
-        
+
         context.add_cost(0.05)
         assert context.total_cost_usd == pytest.approx(0.06)
 
     def test_add_tokens(self):
         """Test recording token usage."""
         context = PolicyContext()
-        
+
         context.add_tokens("gpt-4", 100)
         assert context.token_usage == {"gpt-4": 100}
-        
+
         context.add_tokens("gpt-4", 50)
         assert context.token_usage == {"gpt-4": 150}
-        
+
         context.add_tokens("gpt-3.5-turbo", 200)
         assert context.token_usage == {"gpt-4": 150, "gpt-3.5-turbo": 200}
 
@@ -62,10 +63,10 @@ class TestPolicyContext:
         """Test elapsed time calculation."""
         context = PolicyContext()
         initial = context.elapsed_seconds
-        
+
         time.sleep(0.1)
         elapsed = context.elapsed_seconds
-        
+
         assert elapsed >= 0.1
         assert elapsed > initial
 
@@ -76,7 +77,7 @@ class TestPolicyViolation:
     def test_violation_message(self):
         """Test violation message format."""
         exc = PolicyViolation("default", "timeout_seconds", "Timed out")
-        
+
         assert exc.policy_name == "default"
         assert exc.constraint == "timeout_seconds"
         assert "default" in str(exc)
@@ -115,7 +116,7 @@ class TestPolicyEnforcer:
         """Test starting a policy context."""
         enforcer = PolicyEnforcer(policies)
         context = enforcer.start_context("ctx-1")
-        
+
         assert isinstance(context, PolicyContext)
         assert "ctx-1" in enforcer._contexts
 
@@ -123,10 +124,10 @@ class TestPolicyEnforcer:
         """Test getting existing context."""
         enforcer = PolicyEnforcer(policies)
         enforcer.start_context("ctx-1")
-        
+
         context = enforcer.get_context("ctx-1")
         assert context is not None
-        
+
         missing = enforcer.get_context("missing")
         assert missing is None
 
@@ -134,10 +135,10 @@ class TestPolicyEnforcer:
         """Test ending a context."""
         enforcer = PolicyEnforcer(policies)
         enforcer.start_context("ctx-1")
-        
+
         enforcer.end_context("ctx-1")
         assert enforcer.get_context("ctx-1") is None
-        
+
         # Should not raise for missing context
         enforcer.end_context("missing")
 
@@ -145,7 +146,7 @@ class TestPolicyEnforcer:
         """Test check passes when no policy specified."""
         enforcer = PolicyEnforcer(policies)
         enforcer.start_context("ctx-1")
-        
+
         # Should not raise
         enforcer.check_before_capability_call("ctx-1", None)
 
@@ -154,7 +155,7 @@ class TestPolicyEnforcer:
         enforcer = PolicyEnforcer(policies)
         context = enforcer.start_context("ctx-1")
         context.capability_calls = 5  # Under limit of 10
-        
+
         # Should not raise
         enforcer.check_before_capability_call("ctx-1", "strict")
 
@@ -163,10 +164,10 @@ class TestPolicyEnforcer:
         enforcer = PolicyEnforcer(policies)
         context = enforcer.start_context("ctx-1")
         context.capability_calls = 10  # At limit
-        
+
         with pytest.raises(PolicyViolation) as exc_info:
             enforcer.check_before_capability_call("ctx-1", "strict")
-        
+
         assert exc_info.value.constraint == "max_capability_calls"
         assert "10" in str(exc_info.value)
 
@@ -175,7 +176,7 @@ class TestPolicyEnforcer:
         enforcer = PolicyEnforcer(policies)
         context = enforcer.start_context("ctx-1")
         context.capability_calls = 1000
-        
+
         # Should not raise
         enforcer.check_before_capability_call("ctx-1", "unlimited")
 
@@ -183,7 +184,7 @@ class TestPolicyEnforcer:
         """Test check passes for unknown policy."""
         enforcer = PolicyEnforcer(policies)
         enforcer.start_context("ctx-1")
-        
+
         # Should not raise for unknown policy
         enforcer.check_before_capability_call("ctx-1", "nonexistent")
 
@@ -191,7 +192,7 @@ class TestPolicyEnforcer:
         """Test recording capability calls."""
         enforcer = PolicyEnforcer(policies)
         context = enforcer.start_context("ctx-1")
-        
+
         assert context.capability_calls == 0
         enforcer.record_capability_call("ctx-1")
         assert context.capability_calls == 1
@@ -208,7 +209,7 @@ class TestPolicyEnforcer:
         """Test check cost passes within budget."""
         enforcer = PolicyEnforcer(policies)
         enforcer.start_context("ctx-1")
-        
+
         # Should not raise
         enforcer.check_cost("ctx-1", "strict", 0.50)
 
@@ -216,19 +217,19 @@ class TestPolicyEnforcer:
         """Test check cost raises when exceeding budget."""
         enforcer = PolicyEnforcer(policies)
         enforcer.start_context("ctx-1")
-        
+
         enforcer.check_cost("ctx-1", "strict", 0.60)  # First call OK
-        
+
         with pytest.raises(PolicyViolation) as exc_info:
             enforcer.check_cost("ctx-1", "strict", 0.50)  # Total 1.10 > 1.00
-        
+
         assert exc_info.value.constraint == "max_cost_usd_per_run"
 
     def test_check_cost_no_policy(self, policies):
         """Test check cost passes with no policy."""
         enforcer = PolicyEnforcer(policies)
         enforcer.start_context("ctx-1")
-        
+
         # Should not raise and should still record cost
         enforcer.check_cost("ctx-1", None, 100.00)
         assert enforcer.get_context("ctx-1").total_cost_usd == 100.00
@@ -237,7 +238,7 @@ class TestPolicyEnforcer:
         """Test check timeout passes within limit."""
         enforcer = PolicyEnforcer(policies)
         enforcer.start_context("ctx-1")
-        
+
         # Should not raise (just started)
         enforcer.check_timeout("ctx-1", "strict")
 
@@ -245,13 +246,13 @@ class TestPolicyEnforcer:
         """Test check timeout raises when exceeded."""
         enforcer = PolicyEnforcer(policies)
         context = enforcer.start_context("ctx-1")
-        
+
         # Simulate timeout by adjusting start time
         context.start_time = time.time() - 61  # 61 seconds ago
-        
+
         with pytest.raises(PolicyViolation) as exc_info:
             enforcer.check_timeout("ctx-1", "strict")
-        
+
         assert exc_info.value.constraint == "timeout_seconds"
 
     def test_check_timeout_no_policy(self, policies):
@@ -259,7 +260,7 @@ class TestPolicyEnforcer:
         enforcer = PolicyEnforcer(policies)
         context = enforcer.start_context("ctx-1")
         context.start_time = time.time() - 1000
-        
+
         # Should not raise
         enforcer.check_timeout("ctx-1", None)
 
@@ -272,17 +273,16 @@ class TestPolicyEnforcer:
     def test_multiple_contexts(self, policies):
         """Test managing multiple contexts."""
         enforcer = PolicyEnforcer(policies)
-        
+
         ctx1 = enforcer.start_context("ctx-1")
         ctx2 = enforcer.start_context("ctx-2")
-        
+
         ctx1.capability_calls = 5
         ctx2.capability_calls = 8
-        
+
         assert enforcer.get_context("ctx-1").capability_calls == 5
         assert enforcer.get_context("ctx-2").capability_calls == 8
-        
+
         enforcer.end_context("ctx-1")
         assert enforcer.get_context("ctx-1") is None
         assert enforcer.get_context("ctx-2").capability_calls == 8
-

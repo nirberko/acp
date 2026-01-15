@@ -164,4 +164,3 @@ class SpecRoot(BaseModel):
     policies: list[PolicyConfig] = Field(default_factory=list)
     agents: list[AgentConfig] = Field(default_factory=list)
     workflows: list[WorkflowConfig] = Field(default_factory=list)
-

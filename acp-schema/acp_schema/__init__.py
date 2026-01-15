@@ -17,16 +17,15 @@ from acp_schema.version import VERSION
 
 __all__ = [
     "VERSION",
-    "SpecRoot",
+    "AgentConfig",
+    "CapabilityConfig",
+    "LLMProviderConfig",
+    "PolicyConfig",
     "ProjectConfig",
     "ProvidersConfig",
-    "LLMProviderConfig",
-    "ServerConfig",
     "ServerAuthConfig",
-    "CapabilityConfig",
-    "PolicyConfig",
-    "AgentConfig",
+    "ServerConfig",
+    "SpecRoot",
     "WorkflowConfig",
     "WorkflowStep",
 ]
-

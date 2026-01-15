@@ -3,11 +3,11 @@
 from typing import Any
 
 from langchain_anthropic import ChatAnthropic
-from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
 
-from acp_schema.ir import ResolvedAgent, ResolvedProvider
 from acp_runtime.logging_config import get_logger
+from acp_schema.ir import ResolvedAgent, ResolvedProvider
 
 
 class LLMError(Exception):
@@ -61,7 +61,7 @@ class LLMExecutor:
             raise LLMError(f"API key for provider '{provider_name}' not resolved")
 
         # Build params
-        llm_params = {
+        llm_params: dict[str, Any] = {
             "model": model,
             "api_key": api_key,
         }
@@ -72,6 +72,7 @@ class LLMExecutor:
             llm_params["max_tokens"] = params["max_tokens"]
 
         # Create LLM based on provider
+        llm: ChatOpenAI | ChatAnthropic
         if provider_name == "openai":
             llm = ChatOpenAI(**llm_params)
         elif provider_name == "anthropic":
@@ -102,7 +103,7 @@ class LLMExecutor:
         """
         self._logger.info(
             "llm_execution_start",
-            agent_name=agent.name if hasattr(agent, 'name') else "unknown",
+            agent_name=agent.name if hasattr(agent, "name") else "unknown",
             provider=agent.provider_name,
             model_preference=agent.model_preference,
             model_fallback=agent.model_fallback,
@@ -133,10 +134,12 @@ class LLMExecutor:
                 llm = self._get_llm(agent.provider_name, model, params)
 
                 # Build messages
-                messages = []
+                messages: list[BaseMessage] = []
                 if agent.instructions:
                     messages.append(SystemMessage(content=agent.instructions))
-                    self._logger.debug("llm_system_message_added", instruction_length=len(agent.instructions))
+                    self._logger.debug(
+                        "llm_system_message_added", instruction_length=len(agent.instructions)
+                    )
 
                 # Format input as user message
                 if input_data:
@@ -152,7 +155,11 @@ class LLMExecutor:
                 # Execute
                 self._logger.debug("llm_invoke_start", model=model, message_count=len(messages))
                 response = await llm.ainvoke(messages)
-                self._logger.debug("llm_invoke_complete", model=model, response_length=len(response.content) if response.content else 0)
+                self._logger.debug(
+                    "llm_invoke_complete",
+                    model=model,
+                    response_length=len(response.content) if response.content else 0,
+                )
 
                 usage = getattr(response, "usage_metadata", None)
                 result = {
@@ -190,4 +197,3 @@ class LLMExecutor:
             last_error_type=type(last_error).__name__ if last_error else None,
         )
         raise LLMError(f"All models failed. Last error: {last_error}")
-

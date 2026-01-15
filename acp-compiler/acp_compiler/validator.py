@@ -2,9 +2,8 @@
 
 from dataclasses import dataclass, field
 
-from acp_schema.models import SpecRoot, StepType
-
 from acp_compiler.credentials import get_env_var_name, is_env_reference
+from acp_schema.models import SpecRoot, StepType
 
 
 @dataclass
@@ -58,7 +57,6 @@ def validate_spec(spec: SpecRoot, check_env: bool = True) -> ValidationResult:
     capability_names = {c.name for c in spec.capabilities}
     policy_names = {p.name for p in spec.policies}
     agent_names = {a.name for a in spec.agents}
-    workflow_names = {w.name for w in spec.workflows}
     provider_names = set(spec.providers.llm.keys())
 
     # Collect env var references
@@ -78,9 +76,8 @@ def validate_spec(spec: SpecRoot, check_env: bool = True) -> ValidationResult:
     # Validate servers
     for i, server in enumerate(spec.servers):
         path = f"servers[{i}]"
-        if server.auth and server.auth.token:
-            if is_env_reference(server.auth.token):
-                env_refs.append((f"{path}.auth.token", server.auth.token))
+        if server.auth and server.auth.token and is_env_reference(server.auth.token):
+            env_refs.append((f"{path}.auth.token", server.auth.token))
 
     # Validate capabilities
     for i, cap in enumerate(spec.capabilities):
@@ -204,4 +201,3 @@ def validate_spec(spec: SpecRoot, check_env: bool = True) -> ValidationResult:
                 )
 
     return result
-

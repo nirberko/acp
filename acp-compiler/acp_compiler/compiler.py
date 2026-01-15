@@ -2,12 +2,10 @@
 
 from pathlib import Path
 
-from acp_schema.ir import CompiledSpec
-from acp_schema.models import SpecRoot
-
 from acp_compiler.ir_generator import generate_ir
-from acp_compiler.parser import parse_yaml, parse_yaml_file, ParseError
-from acp_compiler.validator import validate_spec, ValidationResult
+from acp_compiler.parser import ParseError, parse_yaml, parse_yaml_file
+from acp_compiler.validator import ValidationResult, validate_spec
+from acp_schema.ir import CompiledSpec
 
 
 class CompilationError(Exception):
@@ -108,4 +106,3 @@ def validate_spec_file(path: str | Path, check_env: bool = True) -> ValidationRe
         raise CompilationError(f"Parse error: {e}") from e
 
     return validate_spec(spec, check_env=check_env)
-

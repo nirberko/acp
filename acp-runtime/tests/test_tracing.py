@@ -1,7 +1,6 @@
 """Tests for execution tracing."""
 
 import json
-import pytest
 import time
 
 from acp_runtime.tracing import EventType, TraceEvent, Tracer
@@ -76,7 +75,7 @@ class TestTracer:
         """Test emitting basic event."""
         tracer = Tracer("test")
         event = tracer.emit(EventType.STEP_START, step_id="step1")
-        
+
         assert event.type == EventType.STEP_START
         assert event.step_id == "step1"
         assert event.workflow_name == "test"
@@ -91,7 +90,7 @@ class TestTracer:
             step_id="llm",
             data={"model": "gpt-4", "tokens": 50},
         )
-        
+
         assert event.data["model"] == "gpt-4"
         assert event.data["tokens"] == 50
 
@@ -100,7 +99,7 @@ class TestTracer:
         tracer = Tracer("test")
         input_data = {"question": "Hello?"}
         event = tracer.workflow_start(input_data)
-        
+
         assert event.type == EventType.WORKFLOW_START
         assert event.data["input"] == input_data
 
@@ -109,7 +108,7 @@ class TestTracer:
         tracer = Tracer("test")
         output = {"answer": "World!"}
         event = tracer.workflow_end(output)
-        
+
         assert event.type == EventType.WORKFLOW_END
         assert event.data["output"] == output
         assert "duration_seconds" in event.data
@@ -119,7 +118,7 @@ class TestTracer:
         tracer = Tracer("test")
         error = ValueError("Something went wrong")
         event = tracer.workflow_error(error)
-        
+
         assert event.type == EventType.WORKFLOW_ERROR
         assert "Something went wrong" in event.data["error"]
         assert event.data["error_type"] == "ValueError"
@@ -128,7 +127,7 @@ class TestTracer:
         """Test step start event."""
         tracer = Tracer("test")
         event = tracer.step_start("process", "llm")
-        
+
         assert event.type == EventType.STEP_START
         assert event.step_id == "process"
         assert event.data["step_type"] == "llm"
@@ -137,7 +136,7 @@ class TestTracer:
         """Test step end event."""
         tracer = Tracer("test")
         event = tracer.step_end("process", {"result": "success"})
-        
+
         assert event.type == EventType.STEP_END
         assert event.step_id == "process"
         assert event.data["output"] == {"result": "success"}
@@ -147,7 +146,7 @@ class TestTracer:
         tracer = Tracer("test")
         error = RuntimeError("Step failed")
         event = tracer.step_error("process", error)
-        
+
         assert event.type == EventType.STEP_ERROR
         assert event.step_id == "process"
         assert "Step failed" in event.data["error"]
@@ -163,7 +162,7 @@ class TestTracer:
             response="Hi there!",
             tokens=25,
         )
-        
+
         assert event.type == EventType.LLM_CALL
         assert event.step_id == "llm"
         assert event.data["model"] == "gpt-4"
@@ -176,14 +175,14 @@ class TestTracer:
         tracer = Tracer("test")
         long_prompt = "x" * 1000
         long_response = "y" * 1000
-        
+
         event = tracer.llm_call(
             step_id="llm",
             model="gpt-4",
             prompt=long_prompt,
             response=long_response,
         )
-        
+
         assert len(event.data["prompt_preview"]) == 500
         assert len(event.data["response_preview"]) == 500
 
@@ -196,7 +195,7 @@ class TestTracer:
             args={"path": "/tmp/test"},
             result="File content",
         )
-        
+
         assert event.type == EventType.CAPABILITY_CALL
         assert event.step_id == "call"
         assert event.data["capability"] == "read_file"
@@ -207,21 +206,21 @@ class TestTracer:
         """Test capability call truncates long results."""
         tracer = Tracer("test")
         long_result = "z" * 1000
-        
+
         event = tracer.capability_call(
             step_id="call",
             capability="read_file",
             args={},
             result=long_result,
         )
-        
+
         assert len(event.data["result_preview"]) == 500
 
     def test_approval_request(self):
         """Test approval request event."""
         tracer = Tracer("test")
         event = tracer.approval_request("approve", {"changes": ["a", "b"]})
-        
+
         assert event.type == EventType.APPROVAL_REQUEST
         assert event.step_id == "approve"
         assert event.data["payload"] == {"changes": ["a", "b"]}
@@ -229,11 +228,11 @@ class TestTracer:
     def test_approval_response(self):
         """Test approval response event."""
         tracer = Tracer("test")
-        
+
         approved = tracer.approval_response("approve", True)
         assert approved.type == EventType.APPROVAL_RESPONSE
         assert approved.data["approved"] is True
-        
+
         rejected = tracer.approval_response("approve", False)
         assert rejected.data["approved"] is False
 
@@ -242,7 +241,7 @@ class TestTracer:
         tracer = Tracer("test")
         tracer.emit(EventType.STEP_START, step_id="s1")
         tracer.emit(EventType.STEP_END, step_id="s1")
-        
+
         assert len(tracer.events) == 2
 
     def test_to_json(self):
@@ -252,14 +251,14 @@ class TestTracer:
         tracer.step_start("step1", "llm")
         tracer.step_end("step1", {"output": "result"})
         tracer.workflow_end({"final": "output"})
-        
+
         json_str = tracer.to_json()
         data = json.loads(json_str)
-        
+
         assert data["trace_id"] == tracer.trace_id
         assert data["workflow_name"] == "test-workflow"
         assert len(data["events"]) == 4
-        
+
         # Check event structure
         event = data["events"][0]
         assert event["type"] == "workflow_start"
@@ -270,7 +269,7 @@ class TestTracer:
         """Test that to_json produces valid JSON."""
         tracer = Tracer("test")
         tracer.emit(EventType.STEP_START)
-        
+
         json_str = tracer.to_json()
         # Should not raise
         parsed = json.loads(json_str)
@@ -280,6 +279,5 @@ class TestTracer:
         """Test multiple tracers have different trace IDs."""
         tracer1 = Tracer("workflow1")
         tracer2 = Tracer("workflow2")
-        
-        assert tracer1.trace_id != tracer2.trace_id
 
+        assert tracer1.trace_id != tracer2.trace_id

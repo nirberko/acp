@@ -1,8 +1,6 @@
 """Tests for ACP specification validator."""
 
-import pytest
-
-from acp_compiler.validator import ValidationError, ValidationResult, validate_spec
+from acp_compiler.validator import ValidationResult, validate_spec
 from acp_schema.models import (
     AgentConfig,
     CapabilityConfig,
@@ -58,16 +56,14 @@ class TestValidateSpec:
     def test_valid_full_spec(self, monkeypatch):
         """Test validating complete valid spec."""
         monkeypatch.setenv("OPENAI_API_KEY", "test-key")
-        
+
         spec = SpecRoot(
             project=ProjectConfig(name="test"),
             providers=ProvidersConfig(
                 llm={"openai": LLMProviderConfig(api_key="env:OPENAI_API_KEY")}
             ),
             servers=[ServerConfig(name="fs", command=["node", "fs-server"])],
-            capabilities=[
-                CapabilityConfig(name="read_file", server="fs", method="readFile")
-            ],
+            capabilities=[CapabilityConfig(name="read_file", server="fs", method="readFile")],
             policies=[PolicyConfig(name="default")],
             agents=[
                 AgentConfig(
@@ -95,7 +91,7 @@ class TestValidateSpec:
                 )
             ],
         )
-        
+
         result = validate_spec(spec, check_env=True)
         assert result.is_valid is True
 
@@ -107,13 +103,10 @@ class TestValidateSpec:
                 llm={"openai": LLMProviderConfig(api_key="sk-hardcoded-key")}
             ),
         )
-        
+
         result = validate_spec(spec, check_env=False)
         assert result.is_valid is False
-        assert any(
-            "environment variable reference" in e.message
-            for e in result.errors
-        )
+        assert any("environment variable reference" in e.message for e in result.errors)
 
     def test_capability_references_unknown_server(self):
         """Test that capability referencing unknown server is rejected."""
@@ -127,7 +120,7 @@ class TestValidateSpec:
                 )
             ],
         )
-        
+
         result = validate_spec(spec, check_env=False)
         assert result.is_valid is False
         assert any("nonexistent" in e.message for e in result.errors)
@@ -145,7 +138,7 @@ class TestValidateSpec:
                 )
             ],
         )
-        
+
         result = validate_spec(spec, check_env=False)
         assert result.is_valid is False
         assert any("nonexistent_provider" in e.message for e in result.errors)
@@ -167,7 +160,7 @@ class TestValidateSpec:
                 )
             ],
         )
-        
+
         result = validate_spec(spec, check_env=False)
         assert result.is_valid is False
         assert any("unknown_policy" in e.message for e in result.errors)
@@ -189,7 +182,7 @@ class TestValidateSpec:
                 )
             ],
         )
-        
+
         result = validate_spec(spec, check_env=False)
         assert result.is_valid is False
         assert any("nonexistent_capability" in e.message for e in result.errors)
@@ -206,7 +199,7 @@ class TestValidateSpec:
                 )
             ],
         )
-        
+
         result = validate_spec(spec, check_env=False)
         assert result.is_valid is False
         assert any("nonexistent" in e.message for e in result.errors)
@@ -229,7 +222,7 @@ class TestValidateSpec:
                 )
             ],
         )
-        
+
         result = validate_spec(spec, check_env=False)
         assert result.is_valid is False
         assert any("nonexistent" in e.message for e in result.errors)
@@ -252,7 +245,7 @@ class TestValidateSpec:
                 )
             ],
         )
-        
+
         result = validate_spec(spec, check_env=False)
         # next="end" is a special case that's always valid
         assert result.is_valid is True
@@ -275,7 +268,7 @@ class TestValidateSpec:
                 )
             ],
         )
-        
+
         result = validate_spec(spec, check_env=False)
         assert result.is_valid is False
         assert any("agent" in e.message.lower() for e in result.errors)
@@ -298,7 +291,7 @@ class TestValidateSpec:
                 )
             ],
         )
-        
+
         result = validate_spec(spec, check_env=False)
         assert result.is_valid is False
         assert any("nonexistent" in e.message for e in result.errors)
@@ -321,7 +314,7 @@ class TestValidateSpec:
                 )
             ],
         )
-        
+
         result = validate_spec(spec, check_env=False)
         assert result.is_valid is False
         assert any("capability" in e.message.lower() for e in result.errors)
@@ -347,7 +340,7 @@ class TestValidateSpec:
                 )
             ],
         )
-        
+
         result = validate_spec(spec, check_env=False)
         assert result.is_valid is False
         assert any("condition" in e.message.lower() for e in result.errors)
@@ -373,7 +366,7 @@ class TestValidateSpec:
                 )
             ],
         )
-        
+
         result = validate_spec(spec, check_env=False)
         assert result.is_valid is False
         assert any("nonexistent" in e.message for e in result.errors)
@@ -397,7 +390,7 @@ class TestValidateSpec:
                 )
             ],
         )
-        
+
         result = validate_spec(spec, check_env=False)
         assert result.is_valid is False
         assert any("unknown1" in e.message for e in result.errors)
@@ -406,14 +399,12 @@ class TestValidateSpec:
     def test_missing_env_var_warning(self, monkeypatch):
         """Test that missing env var generates warning."""
         monkeypatch.delenv("MISSING_KEY", raising=False)
-        
+
         spec = SpecRoot(
             project=ProjectConfig(name="test"),
-            providers=ProvidersConfig(
-                llm={"openai": LLMProviderConfig(api_key="env:MISSING_KEY")}
-            ),
+            providers=ProvidersConfig(llm={"openai": LLMProviderConfig(api_key="env:MISSING_KEY")}),
         )
-        
+
         result = validate_spec(spec, check_env=True)
         assert result.is_valid is True  # Missing env is warning, not error
         assert len(result.warnings) > 0
@@ -422,16 +413,13 @@ class TestValidateSpec:
     def test_env_check_disabled(self, monkeypatch):
         """Test that env check can be disabled."""
         monkeypatch.delenv("MISSING_KEY", raising=False)
-        
+
         spec = SpecRoot(
             project=ProjectConfig(name="test"),
-            providers=ProvidersConfig(
-                llm={"openai": LLMProviderConfig(api_key="env:MISSING_KEY")}
-            ),
+            providers=ProvidersConfig(llm={"openai": LLMProviderConfig(api_key="env:MISSING_KEY")}),
         )
-        
+
         result = validate_spec(spec, check_env=False)
         assert result.is_valid is True
         # No warnings about missing env var when check_env=False
         assert not any("MISSING_KEY" in w.message for w in result.warnings)
-

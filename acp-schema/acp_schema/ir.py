@@ -126,4 +126,3 @@ class CompiledSpec(BaseModel):
     policies: dict[str, ResolvedPolicy] = Field(default_factory=dict)
     agents: dict[str, ResolvedAgent] = Field(default_factory=dict)
     workflows: dict[str, ResolvedWorkflow] = Field(default_factory=dict)
-

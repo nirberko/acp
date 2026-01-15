@@ -3,15 +3,14 @@
 from typing import Any
 
 from acp_mcp import MCPClient
-from acp_schema.ir import CompiledSpec, ResolvedStep
-from acp_schema.models import StepType
-
 from acp_runtime.approval import ApprovalHandler, CLIApprovalHandler
 from acp_runtime.llm import LLMExecutor
 from acp_runtime.logging_config import get_logger
 from acp_runtime.policy import PolicyEnforcer
 from acp_runtime.state import WorkflowState
 from acp_runtime.tracing import Tracer
+from acp_schema.ir import CompiledSpec, ResolvedStep
+from acp_schema.models import StepType
 
 
 class WorkflowError(Exception):
@@ -56,7 +55,9 @@ class WorkflowEngine:
             if server.auth_token and server.auth_token.value:
                 auth_token = server.auth_token.value
             client.add_server(server_name, server.command, auth_token)
-            self._logger.debug("mcp_server_added", server_name=server_name, has_auth=bool(auth_token))
+            self._logger.debug(
+                "mcp_server_added", server_name=server_name, has_auth=bool(auth_token)
+            )
 
         await client.start_all()
         self._mcp_client = client
@@ -115,16 +116,20 @@ class WorkflowEngine:
                 self._logger.debug("no_mcp_servers", workflow_name=workflow_name)
 
             # Execute steps
-            current_step_id = workflow.entry_step
+            current_step_id: str | None = workflow.entry_step
             final_output = None
             step_count = 0
 
-            self._logger.info("workflow_execution_start", workflow_name=workflow_name, entry_step=current_step_id)
+            self._logger.info(
+                "workflow_execution_start", workflow_name=workflow_name, entry_step=current_step_id
+            )
 
             while current_step_id:
                 step = workflow.steps.get(current_step_id)
                 if not step:
-                    self._logger.error("step_not_found", step_id=current_step_id, workflow_name=workflow_name)
+                    self._logger.error(
+                        "step_not_found", step_id=current_step_id, workflow_name=workflow_name
+                    )
                     raise WorkflowError(f"Step '{current_step_id}' not found")
 
                 step_count += 1
@@ -139,9 +144,7 @@ class WorkflowEngine:
                 tracer.step_start(step.id, step.type.value)
 
                 try:
-                    result, next_step = await self._execute_step(
-                        step, state, tracer, context_id
-                    )
+                    result, next_step = await self._execute_step(step, state, tracer, context_id)
 
                     if step.save_as:
                         state.set(step.save_as, result)
@@ -270,8 +273,10 @@ class WorkflowEngine:
         input_data = {}
         if step.input_mapping:
             input_data = state.resolve_dict(step.input_mapping)
-        
-        self._logger.debug("llm_input_resolved", step_id=step.id, input_keys=list(input_data.keys()))
+
+        self._logger.debug(
+            "llm_input_resolved", step_id=step.id, input_keys=list(input_data.keys())
+        )
 
         # Execute LLM
         result = await self._llm_executor.execute(agent, input_data)
@@ -333,7 +338,7 @@ class WorkflowEngine:
         args = {}
         if step.args_mapping:
             args = state.resolve_dict(step.args_mapping)
-        
+
         self._logger.debug("call_args_resolved", step_id=step.id, args_keys=list(args.keys()))
 
         # Check if approval is required
@@ -346,14 +351,21 @@ class WorkflowEngine:
             )
             self._logger.info("approval_result", step_id=step.id, approved=approved)
             if not approved:
-                self._logger.warning("capability_call_skipped", step_id=step.id, reason="not_approved")
+                self._logger.warning(
+                    "capability_call_skipped", step_id=step.id, reason="not_approved"
+                )
                 return {"approved": False, "skipped": True}, step.next_step
 
         # Execute capability
         if not self._mcp_client:
             raise WorkflowError("MCP client not initialized")
 
-        self._logger.debug("mcp_call_start", step_id=step.id, server=capability.server_name, method=capability.method_name)
+        self._logger.debug(
+            "mcp_call_start",
+            step_id=step.id,
+            server=capability.server_name,
+            method=capability.method_name,
+        )
         result = await self._mcp_client.call_tool(
             capability.server_name,
             capability.method_name,
@@ -415,12 +427,14 @@ class WorkflowEngine:
     ) -> tuple[Any, str | None]:
         """Execute a human approval step."""
         self._logger.info("approval_step_start", step_id=step.id)
-        
+
         # Resolve payload
         payload = None
         if step.payload_expr:
             payload = state.resolve(step.payload_expr)
-            self._logger.debug("approval_payload_resolved", step_id=step.id, has_payload=payload is not None)
+            self._logger.debug(
+                "approval_payload_resolved", step_id=step.id, has_payload=payload is not None
+            )
 
         tracer.approval_request(step.id, payload)
 
@@ -435,4 +449,3 @@ class WorkflowEngine:
 
         next_step = step.on_approve_step if approved else step.on_reject_step
         return {"approved": approved}, next_step
-

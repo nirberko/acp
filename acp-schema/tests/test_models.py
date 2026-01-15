@@ -345,4 +345,3 @@ class TestSpecRoot:
         assert len(spec.policies) == 1
         assert len(spec.agents) == 1
         assert len(spec.workflows) == 1
-
