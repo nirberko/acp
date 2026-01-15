@@ -42,16 +42,20 @@ def generate_ir(spec: SpecRoot, resolve_credentials: bool = True) -> CompiledSpe
     providers: dict[str, ResolvedProvider] = {}
     for name, provider in spec.providers.llm.items():
         var_name = get_env_var_name(provider.api_key)
-        if not var_name:
-            raise IRGenerationError(f"Invalid API key format for provider {name}")
 
-        value = None
-        if resolve_credentials:
-            value = resolve_env_var(provider.api_key, required=False)
+        if var_name:
+            # env:VAR_NAME format - resolve from environment
+            value = None
+            if resolve_credentials:
+                value = resolve_env_var(provider.api_key, required=False)
+            api_key = ResolvedCredential(env_var=var_name, value=value)
+        else:
+            # Direct value (from variable substitution)
+            api_key = ResolvedCredential(env_var="DIRECT_VALUE", value=provider.api_key)
 
         providers[name] = ResolvedProvider(
             name=name,
-            api_key=ResolvedCredential(env_var=var_name, value=value),
+            api_key=api_key,
             default_params=provider.default_params or LLMProviderParams(),
         )
 
@@ -62,10 +66,14 @@ def generate_ir(spec: SpecRoot, resolve_credentials: bool = True) -> CompiledSpe
         if server.auth and server.auth.token:
             var_name = get_env_var_name(server.auth.token)
             if var_name:
+                # env:VAR_NAME format
                 value = None
                 if resolve_credentials:
                     value = resolve_env_var(server.auth.token, required=False)
                 auth_token = ResolvedCredential(env_var=var_name, value=value)
+            else:
+                # Direct value (from variable substitution)
+                auth_token = ResolvedCredential(env_var="DIRECT_VALUE", value=server.auth.token)
 
         servers[server.name] = ResolvedServer(
             name=server.name,

@@ -1,10 +1,21 @@
-"""ACP Compiler - YAML compilation and validation for ACP."""
+"""ACP Compiler - Compilation and validation for ACP.
 
+Compiles native ACP schema (.acp) files.
+"""
+
+from acp_compiler.acp_normalizer import NormalizationError, normalize_acp
+
+# ACP native schema support
+from acp_compiler.acp_parser import ACPParseError, parse_acp, parse_acp_file
+from acp_compiler.acp_resolver import ResolutionError, ResolutionResult, resolve_references
+from acp_compiler.acp_validator import ACPValidationError, ACPValidationResult, validate_acp
 from acp_compiler.compiler import (
     CompilationError,
-    compile_spec,
-    compile_spec_file,
-    validate_spec_file,
+    compile_acp,
+    compile_acp_file,
+    compile_file,
+    validate_acp_file,
+    validate_file,
 )
 from acp_compiler.credentials import (
     CredentialError,
@@ -13,24 +24,33 @@ from acp_compiler.credentials import (
     resolve_env_var,
 )
 from acp_compiler.ir_generator import IRGenerationError, generate_ir
-from acp_compiler.parser import ParseError, parse_yaml, parse_yaml_file
 from acp_compiler.validator import ValidationError, ValidationResult, validate_spec
 
 __all__ = [
+    "ACPParseError",
+    "ACPValidationError",
+    "ACPValidationResult",
     "CompilationError",
     "CredentialError",
     "IRGenerationError",
-    "ParseError",
+    "NormalizationError",
+    "ResolutionError",
+    "ResolutionResult",
     "ValidationError",
     "ValidationResult",
-    "compile_spec",
-    "compile_spec_file",
+    "compile_acp",
+    "compile_acp_file",
+    "compile_file",
     "generate_ir",
     "get_env_var_name",
     "is_env_reference",
-    "parse_yaml",
-    "parse_yaml_file",
+    "normalize_acp",
+    "parse_acp",
+    "parse_acp_file",
     "resolve_env_var",
+    "resolve_references",
+    "validate_acp",
+    "validate_acp_file",
+    "validate_file",
     "validate_spec",
-    "validate_spec_file",
 ]

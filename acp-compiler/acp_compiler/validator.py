@@ -67,10 +67,11 @@ def validate_spec(spec: SpecRoot, check_env: bool = True) -> ValidationResult:
         path = f"providers.llm.{name}"
         if is_env_reference(provider.api_key):
             env_refs.append((f"{path}.api_key", provider.api_key))
-        else:
+        elif not provider.api_key:
+            # Empty API key is an error; direct values are allowed (from variable substitution)
             result.add_error(
                 f"{path}.api_key",
-                "API key must be an environment variable reference (env:VAR_NAME)",
+                "API key is required",
             )
 
     # Validate servers
