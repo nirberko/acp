@@ -1,8 +1,8 @@
 """IR (Intermediate Representation) generation from validated specs."""
 
+from acp_compiler.credentials import get_env_var_name, resolve_env_var
 from acp_schema.ir import (
     CompiledSpec,
-    MCPMethodSchema,
     ResolvedAgent,
     ResolvedCapability,
     ResolvedCredential,
@@ -17,8 +17,6 @@ from acp_schema.models import (
     LLMProviderParams,
     SpecRoot,
 )
-
-from acp_compiler.credentials import get_env_var_name, resolve_env_var
 
 
 class IRGenerationError(Exception):
@@ -101,7 +99,9 @@ def generate_ir(spec: SpecRoot, resolve_credentials: bool = True) -> CompiledSpe
         # Merge provider defaults with agent params
         provider = providers.get(agent.provider)
         if not provider:
-            raise IRGenerationError(f"Provider '{agent.provider}' not found for agent '{agent.name}'")
+            raise IRGenerationError(
+                f"Provider '{agent.provider}' not found for agent '{agent.name}'"
+            )
 
         merged_params = LLMProviderParams()
         if provider.default_params:
@@ -163,4 +163,3 @@ def generate_ir(spec: SpecRoot, resolve_credentials: bool = True) -> CompiledSpe
         agents=agents,
         workflows=workflows,
     )
-

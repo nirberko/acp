@@ -2,13 +2,14 @@
 
 import asyncio
 import os
-import signal
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import anyio
-from anyio.abc import Process
 
 from acp_mcp.types import MCPMethod
+
+if TYPE_CHECKING:
+    from anyio.abc import Process
 
 
 class MCPServerManager:
@@ -121,21 +122,23 @@ class MCPServerManager:
                     break
             except EOFError:
                 break
-        
+
         if not response_bytes:
             raise RuntimeError(f"Server {self.name} returned empty response")
-        
+
         # Extract the first line (up to newline)
         if b"\n" in response_bytes:
             response_bytes = response_bytes.split(b"\n", 1)[0]
-        
+
         response_str = response_bytes.decode()
         try:
             response = json.loads(response_str)
         except json.JSONDecodeError as e:
-            raise RuntimeError(f"Server {self.name} returned invalid JSON: {response_str[:100]}") from e
+            raise RuntimeError(
+                f"Server {self.name} returned invalid JSON: {response_str[:100]}"
+            ) from e
 
-        if "error" in response and response["error"]:
+        if response.get("error"):
             error = response["error"]
             raise Exception(f"MCP error: {error.get('message', 'Unknown error')}")
 
@@ -177,17 +180,17 @@ class MCPServerManager:
             # Enhance error message for "Unknown tool" errors
             if "Unknown tool" in str(e) or "unknown tool" in str(e).lower():
                 available_tools = [tool.name for tool in self._tools]
-                error_msg = f"{str(e)}. Available tools: {', '.join(available_tools) if available_tools else 'none'}"
+                error_msg = f"{e!s}. Available tools: {', '.join(available_tools) if available_tools else 'none'}"
                 raise Exception(error_msg) from e
             raise
-        
+
         # MCP tool results have structure: {content: [...], isError: bool}
         if not isinstance(result, dict):
             return result
-        
+
         is_error = result.get("isError", False)
         content = result.get("content", [])
-        
+
         if is_error:
             # Extract error message from content
             error_messages = []
@@ -198,19 +201,22 @@ class MCPServerManager:
                         error_messages.append(item.get("text", ""))
                     elif "error" in item_type.lower():
                         error_messages.append(str(item))
-            
+
             error_msg = " ".join(error_messages) if error_messages else "Tool call failed"
             raise Exception(f"MCP error: {error_msg}")
-        
+
         # Extract content - return structured content or extract text
         if content and isinstance(content, list):
             # If there's a single text content item, return just the text
-            if len(content) == 1 and isinstance(content[0], dict):
-                if content[0].get("type") == "text":
-                    return content[0].get("text")
+            if (
+                len(content) == 1
+                and isinstance(content[0], dict)
+                and content[0].get("type") == "text"
+            ):
+                return content[0].get("text")
             # Otherwise return the full content structure
             return content
-        
+
         return result
 
     @property
@@ -228,4 +234,3 @@ class MCPServerManager:
     async def __aexit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
         """Context manager exit."""
         await self.stop()
-

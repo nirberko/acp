@@ -48,7 +48,7 @@ class CLIApprovalHandler(ApprovalHandler):
             True if approved, False if rejected
         """
         print("\n" + "=" * 60)
-        print(f"APPROVAL REQUIRED")
+        print("APPROVAL REQUIRED")
         print("=" * 60)
         print(f"Workflow: {workflow_name}")
         print(f"Step: {step_id}")
@@ -99,4 +99,3 @@ class AutoApprovalHandler(ApprovalHandler):
             The configured approval value
         """
         return self._approve
-

@@ -1,7 +1,6 @@
 """YAML parser for ACP specifications."""
 
 from pathlib import Path
-from typing import Any
 
 import yaml
 from pydantic import ValidationError
@@ -43,7 +42,7 @@ def parse_yaml(content: str) -> SpecRoot:
             loc = ".".join(str(x) for x in error["loc"])
             msg = error["msg"]
             errors.append(f"  - {loc}: {msg}")
-        raise ParseError(f"Schema validation failed:\n" + "\n".join(errors)) from e
+        raise ParseError("Schema validation failed:\n" + "\n".join(errors)) from e
 
 
 def parse_yaml_file(path: str | Path) -> SpecRoot:
@@ -69,4 +68,3 @@ def parse_yaml_file(path: str | Path) -> SpecRoot:
         raise ParseError(f"Failed to read file: {e}") from e
 
     return parse_yaml(content)
-

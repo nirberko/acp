@@ -2,7 +2,6 @@
 
 import time
 from dataclasses import dataclass, field
-from typing import Any
 
 from acp_schema.ir import ResolvedPolicy
 
@@ -106,22 +105,26 @@ class PolicyEnforcer:
         budgets = policy.budgets
 
         # Check capability call limit
-        if budgets.max_capability_calls is not None:
-            if context.capability_calls >= budgets.max_capability_calls:
-                raise PolicyViolation(
-                    policy_name,
-                    "max_capability_calls",
-                    f"Limit of {budgets.max_capability_calls} calls reached",
-                )
+        if (
+            budgets.max_capability_calls is not None
+            and context.capability_calls >= budgets.max_capability_calls
+        ):
+            raise PolicyViolation(
+                policy_name,
+                "max_capability_calls",
+                f"Limit of {budgets.max_capability_calls} calls reached",
+            )
 
         # Check timeout
-        if budgets.timeout_seconds is not None:
-            if context.elapsed_seconds >= budgets.timeout_seconds:
-                raise PolicyViolation(
-                    policy_name,
-                    "timeout_seconds",
-                    f"Timeout of {budgets.timeout_seconds}s exceeded",
-                )
+        if (
+            budgets.timeout_seconds is not None
+            and context.elapsed_seconds >= budgets.timeout_seconds
+        ):
+            raise PolicyViolation(
+                policy_name,
+                "timeout_seconds",
+                f"Timeout of {budgets.timeout_seconds}s exceeded",
+            )
 
     def record_capability_call(self, context_id: str) -> None:
         """Record a capability call.
@@ -163,13 +166,15 @@ class PolicyEnforcer:
             return
 
         budgets = policy.budgets
-        if budgets.max_cost_usd_per_run is not None:
-            if context.total_cost_usd > budgets.max_cost_usd_per_run:
-                raise PolicyViolation(
-                    policy_name,
-                    "max_cost_usd_per_run",
-                    f"Cost ${context.total_cost_usd:.4f} exceeds budget ${budgets.max_cost_usd_per_run:.2f}",
-                )
+        if (
+            budgets.max_cost_usd_per_run is not None
+            and context.total_cost_usd > budgets.max_cost_usd_per_run
+        ):
+            raise PolicyViolation(
+                policy_name,
+                "max_cost_usd_per_run",
+                f"Cost ${context.total_cost_usd:.4f} exceeds budget ${budgets.max_cost_usd_per_run:.2f}",
+            )
 
     def check_timeout(self, context_id: str, policy_name: str | None) -> None:
         """Check if timeout has been exceeded.
@@ -193,11 +198,12 @@ class PolicyEnforcer:
             return
 
         budgets = policy.budgets
-        if budgets.timeout_seconds is not None:
-            if context.elapsed_seconds >= budgets.timeout_seconds:
-                raise PolicyViolation(
-                    policy_name,
-                    "timeout_seconds",
-                    f"Timeout of {budgets.timeout_seconds}s exceeded",
-                )
-
+        if (
+            budgets.timeout_seconds is not None
+            and context.elapsed_seconds >= budgets.timeout_seconds
+        ):
+            raise PolicyViolation(
+                policy_name,
+                "timeout_seconds",
+                f"Timeout of {budgets.timeout_seconds}s exceeded",
+            )

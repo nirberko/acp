@@ -73,4 +73,3 @@ class MCPToolResult(BaseModel):
 
     content: list[dict[str, Any]] = Field(default_factory=list)
     isError: bool = False
-
