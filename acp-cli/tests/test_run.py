@@ -363,4 +363,3 @@ workflows:
             spec_path.unlink()
             if output_path.exists():
                 output_path.unlink()
-

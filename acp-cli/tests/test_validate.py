@@ -138,4 +138,3 @@ workflows:
             assert "Summary" in result.stdout or "Workflows" in result.stdout
         finally:
             temp_path.unlink()
-

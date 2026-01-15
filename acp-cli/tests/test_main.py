@@ -42,4 +42,3 @@ class TestMainCLI:
         result = runner.invoke(app, ["run", "--help"])
         assert result.exit_code == 0
         assert "Run an ACP workflow" in result.stdout
-
