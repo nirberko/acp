@@ -4,7 +4,7 @@ These models represent the parsed structure of .acp files before
 normalization to the existing SpecRoot format.
 """
 
-from typing import Any
+from typing import Any, cast
 
 from pydantic import BaseModel, Field
 
@@ -161,7 +161,8 @@ class NestedBlock(ASTNode):
         """Get attribute value by name."""
         for attr in self.attributes:
             if attr.name == name:
-                return attr.value
+                # Type assertion: attr.value is Any but should be Value
+                return cast(Value, attr.value)
         return None
 
     def get_attributes_dict(self) -> dict[str, Value]:
@@ -204,7 +205,8 @@ class ProviderBlock(ASTNode):
         """Get attribute value by name."""
         for attr in self.attributes:
             if attr.name == name:
-                return attr.value
+                # Type assertion: attr.value is Any but should be Value
+                return cast(Value, attr.value)
         return None
 
 
@@ -226,7 +228,8 @@ class ServerBlock(ASTNode):
         """Get attribute value by name."""
         for attr in self.attributes:
             if attr.name == name:
-                return attr.value
+                # Type assertion: attr.value is Any but should be Value
+                return cast(Value, attr.value)
         return None
 
 
@@ -248,7 +251,8 @@ class CapabilityBlock(ASTNode):
         """Get attribute value by name."""
         for attr in self.attributes:
             if attr.name == name:
-                return attr.value
+                # Type assertion: attr.value is Any but should be Value
+                return cast(Value, attr.value)
         return None
 
 
@@ -291,7 +295,8 @@ class ModelBlock(ASTNode):
         """Get attribute value by name."""
         for attr in self.attributes:
             if attr.name == name:
-                return attr.value
+                # Type assertion: attr.value is Any but should be Value
+                return cast(Value, attr.value)
         return None
 
     def get_params_block(self) -> NestedBlock | None:
@@ -322,7 +327,8 @@ class AgentBlock(ASTNode):
         """Get attribute value by name."""
         for attr in self.attributes:
             if attr.name == name:
-                return attr.value
+                # Type assertion: attr.value is Any but should be Value
+                return cast(Value, attr.value)
         return None
 
 
@@ -346,7 +352,8 @@ class StepBlock(ASTNode):
         """Get attribute value by name."""
         for attr in self.attributes:
             if attr.name == name:
-                return attr.value
+                # Type assertion: attr.value is Any but should be Value
+                return cast(Value, attr.value)
         return None
 
     def get_input_block(self) -> NestedBlock | None:
@@ -386,7 +393,8 @@ class WorkflowBlock(ASTNode):
         """Get attribute value by name."""
         for attr in self.attributes:
             if attr.name == name:
-                return attr.value
+                # Type assertion: attr.value is Any but should be Value
+                return cast(Value, attr.value)
         return None
 
 

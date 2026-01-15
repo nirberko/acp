@@ -185,6 +185,11 @@ class ACPNormalizer:
             # Get server reference
             server_ref = cap.get_attribute("server")
             server_name = self._ref_to_name(server_ref, "server")
+            if not server_name:
+                raise NormalizationError(
+                    f"Capability '{cap.name}' must have a server reference",
+                    cap.location,
+                )
 
             # Get method
             method = cap.get_attribute("method")
@@ -267,6 +272,11 @@ class ACPNormalizer:
             # Get primary model reference
             model_ref = agent.get_attribute("model")
             model_name = self._ref_to_name(model_ref, "model")
+            if not model_name:
+                raise NormalizationError(
+                    f"Agent '{agent.name}' must have a model reference",
+                    agent.location,
+                )
             model_info = self._model_cache.get(model_name, (None, None, None))
             provider_name, model_preference, model_params = model_info
 
@@ -282,9 +292,10 @@ class ACPNormalizer:
             if isinstance(fallback_models, list) and fallback_models:
                 first_fallback = fallback_models[0]
                 fallback_name = self._ref_to_name(first_fallback, "model")
-                fallback_info = self._model_cache.get(fallback_name)
-                if fallback_info:
-                    model_fallback = fallback_info[1]  # model_id
+                if fallback_name:
+                    fallback_info = self._model_cache.get(fallback_name)
+                    if fallback_info:
+                        model_fallback = fallback_info[1]  # model_id
 
             # Get instructions
             instructions = agent.get_attribute("instructions")

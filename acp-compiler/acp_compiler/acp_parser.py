@@ -5,7 +5,7 @@ into AST models.
 """
 
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from lark import Lark, Token, Transformer, v_args
 from lark.exceptions import LarkError, UnexpectedCharacters, UnexpectedToken
@@ -84,9 +84,13 @@ def _get_token_location(token: Token) -> SourceLocation | None:
     if token is None:
         return None
     try:
+        line = token.line
+        column = token.column
+        if line is None or column is None:
+            return None
         return SourceLocation(
-            line=token.line,
-            column=token.column,
+            line=line,
+            column=column,
             end_line=token.end_line,
             end_column=token.end_column,
         )
@@ -373,13 +377,19 @@ class ACPTransformer(Transformer):
         return str(children[0]).lower() == "true"
 
     def reference_value(self, meta: Any, children: list) -> Reference:
-        return children[0]
+        result = children[0]
+        assert isinstance(result, Reference)
+        return result
 
-    def array_value(self, meta: Any, children: list) -> list:
-        return children[0]
+    def array_value(self, meta: Any, children: list) -> list[Any]:
+        result = children[0]
+        assert isinstance(result, list)
+        return result
 
     def env_value(self, meta: Any, children: list) -> EnvCall:
-        return children[0]
+        result = children[0]
+        assert isinstance(result, EnvCall)
+        return result
 
     def paren_expr(self, meta: Any, children: list) -> Any:
         """Handle parenthesized expression: (expr)"""
@@ -387,7 +397,9 @@ class ACPTransformer(Transformer):
 
     def state_ref_value(self, meta: Any, children: list) -> StateRef:
         """Handle state reference value."""
-        return children[0]
+        result = children[0]
+        assert isinstance(result, StateRef)
+        return result
 
     # State reference: $input.field or $state.step.field
     def state_ref(self, meta: Any, children: list) -> StateRef:
@@ -526,7 +538,8 @@ def parse_acp(content: str, file_path: str | None = None) -> ACPFile:
 
     try:
         tree = parser.parse(content)
-        return transformer.transform(tree)
+        result = transformer.transform(tree)
+        return cast(ACPFile, result)
     except UnexpectedCharacters as e:
         raise ACPParseError(
             f"Unexpected character: {e.char!r}",

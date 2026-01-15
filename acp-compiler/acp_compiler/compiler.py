@@ -178,10 +178,10 @@ def validate_acp_file(path: str | Path, check_env: bool = True) -> ValidationRes
 
     # Convert to ValidationResult format
     result = ValidationResult()
-    for error in acp_validation.errors:
-        result.add_error(error.path, error.message)
-    for warning in acp_validation.warnings:
-        result.add_warning(warning.path, warning.message)
+    for acp_error in acp_validation.errors:
+        result.add_error(acp_error.path, acp_error.message)
+    for acp_warning in acp_validation.warnings:
+        result.add_warning(acp_warning.path, acp_warning.message)
 
     if not result.is_valid:
         return result

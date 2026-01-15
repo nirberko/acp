@@ -1,6 +1,6 @@
 """Workflow state management."""
 
-from typing import Any
+from typing import Any, cast
 
 # Import AST types for expression evaluation (optional dependency)
 try:
@@ -165,17 +165,17 @@ class WorkflowState:
         op = expr.operator
 
         if op == "==":
-            return left == right
+            return cast(bool, left == right)
         elif op == "!=":
-            return left != right
+            return cast(bool, left != right)
         elif op == "<":
-            return left < right
+            return cast(bool, left < right)
         elif op == ">":
-            return left > right
+            return cast(bool, left > right)
         elif op == "<=":
-            return left <= right
+            return cast(bool, left <= right)
         elif op == ">=":
-            return left >= right
+            return cast(bool, left >= right)
         else:
             raise ExpressionError(f"Unknown comparison operator: {op}")
 
