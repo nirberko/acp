@@ -95,4 +95,3 @@ def validate_env_references(references: list[str]) -> list[str]:
         if var_name and var_name not in os.environ:
             missing.append(var_name)
     return missing
-

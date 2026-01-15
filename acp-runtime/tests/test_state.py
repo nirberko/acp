@@ -26,7 +26,7 @@ class TestWorkflowState:
         state = WorkflowState()
         state.set("result", "success")
         state.set("count", 42)
-        
+
         assert state.get("result") == "success"
         assert state.get("count") == 42
 
@@ -77,14 +77,14 @@ class TestWorkflowStateResolve:
         state = WorkflowState()
         state.set("result", "success")
         state.set("data", {"nested": "value"})
-        
+
         assert state.resolve("$state.result") == "success"
 
     def test_resolve_nested_path(self):
         """Test resolving nested paths."""
         state = WorkflowState({"user": {"profile": {"name": "Bob"}}})
         state.set("response", {"data": {"items": [1, 2, 3]}})
-        
+
         assert state.resolve("$input.user.profile.name") == "Bob"
         assert state.resolve("$state.response.data") == {"items": [1, 2, 3]}
 
@@ -121,26 +121,26 @@ class TestWorkflowStateResolveDict:
         """Test resolving simple dictionary."""
         state = WorkflowState({"name": "Alice"})
         state.set("count", 10)
-        
+
         data = {
             "greeting": "$input.name",
             "total": "$state.count",
         }
-        
+
         result = state.resolve_dict(data)
         assert result == {"greeting": "Alice", "total": 10}
 
     def test_resolve_dict_mixed(self):
         """Test resolving dictionary with mixed values."""
         state = WorkflowState({"x": 1})
-        
+
         data = {
             "expr": "$input.x",
             "literal": "hello",
             "number": 42,
             "boolean": True,
         }
-        
+
         result = state.resolve_dict(data)
         assert result == {
             "expr": 1,
@@ -152,7 +152,7 @@ class TestWorkflowStateResolveDict:
     def test_resolve_dict_nested(self):
         """Test resolving nested dictionary."""
         state = WorkflowState({"a": 1, "b": 2})
-        
+
         data = {
             "outer": {
                 "inner": "$input.a",
@@ -160,7 +160,7 @@ class TestWorkflowStateResolveDict:
             },
             "top": "$input.b",
         }
-        
+
         result = state.resolve_dict(data)
         assert result == {
             "outer": {
@@ -174,11 +174,11 @@ class TestWorkflowStateResolveDict:
         """Test resolving dictionary with list values."""
         state = WorkflowState({"items": ["a", "b", "c"]})
         state.set("extra", "d")
-        
+
         data = {
             "list": ["$input.items", "$state.extra", "literal"],
         }
-        
+
         result = state.resolve_dict(data)
         # List items that are strings get resolved
         assert result["list"][0] == ["a", "b", "c"]
@@ -193,9 +193,9 @@ class TestWorkflowStateSerialization:
         """Test converting state to dictionary."""
         state = WorkflowState({"input_key": "input_value"})
         state.set("state_key", "state_value")
-        
+
         data = state.to_dict()
-        
+
         assert data == {
             "input": {"input_key": "input_value"},
             "state": {"state_key": "state_value"},
@@ -207,9 +207,9 @@ class TestWorkflowStateSerialization:
             "input": {"a": 1, "b": 2},
             "state": {"x": "foo", "y": "bar"},
         }
-        
+
         state = WorkflowState.from_dict(data)
-        
+
         assert state.input == {"a": 1, "b": 2}
         assert state.state == {"x": "foo", "y": "bar"}
 
@@ -218,7 +218,7 @@ class TestWorkflowStateSerialization:
         state = WorkflowState.from_dict({})
         assert state.input == {}
         assert state.state == {}
-        
+
         state = WorkflowState.from_dict({"input": {"a": 1}})
         assert state.input == {"a": 1}
         assert state.state == {}
@@ -227,10 +227,9 @@ class TestWorkflowStateSerialization:
         """Test roundtrip serialization."""
         original = WorkflowState({"key": "value"})
         original.set("result", {"nested": [1, 2, 3]})
-        
+
         data = original.to_dict()
         restored = WorkflowState.from_dict(data)
-        
+
         assert restored.input == original.input
         assert restored.state == original.state
-

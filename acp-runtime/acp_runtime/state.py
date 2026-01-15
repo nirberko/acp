@@ -1,6 +1,5 @@
 """Workflow state management."""
 
-import re
 from typing import Any
 
 
@@ -87,7 +86,7 @@ class WorkflowState:
         for part in path:
             if isinstance(value, dict):
                 if part not in value:
-                    raise KeyError(f"Path '{'.'.join(parts[:parts.index(part)+1])}' not found")
+                    raise KeyError(f"Path '{'.'.join(parts[: parts.index(part) + 1])}' not found")
                 value = value[part]
             elif hasattr(value, part):
                 value = getattr(value, part)
@@ -112,9 +111,7 @@ class WorkflowState:
             elif isinstance(value, dict):
                 result[key] = self.resolve_dict(value)
             elif isinstance(value, list):
-                result[key] = [
-                    self.resolve(v) if isinstance(v, str) else v for v in value
-                ]
+                result[key] = [self.resolve(v) if isinstance(v, str) else v for v in value]
             else:
                 result[key] = value
         return result
@@ -132,4 +129,3 @@ class WorkflowState:
         instance = cls(data.get("input", {}))
         instance._state = data.get("state", {})
         return instance
-

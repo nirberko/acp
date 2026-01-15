@@ -210,4 +210,3 @@ class Tracer:
             },
             indent=2,
         )
-

@@ -1,7 +1,5 @@
 """Tests for ACP IR (Intermediate Representation) models."""
 
-import pytest
-
 from acp_schema.ir import (
     CompiledSpec,
     MCPMethodSchema,
@@ -339,4 +337,3 @@ class TestCompiledSpec:
         assert len(spec.policies) == 1
         assert len(spec.agents) == 1
         assert len(spec.workflows) == 1
-

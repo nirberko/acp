@@ -1,6 +1,7 @@
 """Tests for credential handling."""
 
 import os
+
 import pytest
 
 from acp_compiler.credentials import (
@@ -57,14 +58,14 @@ class TestResolveEnvVar:
     def test_resolve_existing_var(self, monkeypatch):
         """Test resolving an existing env var."""
         monkeypatch.setenv("TEST_API_KEY", "test-value-123")
-        
+
         result = resolve_env_var("env:TEST_API_KEY")
         assert result == "test-value-123"
 
     def test_resolve_missing_var_required(self, monkeypatch):
         """Test resolving missing required var raises error."""
         monkeypatch.delenv("MISSING_VAR", raising=False)
-        
+
         with pytest.raises(CredentialError) as exc_info:
             resolve_env_var("env:MISSING_VAR", required=True)
         assert "Environment variable not set" in str(exc_info.value)
@@ -72,7 +73,7 @@ class TestResolveEnvVar:
     def test_resolve_missing_var_optional(self, monkeypatch):
         """Test resolving missing optional var returns None."""
         monkeypatch.delenv("MISSING_VAR", raising=False)
-        
+
         result = resolve_env_var("env:MISSING_VAR", required=False)
         assert result is None
 
@@ -108,7 +109,7 @@ class TestValidateEnvReferences:
         """Test validation when all vars are present."""
         monkeypatch.setenv("VAR1", "val1")
         monkeypatch.setenv("VAR2", "val2")
-        
+
         missing = validate_env_references(["env:VAR1", "env:VAR2"])
         assert missing == []
 
@@ -117,7 +118,7 @@ class TestValidateEnvReferences:
         monkeypatch.setenv("VAR1", "val1")
         monkeypatch.delenv("VAR2", raising=False)
         monkeypatch.delenv("VAR3", raising=False)
-        
+
         missing = validate_env_references(["env:VAR1", "env:VAR2", "env:VAR3"])
         assert set(missing) == {"VAR2", "VAR3"}
 
@@ -132,4 +133,3 @@ class TestValidateEnvReferences:
         # Invalid refs are ignored, only real vars that are missing are returned
         # REAL_VAR should be in missing if not set
         assert "REAL_VAR" in missing or os.environ.get("REAL_VAR") is not None
-

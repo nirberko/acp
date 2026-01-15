@@ -1,14 +1,15 @@
 """Tests for the main compiler module."""
 
-import pytest
 import tempfile
 from pathlib import Path
 
+import pytest
+
 from acp_compiler.compiler import (
+    CompilationError,
     compile_spec,
     compile_spec_file,
     validate_spec_file,
-    CompilationError,
 )
 
 
@@ -29,7 +30,7 @@ project:
     def test_compile_full_spec(self, monkeypatch):
         """Test compiling a complete spec."""
         monkeypatch.setenv("OPENAI_API_KEY", "sk-test")
-        
+
         yaml_content = """
 version: "0.1"
 project:
@@ -67,7 +68,7 @@ workflows:
         type: end
 """
         ir = compile_spec(yaml_content, check_env=True, resolve_credentials=True)
-        
+
         assert ir.project_name == "full-test"
         assert "openai" in ir.providers
         assert ir.providers["openai"].api_key.value == "sk-test"
@@ -110,7 +111,7 @@ agents:
     def test_compile_with_all_step_types(self, monkeypatch):
         """Test compiling spec with all step types."""
         monkeypatch.setenv("OPENAI_API_KEY", "sk-test")
-        
+
         yaml_content = """
 version: "0.1"
 project:
@@ -168,7 +169,7 @@ workflows:
         type: end
 """
         ir = compile_spec(yaml_content, check_env=False, resolve_credentials=False)
-        
+
         workflow = ir.workflows["complex"]
         assert len(workflow.steps) == 5
         assert workflow.steps["start"].type.value == "llm"
@@ -184,7 +185,7 @@ class TestCompileSpecFile:
     def test_compile_existing_file(self, monkeypatch):
         """Test compiling an existing YAML file."""
         monkeypatch.setenv("OPENAI_API_KEY", "sk-test")
-        
+
         yaml_content = """
 version: "0.1"
 project:
@@ -213,15 +214,13 @@ workflows:
       - id: end
         type: end
 """
-        with tempfile.NamedTemporaryFile(
-            mode="w", suffix=".yaml", delete=False
-        ) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
             f.write(yaml_content)
             f.flush()
-            
+
             ir = compile_spec_file(f.name, check_env=False, resolve_credentials=False)
             assert ir.project_name == "file-test"
-            
+
             # Cleanup
             Path(f.name).unlink()
 
@@ -238,15 +237,13 @@ version: "0.1"
 project:
   name: path-test
 """
-        with tempfile.NamedTemporaryFile(
-            mode="w", suffix=".yaml", delete=False
-        ) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
             f.write(yaml_content)
             f.flush()
-            
+
             ir = compile_spec_file(Path(f.name), check_env=False)
             assert ir.project_name == "path-test"
-            
+
             Path(f.name).unlink()
 
 
@@ -260,15 +257,13 @@ version: "0.1"
 project:
   name: valid-test
 """
-        with tempfile.NamedTemporaryFile(
-            mode="w", suffix=".yaml", delete=False
-        ) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
             f.write(yaml_content)
             f.flush()
-            
+
             result = validate_spec_file(f.name, check_env=False)
             assert result.is_valid is True
-            
+
             Path(f.name).unlink()
 
     def test_validate_invalid_file(self):
@@ -285,16 +280,14 @@ agents:
       preference: gpt-4
     instructions: Help.
 """
-        with tempfile.NamedTemporaryFile(
-            mode="w", suffix=".yaml", delete=False
-        ) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
             f.write(yaml_content)
             f.flush()
-            
+
             result = validate_spec_file(f.name, check_env=False)
             assert result.is_valid is False
             assert len(result.errors) > 0
-            
+
             Path(f.name).unlink()
 
     def test_validate_nonexistent_file(self):
@@ -302,4 +295,3 @@ agents:
         with pytest.raises(CompilationError) as exc_info:
             validate_spec_file("/nonexistent/path.yaml")
         assert "Parse error" in str(exc_info.value)
-

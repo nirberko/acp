@@ -53,7 +53,7 @@ def validate(
         console.print("[green]✓[/green] Schema validation passed")
     except ParseError as e:
         console.print(f"[red]✗[/red] Parse error:\n{e}")
-        raise typer.Exit(1)
+        raise typer.Exit(1) from None
 
     # Validate
     result = validate_spec(spec, check_env=should_check_env)
