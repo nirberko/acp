@@ -28,7 +28,7 @@ servers:
     command:
       - npx
       - "@modelcontextprotocol/server-filesystem"
-      - /Users/Nir/projects/acp/examples
+      - /path/to/allowed/directory
     # No auth needed for filesystem server
 
 capabilities:
