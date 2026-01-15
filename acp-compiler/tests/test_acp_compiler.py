@@ -245,7 +245,9 @@ project:
                 with pytest.raises(CompilationError) as exc_info:
                     compile_file(f.name)
 
-                assert "Expected .acp file" in str(exc_info.value) or "Only .acp files" in str(exc_info.value)
+                assert "Expected .acp file" in str(exc_info.value) or "Only .acp files" in str(
+                    exc_info.value
+                )
             finally:
                 Path(f.name).unlink()
 

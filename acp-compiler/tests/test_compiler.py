@@ -109,7 +109,9 @@ agent "assistant" {
 """
         with pytest.raises(CompilationError) as exc_info:
             compile_acp(acp_content, check_env=False)
-        assert "Unresolved reference" in str(exc_info.value) or "Validation failed" in str(exc_info.value)
+        assert "Unresolved reference" in str(exc_info.value) or "Validation failed" in str(
+            exc_info.value
+        )
         if hasattr(exc_info.value, "validation_result") and exc_info.value.validation_result:
             assert not exc_info.value.validation_result.is_valid
 
@@ -307,7 +309,9 @@ agent "assistant" {
             # Reference resolution errors raise CompilationError, not validation errors
             with pytest.raises(CompilationError) as exc_info:
                 validate_acp_file(f.name, check_env=False)
-            assert "Unresolved reference" in str(exc_info.value) or "Reference resolution failed" in str(exc_info.value)
+            assert "Unresolved reference" in str(
+                exc_info.value
+            ) or "Reference resolution failed" in str(exc_info.value)
 
             Path(f.name).unlink()
 
