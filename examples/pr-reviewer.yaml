@@ -22,7 +22,7 @@ servers:
       - npx
       - "@modelcontextprotocol/server-github"
     auth:
-      token: env:GITHUB_TOKEN
+      token: env:GITHUB_PERSONAL_ACCESS_TOKEN
 
 capabilities:
   - name: get_pr
@@ -32,7 +32,7 @@ capabilities:
 
   - name: list_pr_files
     server: github
-    method: list_pull_request_files
+    method: get_pull_request_files
     side_effect: read
 
   - name: create_review

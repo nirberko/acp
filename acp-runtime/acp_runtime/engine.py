@@ -314,7 +314,7 @@ class WorkflowEngine:
             step_id=step.id,
             capability_name=step.capability_name,
             server_name=capability.server_name,
-            method_name=capability.method_name,
+            method=capability.method_name,
             requires_approval=capability.requires_approval,
         )
 

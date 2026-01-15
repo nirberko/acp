@@ -38,7 +38,10 @@ class MCPServerManager:
         """Get environment variables for the server process."""
         env = os.environ.copy()
         if self.auth_token:
-            # Common env var names for auth tokens
+            # Set common env var names for auth tokens
+            # GitHub MCP server expects GITHUB_PERSONAL_ACCESS_TOKEN
+            env["GITHUB_PERSONAL_ACCESS_TOKEN"] = self.auth_token
+            # Also set legacy/common names for compatibility
             env["GITHUB_TOKEN"] = self.auth_token
             env["API_TOKEN"] = self.auth_token
         return env
@@ -105,9 +108,32 @@ class MCPServerManager:
         request_line = json.dumps(request) + "\n"
         await self._process.stdin.send(request_line.encode())
 
-        # Read response
-        response_line = await self._process.stdout.receive()
-        response = json.loads(response_line.decode())
+        # Read response - MCP uses newline-delimited JSON, so read until we get a complete line
+        response_bytes = b""
+        while True:
+            try:
+                chunk = await self._process.stdout.receive()
+                if not chunk:
+                    break
+                response_bytes += chunk
+                # Check if we've received a complete line (ends with newline)
+                if b"\n" in response_bytes:
+                    break
+            except EOFError:
+                break
+        
+        if not response_bytes:
+            raise RuntimeError(f"Server {self.name} returned empty response")
+        
+        # Extract the first line (up to newline)
+        if b"\n" in response_bytes:
+            response_bytes = response_bytes.split(b"\n", 1)[0]
+        
+        response_str = response_bytes.decode()
+        try:
+            response = json.loads(response_str)
+        except json.JSONDecodeError as e:
+            raise RuntimeError(f"Server {self.name} returned invalid JSON: {response_str[:100]}") from e
 
         if "error" in response and response["error"]:
             error = response["error"]
@@ -139,10 +165,52 @@ class MCPServerManager:
             arguments: Tool arguments
 
         Returns:
-            Tool result
+            Tool result (extracted from content if successful)
+
+        Raises:
+            Exception: If tool call resulted in an error
         """
         params = {"name": name, "arguments": arguments or {}}
-        result = await self.send_request("tools/call", params)
+        try:
+            result = await self.send_request("tools/call", params)
+        except Exception as e:
+            # Enhance error message for "Unknown tool" errors
+            if "Unknown tool" in str(e) or "unknown tool" in str(e).lower():
+                available_tools = [tool.name for tool in self._tools]
+                error_msg = f"{str(e)}. Available tools: {', '.join(available_tools) if available_tools else 'none'}"
+                raise Exception(error_msg) from e
+            raise
+        
+        # MCP tool results have structure: {content: [...], isError: bool}
+        if not isinstance(result, dict):
+            return result
+        
+        is_error = result.get("isError", False)
+        content = result.get("content", [])
+        
+        if is_error:
+            # Extract error message from content
+            error_messages = []
+            for item in content:
+                if isinstance(item, dict):
+                    item_type = item.get("type", "")
+                    if item_type == "text":
+                        error_messages.append(item.get("text", ""))
+                    elif "error" in item_type.lower():
+                        error_messages.append(str(item))
+            
+            error_msg = " ".join(error_messages) if error_messages else "Tool call failed"
+            raise Exception(f"MCP error: {error_msg}")
+        
+        # Extract content - return structured content or extract text
+        if content and isinstance(content, list):
+            # If there's a single text content item, return just the text
+            if len(content) == 1 and isinstance(content[0], dict):
+                if content[0].get("type") == "text":
+                    return content[0].get("text")
+            # Otherwise return the full content structure
+            return content
+        
         return result
 
     @property
