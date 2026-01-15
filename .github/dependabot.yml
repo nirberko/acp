@@ -1,0 +1,62 @@
+version: 2
+updates:
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      actions:
+        patterns:
+          - "*"
+
+  # acp-schema
+  - package-ecosystem: "pip"
+    directory: "/acp-schema"
+    schedule:
+      interval: "weekly"
+    groups:
+      python-deps:
+        patterns:
+          - "*"
+
+  # acp-compiler
+  - package-ecosystem: "pip"
+    directory: "/acp-compiler"
+    schedule:
+      interval: "weekly"
+    groups:
+      python-deps:
+        patterns:
+          - "*"
+
+  # acp-mcp
+  - package-ecosystem: "pip"
+    directory: "/acp-mcp"
+    schedule:
+      interval: "weekly"
+    groups:
+      python-deps:
+        patterns:
+          - "*"
+
+  # acp-runtime
+  - package-ecosystem: "pip"
+    directory: "/acp-runtime"
+    schedule:
+      interval: "weekly"
+    groups:
+      python-deps:
+        patterns:
+          - "*"
+
+  # acp-cli
+  - package-ecosystem: "pip"
+    directory: "/acp-cli"
+    schedule:
+      interval: "weekly"
+    groups:
+      python-deps:
+        patterns:
+          - "*"
+

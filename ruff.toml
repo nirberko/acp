@@ -1,0 +1,63 @@
+# Ruff configuration for ACP monorepo
+# https://docs.astral.sh/ruff/configuration/
+
+target-version = "py311"
+line-length = 100
+
+# Include all Python source directories
+src = [
+    "acp-schema/acp_schema",
+    "acp-compiler/acp_compiler",
+    "acp-mcp/acp_mcp",
+    "acp-runtime/acp_runtime",
+    "acp-cli/acp_cli",
+]
+
+[lint]
+select = [
+    "E",      # pycodestyle errors
+    "W",      # pycodestyle warnings
+    "F",      # Pyflakes
+    "I",      # isort
+    "B",      # flake8-bugbear
+    "C4",     # flake8-comprehensions
+    "UP",     # pyupgrade
+    "ARG",    # flake8-unused-arguments
+    "SIM",    # flake8-simplify
+    "TCH",    # flake8-type-checking
+    "PTH",    # flake8-use-pathlib
+    "RUF",    # Ruff-specific rules
+]
+
+ignore = [
+    "E501",   # Line too long (handled by formatter)
+    "B008",   # Do not perform function calls in argument defaults
+    "ARG001", # Unused function argument (common in abstract methods)
+    "ARG002", # Unused method argument
+]
+
+[lint.per-file-ignores]
+"**/tests/**/*.py" = [
+    "ARG",    # Unused arguments are common in test fixtures
+    "S101",   # assert is fine in tests
+]
+"**/__init__.py" = [
+    "F401",   # Unused imports in __init__.py are fine
+]
+
+[lint.isort]
+known-first-party = [
+    "acp_schema",
+    "acp_compiler",
+    "acp_mcp",
+    "acp_runtime",
+    "acp_cli",
+]
+
+[format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+docstring-code-format = true
+
