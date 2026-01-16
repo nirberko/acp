@@ -1,286 +1,465 @@
-# Agentform Examples
+<p align="center">
+  <img width="1200" height="300" alt="Agentform" src="https://github.com/user-attachments/assets/40707d9d-ea9c-448b-8c0e-d7b6c1a14140" />
+</p>
 
-This directory contains example Agentform configurations demonstrating various features and use cases. Each example is a complete, runnable project with its own documentation.
+<p align="center">
+  <strong>Define AI agent systems declaratively using Agentform™ native schema</strong>
+</p>
+
+<p align="center">
+  Think <em>Infrastructure as Code</em>, but for AI agents
+</p>
+
+<br />
+
+<p align="center">
+  <a href="https://pypi.org/project/agentform-cli/"><img src="https://img.shields.io/pypi/v/agentform-cli?style=flat-square&color=6366f1" alt="PyPI version"></a>
+  <a href="https://pypi.org/project/agentform-cli/"><img src="https://img.shields.io/pypi/pyversions/agentform-cli?style=flat-square" alt="Python 3.12+"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-22c55e?style=flat-square" alt="Apache License 2.0"></a>
+  <a href="#"><img src="https://img.shields.io/badge/status-alpha-f97316?style=flat-square" alt="Alpha"></a>
+</p>
+
+---
+
+## Table of Contents
+
+- [Why Agentform?](#why-agentform)
+- [Installation](#installation)
+  - [Quick Install (Recommended)](#quick-install-recommended)
+  - [Verify Installation](#verify-installation)
+- [Quick Start](#quick-start)
+- [Features](#features)
+- [Architecture](#architecture)
+- [Examples](#examples)
+- [Modules](#modules)
+  - [Using Modules](#using-modules)
+  - [Creating Modules](#creating-modules)
+  - [Module Source Formats](#module-source-formats)
+  - [Module Caching](#module-caching)
+- [CLI Reference](#cli-reference)
+- [Contributing](#contributing)
+  - [Development Setup](#development-setup)
+  - [Project Structure](#project-structure)
+- [License](#license)
+
+---
+
+## Why Agentform™?
+
+Most AI agent frameworks require you to write imperative code - managing state, handling retries, wiring up tools. Agentform takes a different approach: **describe your agents declaratively in Agentform native schema, and let the runtime engine handle the rest.**
+
+```hcl
+agent "reviewer" {
+  model        = model.gpt4o
+  instructions = "Review code for security issues"
+  allow        = [capability.read_file, capability.get_diff]
+  policy       = policy.strict
+}
+```
+
+**The result:** Your agent configurations become version-controlled artifacts that are easy to review, share, and reproduce. The native `.agentform` format provides type safety, explicit references, and improved editor support.
+
+<br />
+
+## Installation
+
+### Quick Install (Recommended)
+
+```bash
+pip install agentform-cli
+```
+
+That's it! You're ready to go.
+
+
+### Verify Installation
+
+```bash
+agentform --help
+```
+
+<br />
 
 ## Quick Start
 
-All examples follow the same pattern:
+### 1. Set up your API key
 
 ```bash
-cd examples/<example-name>
-agentform validate --var openai_api_key=test  # Validate the configuration
-agentform run <workflow> --var openai_api_key=$OPENAI_API_KEY --input-file input.yaml
+export OPENAI_API_KEY="your-openai-key"
 ```
 
----
+### 2. Create an agent spec
 
-## Examples Overview
+Create a file called `my-agent.agentform`:
 
-| Example | Difficulty | Description |
-|---------|------------|-------------|
-| [simple-agent](#simple-agent) | Beginner | Basic LLM agent answering questions |
-| [python-api](#python-api) | Beginner | Using Agentform programmatically from Python |
-| [multi-agent](#multi-agent) | Intermediate | Multiple agents with conditional routing |
-| [filesystem-agent](#filesystem-agent) | Intermediate | File operations via MCP server |
-| [pr-reviewer](#pr-reviewer) | Advanced | GitHub PR reviews with human approval |
+```hcl
+agentform {
+  version = "0.1"
+  project = "my-first-agent"
+}
 
----
+variable "openai_api_key" {
+  type        = string
+  description = "OpenAI API key"
+  sensitive   = true
+}
 
-## Simple Agent
+provider "llm.openai" "default" {
+  api_key = var.openai_api_key
+  default_params {
+    temperature = 0.7
+    max_tokens  = 2000
+  }
+}
 
-**Directory:** [`simple-agent/`](simple-agent/)
+policy "default" {
+  budgets { max_cost_usd_per_run = 0.50 }
+  budgets { timeout_seconds = 60 }
+}
 
-The simplest possible Agentform configuration. A single agent that answers questions using OpenAI.
+model "gpt4o_mini" {
+  provider = provider.llm.openai.default
+  id       = "gpt-4o-mini"
+}
 
-### What You'll Learn
+model "gpt4o" {
+  provider = provider.llm.openai.default
+  id       = "gpt-4o"
+}
 
-- Basic Agentform file structure with numbered prefixes
-- Defining variables, providers, and models
-- Creating an agent with instructions
-- Building a simple workflow
+agent "assistant" {
+  model           = model.gpt4o_mini
+  fallback_models = [model.gpt4o]
 
-### Features Used
+  instructions = "You are a helpful assistant. Answer questions clearly and concisely."
 
-- Variables with `sensitive = true`
-- LLM provider configuration
-- Policy budgets (cost and timeout)
-- Fallback models
-- Single-step LLM workflow
+  policy = policy.default
+}
 
-### Prerequisites
+workflow "ask" {
+  entry = step.process
 
-- OpenAI API key
+  step "process" {
+    type  = "llm"
+    agent = agent.assistant
 
-### Run It
+    input { question = input.question }
+
+    output "answer" { from = result.text }
+
+    next = step.end
+  }
+
+  step "end" { type = "end" }
+}
+```
+
+### 3. Run it
+
+```bash
+# Validate your spec
+agentform validate my-agent.agentform
+
+# Run with input
+agentform run ask --spec my-agent.agentform --input '{"question": "What is the capital of France?"}'
+```
+
+<br />
+
+## Features
+
+| Feature | Description |
+|---------|-------------|
+| **Native Schema** | Define agents, workflows, and policies in type-safe `.agentform` format with explicit references |
+| **Modules** | Terraform-style reusable modules for sharing agent configurations via Git |
+| **Multi-Provider** | Use OpenAI, Anthropic, or other LLM providers interchangeably |
+| **Multi-Agent** | Coordinate multiple specialized agents with conditional routing |
+| **MCP Integration** | Connect to external tools via Model Context Protocol servers |
+| **Policy Enforcement** | Set budgets, timeouts, and capability limits per agent |
+| **Human-in-the-Loop** | Built-in approval gates for sensitive operations |
+| **Execution Tracing** | Full visibility into workflow execution for debugging |
+
+<br />
+
+## Architecture
+
+Agentform is built as a modular system with five core packages:
+
+```mermaid
+flowchart TB
+    subgraph User["User Layer"]
+        Agentform["📄 .agentform Spec"]
+        CLI["⚡ agentform-cli"]
+        Agentform --> CLI
+    end
+
+    subgraph Core["Core Layer"]
+        SCHEMA["📦 agentform-schema"]
+        COMPILER["🔧 agentform-compiler"]
+        RUNTIME["🚀 agentform-runtime"]
+        COMPILER --> SCHEMA
+        COMPILER --> RUNTIME
+    end
+
+    subgraph Integration["Integration Layer"]
+        MCP["🔌 agentform-mcp"]
+        LLM["🧠 LLM Providers"]
+        TOOLS["🛠️ External Tools"]
+    end
+
+    CLI --> COMPILER
+    RUNTIME --> MCP
+    RUNTIME --> LLM
+    MCP --> TOOLS
+```
+
+| Package | Description |
+|---------|-------------|
+| **agentform-schema** | Core Pydantic models for specs and Intermediate Representation |
+| **agentform-compiler** | Parses `.agentform` files, validates specs, and generates IR for the runtime |
+| **agentform-runtime** | Workflow execution engine with LLM integration and policy enforcement |
+| **agentform-mcp** | MCP (Model Context Protocol) client for connecting to external tool servers |
+| **agentform-cli** | Command-line interface for validating and running workflows |
+
+<br />
+
+## Examples
+
+The [`examples/`](examples/) directory contains ready-to-use configurations demonstrating various Agentform features. Each example includes detailed documentation explaining the concepts it covers.
+
+**[Browse all examples →](examples/)**
+
+Quick start with the simplest example:
 
 ```bash
 cd examples/simple-agent
-agentform run ask --var openai_api_key=$OPENAI_API_KEY --input '{"question": "What is Agentform?"}'
+agentform run ask --var openai_api_key=$OPENAI_API_KEY --input '{"question": "Hello!"}'
 ```
 
----
+<br />
 
-## Python API
+## Modules
 
-**Directory:** [`python-api/`](python-api/)
+Agentform supports a **Terraform-style module system** for creating reusable, shareable agent configurations. Modules let you package providers, policies, agents, and workflows together, making it easy for others to use without extensive configuration.
 
-Use Agentform workflows programmatically from Python applications using the `agentform-api` package.
+### Using Modules
 
-### What You'll Learn
+#### 1. Import a module in your project
 
-- Loading Agentform specs from Python code
-- Running workflows programmatically
-- Using async context managers for resource cleanup
-- Error handling patterns
-- Integrating Agentform into web applications (FastAPI example)
+Create a module block referencing a Git repository:
 
-### Features Used
+```hcl
+module "pr-reviewer" {
+  source  = "github.com/org/agentform-modules//pr-reviewer"
+  version = "v1.0.0"  // Git branch, tag, or commit
+  
+  // Pass required parameters
+  api_key = var.openai_api_key
+  model   = "gpt-4o"
+}
+```
 
-- `agentform-api` Python SDK
-- Async/await patterns
-- Context managers for resource cleanup
-- Error handling with custom exceptions
-- Web framework integration
+The `//` syntax separates the repository URL from the subdirectory path (like Terraform).
 
-### Prerequisites
+#### 2. Initialize your project
 
-- Python 3.11+
-- `agentform-api` package: `pip install agentform-api`
-- OpenAI API key
-
-### Run It
+Download all external modules to your local `.agentform/modules/` directory:
 
 ```bash
-cd examples/python-api
-
-# Basic usage
-python basic_usage.py
-
-# With context manager
-python context_manager.py
-
-# Error handling example
-python error_handling.py
-
-# FastAPI web server
-pip install fastapi uvicorn
-python fastapi_example.py
+agentform init
 ```
 
-### Use Cases
+This clones the module repositories locally. You must run `agentform init` before compiling or running workflows that use external modules.
 
-- Web applications (FastAPI, Flask, Django)
-- Background job processors (Celery, RQ)
-- Scripts and automation tools
-- Testing workflows programmatically
+#### 3. Use module resources
 
----
+Resources from modules are namespaced with `module.<name>`:
 
-## Multi-Agent
+```hcl
+workflow "review" {
+  entry = step.start
+  
+  step "start" {
+    type  = "llm"
+    agent = agent.module.pr-reviewer.reviewer  // Use module's agent
+    next  = step.end
+  }
+  
+  step "end" { type = "end" }
+}
+```
 
-**Directory:** [`multi-agent/`](multi-agent/)
-
-Multiple specialized agents working together with intelligent task routing.
-
-### What You'll Learn
-
-- Using multiple LLM providers (OpenAI + Anthropic)
-- Creating specialized agents for different tasks
-- Conditional workflow routing based on classification
-- Differentiated policies for fast vs. thorough processing
-
-### Features Used
-
-- Multiple providers (OpenAI and Anthropic)
-- Multiple models across providers
-- Different policies (`fast` vs `thorough`)
-- Classifier agent for task routing
-- Conditional steps (`type = "condition"`)
-- State passing between steps
-
-### Prerequisites
-
-- OpenAI API key
-- Anthropic API key
-
-### Run It
+Or run a module's workflow directly:
 
 ```bash
-cd examples/multi-agent
-
-# Simple task → quick_responder (GPT-4o)
-agentform run smart_respond \
-  --var openai_api_key=$OPENAI_API_KEY \
-  --var anthropic_api_key=$ANTHROPIC_API_KEY \
-  --input '{"task": "What is 2+2?"}'
-
-# Complex task → deep_analyst (Claude)
-agentform run smart_respond \
-  --var openai_api_key=$OPENAI_API_KEY \
-  --var anthropic_api_key=$ANTHROPIC_API_KEY \
-  --input '{"task": "Analyze the impact of AI on employment"}'
+agentform run module.pr-reviewer.review_workflow .
 ```
 
----
+### Creating Modules
 
-## Filesystem Agent
+A module is simply a directory containing `.agentform` files. To create a shareable module:
 
-**Directory:** [`filesystem-agent/`](filesystem-agent/)
+#### 1. Create the module structure
 
-An agent that interacts with the filesystem via MCP (Model Context Protocol) server.
+```
+my-module/
+├── 00-project.agentform      # Module metadata
+├── 01-variables.agentform    # Input parameters (variables)
+├── 02-providers.agentform    # LLM providers
+├── 03-policies.agentform     # Policies
+├── 04-models.agentform       # Model configurations
+├── 05-agents.agentform       # Agent definitions
+└── 06-workflows.agentform    # Workflows (optional)
+```
 
-### What You'll Learn
+#### 2. Define input variables
 
-- Integrating MCP servers for external capabilities
-- Defining capabilities from server methods
-- Using `call` steps to invoke capabilities
-- Human approval for write operations
-- Capability call budgets
+Variables without defaults become required parameters:
 
-### Features Used
+```hcl
+// 01-variables.agentform
+variable "api_key" {
+  type        = string
+  description = "API key for the LLM provider"
+  sensitive   = true
+  // No default = required parameter
+}
 
-- MCP server configuration (`server` block)
-- Capability definitions with side effects
-- `requires_approval = true` for sensitive operations
-- `type = "call"` workflow steps
-- `max_capability_calls` budget
-- Multiple workflows in one project
+variable "model" {
+  type        = string
+  description = "Model to use"
+  default     = "gpt-4o-mini"  // Has default = optional
+}
+```
 
-### Prerequisites
+#### 3. Publish to Git
 
-- OpenAI API key
-- Node.js and npm (for MCP filesystem server)
+Push your module to a Git repository. Users can then reference it:
 
-### Run It
+```hcl
+module "my-module" {
+  source  = "github.com/your-org/your-repo//path/to/module"
+  version = "main"
+  
+  api_key = var.my_api_key
+}
+```
+
+### Module Source Formats
+
+| Format | Example |
+|--------|---------|
+| GitHub | `github.com/org/repo` |
+| GitHub with subdirectory | `github.com/org/repo//modules/my-module` |
+| GitLab | `gitlab.com/org/repo` |
+| Local path | `./modules/my-module` |
+
+### Module Caching
+
+Modules are cached in `.agentform/modules/` within your project directory:
+
+```
+my-project/
+├── .agentform/
+│   └── modules/
+│       └── github_com_org_repo_abc123/  # Cached module
+├── 00-project.agentform
+└── 01-modules.agentform
+```
+
+Add `.agentform/` to your `.gitignore` - these are downloaded dependencies.
+
+<br />
+
+## CLI Reference
 
 ```bash
-cd examples/filesystem-agent
+# Initialize project - download external modules
+agentform init [directory]
 
-# Read and summarize a file
-agentform run read_and_summarize \
-  --var openai_api_key=$OPENAI_API_KEY \
-  --input '{"file_path": "article.txt", "task": "Summarize this"}'
+# Validate a specification
+agentform validate <spec-file>
 
-# List directory contents
-agentform run list_and_read \
-  --var openai_api_key=$OPENAI_API_KEY \
-  --input '{"directory_path": ".", "task": "What files are here?"}'
+# Compile to IR (Intermediate Representation) - useful for debugging
+agentform compile <spec-file> [--output output.json]
+
+# Run a workflow
+agentform run <workflow-name> [options]
+
+Options:
+  -s, --spec PATH        Path to .agentform spec file (default: agentform.agentform)
+  -i, --input JSON       Input data as JSON string
+  -f, --input-file PATH  Input data from JSON file
+  -o, --output PATH      Write output to file
+  -t, --trace PATH       Write execution trace to file
+  -v, --verbose          Enable verbose output
 ```
+
+<br />
 
 ---
 
-## PR Reviewer
+<br />
 
-**Directory:** [`pr-reviewer/`](pr-reviewer/)
+## Contributing
 
-Automated GitHub pull request reviewer with human-in-the-loop approval.
+We welcome contributions! Whether it's bug fixes, new features, or documentation improvements.
 
-### What You'll Learn
+### Development Setup
 
-- GitHub MCP integration with authentication
-- Multi-step data gathering workflows
-- Human approval gates before write operations
-- Building context from multiple API calls
-- Safe patterns for automated actions
+#### Prerequisites
 
-### Features Used
+- Python 3.12 or higher
+- [Poetry](https://python-poetry.org/) for dependency management
 
-- MCP server with `auth` block for tokens
-- Capabilities: read (`get_pr`, `list_files`) and write (`create_review`)
-- `requires_approval = true` on write capabilities
-- `type = "human_approval"` workflow step
-- Sequential capability calls to build context
-- Passing state between steps
-
-### Prerequisites
-
-- OpenAI API key
-- GitHub Personal Access Token (with `repo` scope)
-- Node.js and npm (for MCP GitHub server)
-
-### Run It
+#### Clone and Install
 
 ```bash
-cd examples/pr-reviewer
+# Clone the repository
+git clone https://github.com/agentform-team/agentform.git
+cd agentform
 
-agentform run review_pr \
-  --var openai_api_key=$OPENAI_API_KEY \
-  --var github_personal_access_token=$GITHUB_TOKEN \
-  --input '{"owner": "your-org", "repo": "your-repo", "pr_number": 123}'
+# Install all packages in development mode
+cd agentform-schema && poetry install && cd ..
+cd agentform-mcp && poetry install && cd ..
+cd agentform-compiler && poetry install && cd ..
+cd agentform-runtime && poetry install && cd ..
+cd agentform-cli && poetry install && cd ..
 ```
 
-The workflow will pause for your approval before submitting the review to GitHub.
+#### Running Tests
+
+```bash
+# Run tests for a specific package
+cd agentform-runtime
+poetry run pytest
+
+# Run with coverage
+poetry run pytest --cov=agentform_runtime
+```
+
+### Project Structure
+
+```
+agentform/
+├── agentform-schema/      # Core data models
+├── agentform-compiler/    # Agentform parser and validator
+├── agentform-runtime/     # Workflow execution engine
+├── agentform-mcp/         # MCP client integration
+├── agentform-cli/         # Command-line interface
+└── examples/        # Example configurations (.agentform format)
+```
+
+## License
+
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
+
+<br />
 
 ---
 
-## File Structure Convention
+<p align="center">
+  <sub>Built with ❤️ for the AI agent community</sub>
+</p>
 
-All examples follow the same file naming convention:
 
-```
-example/
-├── 00-project.agentform      # Project metadata (agentform block)
-├── 01-variables.agentform    # Variable definitions
-├── 02-providers.agentform    # Provider and model definitions
-├── 03-servers.agentform      # MCP server configuration (if needed)
-├── 04-capabilities.agentform # Capability definitions (if needed)
-├── 05-policies.agentform     # Policy definitions
-├── 06-agents.agentform       # Agent definitions
-├── 07-workflows.agentform    # Workflow definitions
-├── input.yaml          # Sample input
-└── README.md           # Detailed documentation
-```
-
-Numbered prefixes ensure files are processed in the correct order. References work across files—for example, agents can reference models defined in the providers file.
-
----
-
-## Next Steps
-
-After exploring these examples:
-
-1. **Create your own agent**: Start with `simple-agent` as a template
-2. **Add capabilities**: Use `filesystem-agent` as a guide for MCP integration
-3. **Build complex workflows**: Use `multi-agent` patterns for routing
-
-See the [main README](../README.md) for full documentation.
