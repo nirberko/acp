@@ -561,9 +561,7 @@ def merge_acp_files(files: list[ACPFile]) -> ACPFile:
 
     # Validate exactly one acp block
     if len(acp_blocks) == 0:
-        raise MergeError(
-            "No 'acp' metadata block found. One file must contain an 'acp {}' block."
-        )
+        raise MergeError("No 'acp' metadata block found. One file must contain an 'acp {}' block.")
     elif len(acp_blocks) > 1:
         locations = [loc for _, loc in acp_blocks if loc]
         loc_strs = [_format_location(loc) for loc in locations]

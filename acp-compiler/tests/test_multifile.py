@@ -141,27 +141,19 @@ class TestMergeACPFiles:
 
     def test_merge_no_acp_block_raises_error(self) -> None:
         """Test that merging files without acp block raises error."""
-        file1 = parse_acp(
-            'variable "key" { type = string }', file_path="vars.acp"
-        )
+        file1 = parse_acp('variable "key" { type = string }', file_path="vars.acp")
         file2 = parse_acp(
             'model "gpt4" { provider = provider.test id = "test" }',
             file_path="models.acp",
         )
 
-        with pytest.raises(
-            MergeError, match="No 'acp' metadata block found"
-        ):
+        with pytest.raises(MergeError, match="No 'acp' metadata block found"):
             merge_acp_files([file1, file2])
 
     def test_merge_multiple_acp_blocks_raises_error(self) -> None:
         """Test that multiple acp blocks raises error."""
-        file1 = parse_acp(
-            'acp { version = "0.1" project = "test1" }', file_path="main.acp"
-        )
-        file2 = parse_acp(
-            'acp { version = "0.1" project = "test2" }', file_path="other.acp"
-        )
+        file1 = parse_acp('acp { version = "0.1" project = "test1" }', file_path="main.acp")
+        file2 = parse_acp('acp { version = "0.1" project = "test2" }', file_path="other.acp")
 
         with pytest.raises(MergeError, match="Multiple 'acp' blocks found"):
             merge_acp_files([file1, file2])
@@ -175,9 +167,7 @@ class TestMergeACPFiles:
             """,
             file_path="main.acp",
         )
-        file2 = parse_acp(
-            'variable "api_key" { type = string }', file_path="vars.acp"
-        )
+        file2 = parse_acp('variable "api_key" { type = string }', file_path="vars.acp")
 
         with pytest.raises(MergeError, match="Duplicate variable 'api_key'"):
             merge_acp_files([file1, file2])
@@ -196,9 +186,7 @@ class TestMergeACPFiles:
             file_path="providers.acp",
         )
 
-        with pytest.raises(
-            MergeError, match=r"Duplicate provider 'llm\.openai\.default'"
-        ):
+        with pytest.raises(MergeError, match=r"Duplicate provider 'llm\.openai\.default'"):
             merge_acp_files([file1, file2])
 
     def test_merge_duplicate_model_raises_error(self) -> None:
@@ -491,12 +479,8 @@ class TestParseACPDirectory:
     def test_parse_directory_with_merge_error(self) -> None:
         """Test that merge errors are propagated."""
         with tempfile.TemporaryDirectory() as tmpdir:
-            Path(tmpdir, "main.acp").write_text(
-                'acp { version = "0.1" project = "test1" }'
-            )
-            Path(tmpdir, "other.acp").write_text(
-                'acp { version = "0.1" project = "test2" }'
-            )
+            Path(tmpdir, "main.acp").write_text('acp { version = "0.1" project = "test1" }')
+            Path(tmpdir, "other.acp").write_text('acp { version = "0.1" project = "test2" }')
 
             with pytest.raises(MergeError, match="Multiple 'acp' blocks"):
                 parse_acp_directory(tmpdir)
@@ -645,9 +629,7 @@ class TestCompileDirectory:
     def test_compile_directory_with_reference_errors(self) -> None:
         """Test that cross-file reference errors are detected."""
         with tempfile.TemporaryDirectory() as tmpdir:
-            Path(tmpdir, "main.acp").write_text(
-                'acp { version = "0.1" project = "test" }'
-            )
+            Path(tmpdir, "main.acp").write_text('acp { version = "0.1" project = "test" }')
 
             # Reference undefined model
             Path(tmpdir, "agents.acp").write_text(

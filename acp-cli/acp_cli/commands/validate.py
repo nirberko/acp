@@ -134,7 +134,9 @@ def validate(
 
     if is_directory:
         acp_files = list(spec_path.glob("*.acp"))
-        console.print(f"\n[bold]Validating {len(acp_files)} .acp file(s) from:[/bold] {spec_path.resolve()}\n")
+        console.print(
+            f"\n[bold]Validating {len(acp_files)} .acp file(s) from:[/bold] {spec_path.resolve()}\n"
+        )
     else:
         console.print(f"\n[bold]Validating:[/bold] {spec_path}\n")
 

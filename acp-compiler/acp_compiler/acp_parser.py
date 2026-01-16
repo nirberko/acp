@@ -655,9 +655,7 @@ def discover_acp_files(directory: str | Path) -> list[Path]:
         raise ACPParseError(f"Path is not a directory: {directory}")
 
     # Find all .acp files (case-insensitive extension matching)
-    acp_files = [
-        f for f in directory.iterdir() if f.is_file() and f.suffix.lower() == ".acp"
-    ]
+    acp_files = [f for f in directory.iterdir() if f.is_file() and f.suffix.lower() == ".acp"]
 
     # Sort alphabetically for consistent ordering
     return sorted(acp_files)
