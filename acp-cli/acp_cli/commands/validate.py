@@ -20,7 +20,7 @@ def _find_default_spec_path() -> Path:
     3. spec.acp file
     4. Current directory (fallback)
     """
-    cwd = Path(".")
+    cwd = Path()
 
     # Check for .acp files in current directory
     acp_files = list(cwd.glob("*.acp"))
@@ -134,7 +134,9 @@ def validate(
 
     if is_directory:
         acp_files = list(spec_path.glob("*.acp"))
-        console.print(f"\n[bold]Validating {len(acp_files)} .acp file(s) from:[/bold] {spec_path.resolve()}\n")
+        console.print(
+            f"\n[bold]Validating {len(acp_files)} .acp file(s) from:[/bold] {spec_path.resolve()}\n"
+        )
     else:
         console.print(f"\n[bold]Validating:[/bold] {spec_path}\n")
 
