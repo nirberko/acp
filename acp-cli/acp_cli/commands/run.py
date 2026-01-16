@@ -1,6 +1,7 @@
 """Run command for ACP CLI."""
 
 import asyncio
+import contextlib
 import json
 import re
 from pathlib import Path
@@ -357,12 +358,11 @@ def run(
         for field in required_inputs:
             if field not in parsed_input and field in variables:
                 # Convert pr_number to int if it looks like a number
-                value = variables[field]
-                if field == "pr_number" or (value.isdigit()):
-                    try:
-                        value = int(value)
-                    except ValueError:
-                        pass
+                value_str = variables[field]
+                value: str | int = value_str
+                if field == "pr_number" or value_str.isdigit():
+                    with contextlib.suppress(ValueError):
+                        value = int(value_str)
                 parsed_input[field] = value
                 logger.info("input_auto_populated_from_var", field=field)
 
