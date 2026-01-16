@@ -22,7 +22,6 @@ acp run <workflow> --var openai_api_key=$OPENAI_API_KEY --input-file input.yaml
 | [multi-agent](#multi-agent) | Intermediate | Multiple agents with conditional routing |
 | [filesystem-agent](#filesystem-agent) | Intermediate | File operations via MCP server |
 | [pr-reviewer](#pr-reviewer) | Advanced | GitHub PR reviews with human approval |
-| [module-example](#module-example) | Intermediate | Reusable modules from Git |
 
 ---
 
@@ -197,52 +196,6 @@ The workflow will pause for your approval before submitting the review to GitHub
 
 ---
 
-## Module Example
-
-**Directory:** [`module-example/`](module-example/)
-
-Demonstrates ACP's Terraform-style module system for reusable configurations.
-
-### What You'll Learn
-
-- Importing modules from Git repositories
-- Passing parameters to modules
-- Using namespaced resources (`module.<name>.<resource>`)
-- Running workflows from imported modules
-- The `acp init` command
-
-### Features Used
-
-- `module` block with `source` and `version`
-- Git repository sources with `//` subdirectory syntax
-- Variable references as module parameters
-- Module resource namespacing
-- Project initialization with `acp init`
-
-### Prerequisites
-
-- OpenAI API key
-- GitHub access (for cloning the module)
-
-### Run It
-
-```bash
-cd examples/module-example
-
-# First, download the module
-acp init
-
-# Then run a workflow from the module
-acp run module.simple-acp-module.review_pr \
-  --var openai_api_key=$OPENAI_API_KEY \
-  --var github_token=$GITHUB_TOKEN \
-  --var owner=your-org \
-  --var repo=your-repo \
-  --var pr_number=123
-```
-
----
-
 ## File Structure Convention
 
 All examples follow the same file naming convention:
@@ -272,6 +225,5 @@ After exploring these examples:
 1. **Create your own agent**: Start with `simple-agent` as a template
 2. **Add capabilities**: Use `filesystem-agent` as a guide for MCP integration
 3. **Build complex workflows**: Use `multi-agent` patterns for routing
-4. **Share your work**: Create modules like `module-example` for reuse
 
 See the [main README](../README.md) for full documentation.
