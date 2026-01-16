@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "acp-cli"
-version = "0.0.803"
+version = "0.0.804"
 description = "CLI interface for ACP"
 authors = ["ACP Team"]
 readme = "README.md"
@@ -55,6 +55,11 @@ pytest-asyncio = "^0.24"
 pytest-cov = "^4.1"
 ruff = "^0.8"
 mypy = "^1.8"
+
+[tool.pytest.ini_options]
+filterwarnings = [
+    "ignore::RuntimeWarning",
+]
 
 [build-system]
 requires = ["poetry-core"]
