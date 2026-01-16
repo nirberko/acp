@@ -6,9 +6,8 @@ import pytest
 
 from acp_compiler.acp_ast import Attribute, ModuleBlock
 from acp_compiler.acp_module_loader import (
-    LoadedModule,
-    ModuleLoadError,
     ModuleLoader,
+    ModuleLoadError,
 )
 
 
@@ -77,9 +76,7 @@ class TestModuleLoader:
 
         assert "requires parameter 'api_key'" in str(exc_info.value)
 
-    def test_uses_default_values(
-        self, simple_module_path: Path, fixtures_dir: Path
-    ) -> None:
+    def test_uses_default_values(self, simple_module_path: Path, fixtures_dir: Path) -> None:
         module_block = ModuleBlock(
             name="test-module",
             attributes=[
@@ -95,9 +92,7 @@ class TestModuleLoader:
         assert loaded.parameters["model_name"] == "gpt-4o-mini"
         assert loaded.parameters["temperature"] == 0.7
 
-    def test_overrides_default_values(
-        self, simple_module_path: Path, fixtures_dir: Path
-    ) -> None:
+    def test_overrides_default_values(self, simple_module_path: Path, fixtures_dir: Path) -> None:
         module_block = ModuleBlock(
             name="test-module",
             attributes=[
@@ -114,9 +109,7 @@ class TestModuleLoader:
         assert loaded.parameters["model_name"] == "gpt-4o"
         assert loaded.parameters["temperature"] == 0.3
 
-    def test_validates_param_type(
-        self, simple_module_path: Path, fixtures_dir: Path
-    ) -> None:
+    def test_validates_param_type(self, simple_module_path: Path, fixtures_dir: Path) -> None:
         module_block = ModuleBlock(
             name="test-module",
             attributes=[

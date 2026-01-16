@@ -249,7 +249,7 @@ def compile_acp_directory(
         CompilationError: If compilation fails
     """
     from acp_compiler.acp_ast import MergeError
-    from acp_compiler.acp_module_loader import LoadedModule, ModuleLoadError, ModuleLoader
+    from acp_compiler.acp_module_loader import LoadedModule, ModuleLoader, ModuleLoadError
     from acp_compiler.acp_normalizer import NormalizationError, normalize_acp
     from acp_compiler.acp_parser import ACPParseError, parse_acp_directory
     from acp_compiler.acp_resolver import add_module_symbols, resolve_references
@@ -335,7 +335,7 @@ def validate_acp_directory(
         CompilationError: If parsing or merging fails
     """
     from acp_compiler.acp_ast import MergeError
-    from acp_compiler.acp_module_loader import LoadedModule, ModuleLoadError, ModuleLoader
+    from acp_compiler.acp_module_loader import LoadedModule, ModuleLoader, ModuleLoadError
     from acp_compiler.acp_normalizer import NormalizationError, normalize_acp
     from acp_compiler.acp_parser import ACPParseError, parse_acp_directory
     from acp_compiler.acp_resolver import add_module_symbols, resolve_references

@@ -16,8 +16,8 @@ console = Console()
 
 
 def init(
-    directory: Path = typer.Argument(
-        Path("."),
+    directory: Path | None = typer.Argument(
+        None,
         help="Path to ACP project directory. Defaults to current directory.",
     ),
 ) -> None:
@@ -29,6 +29,8 @@ def init(
     Similar to 'terraform init'.
     """
     # Resolve to absolute path
+    if directory is None:
+        directory = Path.cwd()
     project_dir = directory.resolve()
 
     if not project_dir.exists():
@@ -62,10 +64,7 @@ def init(
         return
 
     # Filter to only Git modules
-    git_modules = [
-        m for m in acp_file.modules
-        if m.source and is_git_url(m.source)
-    ]
+    git_modules = [m for m in acp_file.modules if m.source and is_git_url(m.source)]
 
     if not git_modules:
         console.print("[green]✓[/green] No external Git modules to download")
@@ -85,6 +84,10 @@ def init(
         source = module.source
         version = module.version
 
+        # Type narrowing: source is guaranteed to be non-None after filter
+        if source is None:
+            continue
+
         console.print(f"  [dim]•[/dim] {module.name}")
         console.print(f"    Source: {source}")
         if version:
@@ -102,13 +105,10 @@ def init(
 
     # Summary
     if error_count == 0:
-        console.print(
-            f"[green]✓[/green] Successfully downloaded {success_count} module(s)"
-        )
+        console.print(f"[green]✓[/green] Successfully downloaded {success_count} module(s)")
         console.print("\n[dim]Project initialized successfully[/dim]")
     else:
         console.print(
-            f"[yellow]![/yellow] Downloaded {success_count} module(s), "
-            f"{error_count} failed"
+            f"[yellow]![/yellow] Downloaded {success_count} module(s), {error_count} failed"
         )
         raise typer.Exit(1)

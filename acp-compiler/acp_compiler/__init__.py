@@ -4,7 +4,7 @@ Compiles native ACP schema (.acp) files.
 """
 
 from acp_compiler.acp_ast import MergeError, ModuleBlock, merge_acp_files
-from acp_compiler.acp_module_loader import LoadedModule, ModuleLoadError, ModuleLoader
+from acp_compiler.acp_module_loader import LoadedModule, ModuleLoader, ModuleLoadError
 from acp_compiler.acp_module_resolver import (
     ModuleResolutionError,
     ModuleResolver,

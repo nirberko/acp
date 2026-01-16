@@ -122,9 +122,7 @@ class ModuleLoader:
         parameters = module_block.get_parameters()
 
         if not source:
-            raise ModuleLoadError(
-                f"Module '{name}' is missing required 'source' attribute"
-            )
+            raise ModuleLoadError(f"Module '{name}' is missing required 'source' attribute")
 
         # Check cache (keyed by name since same module can be loaded with different params)
         # For now, don't cache - each module instance may have different params
@@ -134,22 +132,16 @@ class ModuleLoader:
             # Resolve the module source
             resolved = self.resolver.resolve(source, version)
         except ModuleResolutionError as e:
-            raise ModuleLoadError(
-                f"Failed to resolve module '{name}': {e}"
-            ) from e
+            raise ModuleLoadError(f"Failed to resolve module '{name}': {e}") from e
 
         try:
             # Parse the module directory
             acp_file = parse_acp_directory(resolved.path)
         except ACPParseError as e:
-            raise ModuleLoadError(
-                f"Failed to parse module '{name}': {e}"
-            ) from e
+            raise ModuleLoadError(f"Failed to parse module '{name}': {e}") from e
 
         # Validate and apply parameters
-        resolved_params = self._resolve_parameters(
-            name, acp_file, parameters
-        )
+        resolved_params = self._resolve_parameters(name, acp_file, parameters)
 
         return LoadedModule(
             name=name,
@@ -177,9 +169,7 @@ class ModuleLoader:
 
         for block in module_blocks:
             if block.name in loaded:
-                raise ModuleLoadError(
-                    f"Duplicate module name: {block.name}"
-                )
+                raise ModuleLoadError(f"Duplicate module name: {block.name}")
             loaded[block.name] = self.load_module(block)
 
         return loaded
@@ -209,9 +199,7 @@ class ModuleLoader:
             ModuleLoadError: If validation fails
         """
         resolved: dict[str, Any] = {}
-        declared_vars: dict[str, VariableBlock] = {
-            v.name: v for v in acp_file.variables
-        }
+        declared_vars: dict[str, VariableBlock] = {v.name: v for v in acp_file.variables}
 
         # Check for required parameters
         for var_name, var_block in declared_vars.items():
@@ -226,9 +214,7 @@ class ModuleLoader:
                     resolved[var_name] = value
                 else:
                     # Validate type if specified
-                    self._validate_param_type(
-                        module_name, var_name, value, var_block.var_type
-                    )
+                    self._validate_param_type(module_name, var_name, value, var_block.var_type)
                     resolved[var_name] = value
 
             elif var_block.default is not None:
@@ -237,9 +223,7 @@ class ModuleLoader:
 
             else:
                 # Required parameter not provided
-                raise ModuleLoadError(
-                    f"Module '{module_name}' requires parameter '{var_name}'"
-                )
+                raise ModuleLoadError(f"Module '{module_name}' requires parameter '{var_name}'")
 
         # Check for unknown parameters (warn but don't error)
         for param_name in provided_params:
@@ -271,7 +255,7 @@ class ModuleLoader:
         if expected_type is None:
             return  # No type constraint
 
-        type_map = {
+        type_map: dict[str, Any] = {
             "string": str,
             "number": (int, float),
             "bool": bool,

@@ -7,22 +7,22 @@ import pytest
 
 from acp_compiler.acp_parser import parse_acp
 from acp_compiler.acp_resolver import add_module_symbols, resolve_references
-from acp_compiler.compiler import CompilationError, compile_acp_directory
+from acp_compiler.compiler import compile_acp_directory
 
 
 class TestModuleParsing:
     """Tests for parsing module blocks."""
 
     def test_parses_module_block(self) -> None:
-        code = '''
+        code = """
         acp { version = "0.1" project = "test" }
-        
+
         module "my-module" {
             source  = "github.com/example/module"
             version = "v1.0.0"
             api_key = "secret-key"
         }
-        '''
+        """
         result = parse_acp(code)
 
         assert len(result.modules) == 1
@@ -34,18 +34,18 @@ class TestModuleParsing:
         assert params["api_key"] == "secret-key"
 
     def test_parses_multiple_modules(self) -> None:
-        code = '''
+        code = """
         acp { version = "0.1" project = "test" }
-        
+
         module "module-a" {
             source = "./modules/a"
         }
-        
+
         module "module-b" {
             source = "./modules/b"
             param1 = "value1"
         }
-        '''
+        """
         result = parse_acp(code)
 
         assert len(result.modules) == 2
@@ -53,18 +53,18 @@ class TestModuleParsing:
         assert result.modules[1].name == "module-b"
 
     def test_parses_module_with_var_ref_param(self) -> None:
-        code = '''
+        code = """
         acp { version = "0.1" project = "test" }
-        
+
         variable "api_key" {
             type = string
         }
-        
+
         module "llm" {
             source  = "./modules/llm"
             api_key = var.api_key
         }
-        '''
+        """
         result = parse_acp(code)
 
         assert len(result.modules) == 1
@@ -72,6 +72,7 @@ class TestModuleParsing:
         params = module.get_parameters()
         # Should be a VarRef, not a resolved string
         from acp_compiler.acp_ast import VarRef
+
         assert isinstance(params["api_key"], VarRef)
         assert params["api_key"].var_name == "api_key"
 
@@ -80,13 +81,13 @@ class TestModuleSymbols:
     """Tests for module symbol resolution."""
 
     def test_builds_module_symbols(self) -> None:
-        code = '''
+        code = """
         acp { version = "0.1" project = "test" }
-        
+
         module "my-module" {
             source = "./modules/test"
         }
-        '''
+        """
         acp_file = parse_acp(code)
         resolution = resolve_references(acp_file)
 
@@ -95,22 +96,22 @@ class TestModuleSymbols:
         assert resolution.symbols["module.my-module"].kind == "module"
 
     def test_validates_module_reference(self) -> None:
-        code = '''
+        code = """
         acp { version = "0.1" project = "test" }
-        
+
         module "existing" {
             source = "./modules/test"
         }
-        
+
         agent "test" {
             model = module.existing.model.default
             policy = policy.default
         }
-        
+
         policy "default" {
             budgets { timeout_seconds = 60 }
         }
-        '''
+        """
         acp_file = parse_acp(code)
         resolution = resolve_references(acp_file)
 
@@ -120,18 +121,18 @@ class TestModuleSymbols:
         assert resolution.is_valid
 
     def test_catches_unresolved_module_reference(self) -> None:
-        code = '''
+        code = """
         acp { version = "0.1" project = "test" }
-        
+
         agent "test" {
             model = module.nonexistent.model.default
             policy = policy.default
         }
-        
+
         policy "default" {
             budgets { timeout_seconds = 60 }
         }
-        '''
+        """
         acp_file = parse_acp(code)
         resolution = resolve_references(acp_file)
 
@@ -145,37 +146,37 @@ class TestAddModuleSymbols:
 
     def test_adds_namespaced_symbols(self) -> None:
         # Parse a module's content
-        module_code = '''
+        module_code = """
         acp { version = "0.1" project = "test-module" }
-        
+
         provider "llm.openai" "default" {
             api_key = "test"
         }
-        
+
         model "gpt4" {
             provider = provider.llm.openai.default
             id = "gpt-4o"
         }
-        
+
         agent "assistant" {
             model = model.gpt4
             policy = policy.default
         }
-        
+
         policy "default" {
             budgets { timeout_seconds = 60 }
         }
-        '''
+        """
         module_acp = parse_acp(module_code)
-        
+
         # Create a main file resolution
-        main_code = '''
+        main_code = """
         acp { version = "0.1" project = "main" }
-        
+
         module "llm" {
             source = "./modules/llm"
         }
-        '''
+        """
         main_acp = parse_acp(main_code)
         resolution = resolve_references(main_acp)
 
@@ -214,7 +215,7 @@ class TestModuleIntegration:
             }}
 
             module "llm" {{
-                source  = "{test_project_dir / 'simple-module'}"
+                source  = "{test_project_dir / "simple-module"}"
                 api_key = "test-key-123"
             }}
 
@@ -224,10 +225,10 @@ class TestModuleIntegration:
                 policy = module.llm.policy.standard
                 instructions = "Hello"
             }}
-            
+
             workflow "main" {{
                 entry = step.ask
-                
+
                 step "ask" {{
                     type = "llm"
                     agent = agent.my_agent
@@ -236,7 +237,7 @@ class TestModuleIntegration:
                     }}
                     next = step.end
                 }}
-                
+
                 step "end" {{
                     type = "end"
                 }}
@@ -253,7 +254,7 @@ class TestModuleIntegration:
             # Verify module resources are included
             assert result.agents is not None
             assert "my_agent" in result.agents
-            
+
             # Module resources should be namespaced
             assert result.policies is not None
             assert "module.llm.standard" in result.policies

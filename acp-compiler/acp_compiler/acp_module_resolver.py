@@ -70,10 +70,7 @@ def is_git_url(source: str) -> bool:
     Returns:
         True if this appears to be a Git URL
     """
-    for pattern in _GIT_URL_PATTERNS:
-        if re.match(pattern, source):
-            return True
-    return False
+    return any(re.match(pattern, source) for pattern in _GIT_URL_PATTERNS)
 
 
 def _parse_git_source(source: str) -> ParsedGitSource:
@@ -235,9 +232,7 @@ class ModuleResolver:
         self._resolved_cache[cache_key] = result
         return result
 
-    def download_module(
-        self, source: str, version: str | None = None
-    ) -> ResolvedModule:
+    def download_module(self, source: str, version: str | None = None) -> ResolvedModule:
         """Download a Git module (used by 'acp init').
 
         This method always clones/updates Git modules, regardless of auto_download setting.
@@ -294,18 +289,14 @@ class ModuleResolver:
                     f"Subdirectory '{subdir}' not found in repository: {repo_url}"
                 )
             if not module_path.is_dir():
-                raise ModuleResolutionError(
-                    f"Subdirectory path is not a directory: {subdir}"
-                )
+                raise ModuleResolutionError(f"Subdirectory path is not a directory: {subdir}")
         else:
             module_path = repo_path
 
         # Verify module has .acp files
         acp_files = list(module_path.glob("*.acp"))
         if not acp_files:
-            raise ModuleResolutionError(
-                f"No .acp files found in module: {source}"
-            )
+            raise ModuleResolutionError(f"No .acp files found in module: {source}")
 
         return ResolvedModule(
             path=module_path,
@@ -344,9 +335,7 @@ class ModuleResolver:
         # Check for .acp files
         acp_files = list(path.glob("*.acp"))
         if not acp_files:
-            raise ModuleResolutionError(
-                f"No .acp files found in module directory: {source}"
-            )
+            raise ModuleResolutionError(f"No .acp files found in module directory: {source}")
 
         return ResolvedModule(
             path=path,
@@ -355,9 +344,7 @@ class ModuleResolver:
             is_local=True,
         )
 
-    def _resolve_git_module(
-        self, source: str, version: str | None
-    ) -> ResolvedModule:
+    def _resolve_git_module(self, source: str, version: str | None) -> ResolvedModule:
         """Resolve a Git module by cloning/updating it.
 
         Supports Terraform-style // syntax for subdirectories:
@@ -386,21 +373,16 @@ class ModuleResolver:
         cache_key = _get_cache_key(repo_url, version)
         repo_path = self.cache_dir / cache_key
 
-        # Normalize URL for cloning
-        git_url = _normalize_git_url(repo_url)
-
         # Check if module is cached (must run 'acp init' first)
         if not repo_path.exists():
             raise ModuleResolutionError(
-                f"Module '{source}' not found locally. "
-                f"Run 'acp init' to download external modules."
+                f"Module '{source}' not found locally. Run 'acp init' to download external modules."
             )
 
         # Verify it's a valid git repo
         if not (repo_path / ".git").exists():
             raise ModuleResolutionError(
-                f"Module '{source}' cache is corrupted. "
-                f"Run 'acp init' to re-download modules."
+                f"Module '{source}' cache is corrupted. Run 'acp init' to re-download modules."
             )
 
         # Checkout specific version if requested
@@ -415,18 +397,14 @@ class ModuleResolver:
                     f"Subdirectory '{subdir}' not found in repository: {repo_url}"
                 )
             if not module_path.is_dir():
-                raise ModuleResolutionError(
-                    f"Subdirectory path is not a directory: {subdir}"
-                )
+                raise ModuleResolutionError(f"Subdirectory path is not a directory: {subdir}")
         else:
             module_path = repo_path
 
         # Verify module has .acp files
         acp_files = list(module_path.glob("*.acp"))
         if not acp_files:
-            raise ModuleResolutionError(
-                f"No .acp files found in module: {source}"
-            )
+            raise ModuleResolutionError(f"No .acp files found in module: {source}")
 
         return ResolvedModule(
             path=module_path,
@@ -435,9 +413,7 @@ class ModuleResolver:
             is_local=False,
         )
 
-    def _clone_module(
-        self, url: str, target_path: Path, version: str | None
-    ) -> None:
+    def _clone_module(self, url: str, target_path: Path, version: str | None) -> None:
         """Clone a Git repository.
 
         Args:
@@ -470,22 +446,14 @@ class ModuleResolver:
                 if version and "not found" in result.stderr.lower():
                     self._clone_and_checkout(url, target_path, version)
                 else:
-                    raise ModuleResolutionError(
-                        f"Failed to clone module {url}: {result.stderr}"
-                    )
+                    raise ModuleResolutionError(f"Failed to clone module {url}: {result.stderr}")
 
         except subprocess.TimeoutExpired:
-            raise ModuleResolutionError(
-                f"Timeout while cloning module {url}"
-            ) from None
+            raise ModuleResolutionError(f"Timeout while cloning module {url}") from None
         except FileNotFoundError:
-            raise ModuleResolutionError(
-                "Git is not installed or not in PATH"
-            ) from None
+            raise ModuleResolutionError("Git is not installed or not in PATH") from None
 
-    def _clone_and_checkout(
-        self, url: str, target_path: Path, version: str
-    ) -> None:
+    def _clone_and_checkout(self, url: str, target_path: Path, version: str) -> None:
         """Clone a repository and checkout a specific ref.
 
         Used when the ref might be a commit hash or non-branch ref.
@@ -508,17 +476,13 @@ class ModuleResolver:
             )
 
             if result.returncode != 0:
-                raise ModuleResolutionError(
-                    f"Failed to clone module {url}: {result.stderr}"
-                )
+                raise ModuleResolutionError(f"Failed to clone module {url}: {result.stderr}")
 
             # Checkout the specific version
             self._checkout_version(target_path, version)
 
         except subprocess.TimeoutExpired:
-            raise ModuleResolutionError(
-                f"Timeout while cloning module {url}"
-            ) from None
+            raise ModuleResolutionError(f"Timeout while cloning module {url}") from None
 
     def _checkout_version(self, repo_path: Path, version: str) -> None:
         """Checkout a specific version in a Git repository.
@@ -554,9 +518,7 @@ class ModuleResolver:
                 )
 
         except subprocess.TimeoutExpired:
-            raise ModuleResolutionError(
-                f"Timeout while checking out version {version}"
-            ) from None
+            raise ModuleResolutionError(f"Timeout while checking out version {version}") from None
 
     def clear_cache(self) -> None:
         """Clear the in-memory resolution cache."""

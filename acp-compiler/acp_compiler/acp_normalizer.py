@@ -99,9 +99,7 @@ class ACPNormalizer:
         workflows = self._normalize_workflows()
 
         # Merge module resources with namespaced names
-        self._merge_module_resources(
-            providers, servers, capabilities, policies, agents, workflows
-        )
+        self._merge_module_resources(providers, servers, capabilities, policies, agents, workflows)
 
         return SpecRoot(
             version=self._get_version(),
