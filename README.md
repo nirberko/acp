@@ -448,9 +448,6 @@ acp/
 ├── acp-mcp/         # MCP client integration
 ├── acp-cli/         # Command-line interface
 └── examples/        # Example configurations (.acp format)
-
-acp-vscode/          # VS Code extension (separate repo)
-└── syntaxes/        # TextMate grammar for syntax highlighting
 ```
 
 ## License
