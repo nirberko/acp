@@ -129,9 +129,7 @@ class TestACPRunWorkflow:
         )
         mock_engine_class.return_value = mock_engine
 
-        result = await mock_acp.run_workflow(
-            "test_workflow", input_data={"question": "Capital?"}
-        )
+        result = await mock_acp.run_workflow("test_workflow", input_data={"question": "Capital?"})
 
         assert isinstance(result, WorkflowResult)
         assert result.output == {"answer": "Paris"}
@@ -142,9 +140,7 @@ class TestACPRunWorkflow:
     async def test_run_workflow_no_input(self, mock_engine_class, mock_acp):
         """Test workflow execution without input data."""
         mock_engine = MagicMock()
-        mock_engine.run = AsyncMock(
-            return_value={"output": None, "state": {}, "trace": {}}
-        )
+        mock_engine.run = AsyncMock(return_value={"output": None, "state": {}, "trace": {}})
         mock_engine_class.return_value = mock_engine
 
         result = await mock_acp.run_workflow("test_workflow")
@@ -168,9 +164,7 @@ class TestACPRunWorkflow:
     async def test_run_workflow_reuses_engine(self, mock_engine_class, mock_acp):
         """Test that engine is reused across workflow runs."""
         mock_engine = MagicMock()
-        mock_engine.run = AsyncMock(
-            return_value={"output": None, "state": {}, "trace": {}}
-        )
+        mock_engine.run = AsyncMock(return_value={"output": None, "state": {}, "trace": {}})
         mock_engine_class.return_value = mock_engine
 
         await mock_acp.run_workflow("test_workflow")

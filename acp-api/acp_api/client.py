@@ -129,11 +129,10 @@ class ACP:
         Example:
             ```python
             result = await acp.run_workflow(
-                "process",
-                input_data={"question": "What is the capital of France?"}
+                "process", input_data={"question": "What is the capital of France?"}
             )
             print(result.output)  # Workflow output
-            print(result.state)   # Full state including all step outputs
+            print(result.state)  # Full state including all step outputs
             ```
         """
         engine = self._get_engine()

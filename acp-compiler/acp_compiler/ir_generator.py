@@ -116,7 +116,7 @@ def generate_ir(spec: SpecRoot, resolve_credentials: bool = True) -> CompiledSpe
             merged_params = resolved_provider.default_params.model_copy()
         if agent.params:
             # Override with agent-specific params
-            for field_name in agent.params.model_fields:
+            for field_name in type(agent.params).model_fields:
                 agent_value = getattr(agent.params, field_name)
                 if agent_value is not None:
                     setattr(merged_params, field_name, agent_value)

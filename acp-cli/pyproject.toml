@@ -56,6 +56,11 @@ pytest-cov = "^4.1"
 ruff = "^0.8"
 mypy = "^1.8"
 
+[tool.pytest.ini_options]
+filterwarnings = [
+    "ignore::RuntimeWarning",
+]
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
