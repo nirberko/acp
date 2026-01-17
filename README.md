@@ -13,8 +13,8 @@
 <br />
 
 <p align="center">
+  <a href="https://agentform.co"><img src="https://img.shields.io/badge/website-agentform.co-6366f1?style=flat-square" alt="Website"></a>
   <a href="https://pypi.org/project/agentform-cli/"><img src="https://img.shields.io/pypi/v/agentform-cli?style=flat-square&color=6366f1" alt="PyPI version"></a>
-  <a href="https://pypi.org/project/agentform-cli/"><img src="https://img.shields.io/pypi/pyversions/agentform-cli?style=flat-square" alt="Python 3.12+"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-22c55e?style=flat-square" alt="Apache License 2.0"></a>
   <a href="#"><img src="https://img.shields.io/badge/status-alpha-f97316?style=flat-square" alt="Alpha"></a>
 </p>
