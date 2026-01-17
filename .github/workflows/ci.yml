@@ -105,9 +105,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ matrix.package }}/.venv
-          key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ matrix.package }}-${{ hashFiles(format('{0}/poetry.lock', matrix.package)) }}
+          key: venv-v2-${{ runner.os }}-${{ matrix.python-version }}-${{ matrix.package }}-${{ hashFiles(format('{0}/poetry.lock', matrix.package)) }}
           restore-keys: |
-            venv-${{ runner.os }}-${{ matrix.python-version }}-${{ matrix.package }}-
+            venv-v2-${{ runner.os }}-${{ matrix.python-version }}-${{ matrix.package }}-
 
       - name: Install dependencies for agentform-schema
         if: matrix.package != 'agentform-schema'
@@ -118,7 +118,7 @@ jobs:
         run: cd agentform-compiler && poetry install --no-interaction
 
       - name: Install dependencies for agentform-mcp
-        if: matrix.package == 'agentform-runtime' || matrix.package == 'agentform-cli'
+        if: matrix.package == 'agentform-compiler' || matrix.package == 'agentform-runtime' || matrix.package == 'agentform-cli'
         run: cd agentform-mcp && poetry install --no-interaction
 
       - name: Install dependencies for agentform-runtime
