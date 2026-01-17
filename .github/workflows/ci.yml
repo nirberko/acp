@@ -126,7 +126,7 @@ jobs:
         run: cd agentform-runtime && poetry install --no-interaction
 
       - name: Install package dependencies
-        run: cd ${{ matrix.package }} && poetry install --no-interaction
+        run: cd ${{ matrix.package }} && poetry install --no-interaction --with dev
 
       - name: Run tests with coverage
         run: |
