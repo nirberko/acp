@@ -1,6 +1,7 @@
 ---
 layout: default
 title: Agentform Documentation
+permalink: /
 ---
 
 # Agentform™

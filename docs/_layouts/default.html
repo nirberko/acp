@@ -5,27 +5,58 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% if page.title %}{{ page.title }} - {% endif %}{{ site.title }}</title>
     <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1><a href="{{ '/' | relative_url }}">{{ site.title }}</a></h1>
-            <nav>
-                <ul>
-                    {% for item in site.navigation %}
-                    <li><a href="{{ item.url | relative_url }}" {% if page.url == item.url or page.url == item.url | remove: '/' %}class="active"{% endif %}>{{ item.title }}</a></li>
-                    {% endfor %}
-                </ul>
-            </nav>
+    <div class="wrapper">
+        <header class="site-header">
+            <div class="container">
+                <div class="header-content">
+                    <a href="{{ '/' | relative_url }}" class="logo">
+                        <span class="logo-text">Agentform</span>
+                        <span class="logo-tagline">Documentation</span>
+                    </a>
+                    <nav class="main-nav">
+                        <ul>
+                            {% for item in site.navigation %}
+                            {% assign item_url = item.url | relative_url %}
+                            {% assign current_url = page.url %}
+                            {% assign item_path = item.url | remove: '/' %}
+                            {% assign page_path = page.url | remove: '/' | remove: '.html' %}
+                            <li>
+                                <a href="{{ item_url }}" 
+                                   {% if page.url == item.url or page.url == item.url | remove: '/' or page_path == item_path or page.url == '/' and item.url == '/' %}class="active"{% endif %}>
+                                    {{ item.title }}
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </nav>
+                </div>
+            </div>
         </header>
         
-        <main>
-            {{ content }}
+        <main class="site-main">
+            <div class="container">
+                <article class="content">
+                    {{ content }}
+                </article>
+            </div>
         </main>
         
-        <footer>
-            <p>Built with ❤️ for the AI agent community</p>
-            <p><a href="https://github.com/agentform-team/agentform">GitHub</a> | <a href="https://pypi.org/project/agentform-cli/">PyPI</a></p>
+        <footer class="site-footer">
+            <div class="container">
+                <div class="footer-content">
+                    <p class="footer-text">Built with ❤️ for the AI agent community</p>
+                    <div class="footer-links">
+                        <a href="https://github.com/agentform-team/agentform" target="_blank" rel="noopener">GitHub</a>
+                        <span class="separator">•</span>
+                        <a href="https://pypi.org/project/agentform-cli/" target="_blank" rel="noopener">PyPI</a>
+                    </div>
+                </div>
+            </div>
         </footer>
     </div>
 </body>

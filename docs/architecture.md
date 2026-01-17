@@ -1,6 +1,7 @@
 ---
 layout: default
 title: Architecture
+permalink: /architecture/
 ---
 
 # Agentform Architecture
