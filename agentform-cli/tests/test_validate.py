@@ -15,13 +15,13 @@ class TestValidateCommand:
 
     def test_validate_nonexistent_file(self):
         """Test validating a file that doesn't exist."""
-        result = runner.invoke(app, ["validate", "nonexistent.agentform"])
+        result = runner.invoke(app, ["validate", "nonexistent.af"])
         assert result.exit_code == 1
         assert "Path not found" in result.stdout
 
     def test_validate_invalid_yaml(self):
         """Test validating invalid Agentform."""
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".agentform", delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".af", delete=False) as f:
             f.write("invalid agentform content [")
             temp_path = Path(f.name)
 
@@ -40,7 +40,7 @@ agentform {
   project = "test-project"
 }
 """
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".agentform", delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".af", delete=False) as f:
             f.write(agentform_content)
             temp_path = Path(f.name)
 
@@ -59,7 +59,7 @@ agentform {
   project = "test-project"
 }
 """
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".agentform", delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".af", delete=False) as f:
             f.write(agentform_content)
             temp_path = Path(f.name)
 
@@ -78,7 +78,7 @@ agentform {
   project = "test-project"
 }
 """
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".agentform", delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".af", delete=False) as f:
             f.write(agentform_content)
             temp_path = Path(f.name)
 
@@ -137,7 +137,7 @@ workflow "ask" {
   step "end" { type = "end" }
 }
 """
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".agentform", delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".af", delete=False) as f:
             f.write(agentform_content)
             temp_path = Path(f.name)
 

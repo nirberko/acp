@@ -2,7 +2,7 @@
 
 import pytest
 
-from agentform_compiler.agentform_ast import (
+from agentform_compiler.af_ast import (
     AgentformFile,
     AndExpr,
     ComparisonExpr,
@@ -13,7 +13,7 @@ from agentform_compiler.agentform_ast import (
     StateRef,
     VarRef,
 )
-from agentform_compiler.agentform_parser import AgentformParseError, parse_agentform
+from agentform_compiler.af_parser import AgentformParseError, parse_agentform
 
 
 class TestBasicParsing:
@@ -25,9 +25,9 @@ class TestBasicParsing:
         result = parse_agentform(content)
 
         assert isinstance(result, AgentformFile)
-        assert result.agentform is not None
-        assert result.agentform.version == "0.1"
-        assert result.agentform.project == "test"
+        assert result.af is not None
+        assert result.af.version == "0.1"
+        assert result.af.project == "test"
 
     def test_parse_provider_block(self) -> None:
         """Test parsing a provider block."""
@@ -180,8 +180,8 @@ class TestValueParsing:
         agentform { version = "0.1" project = "test project" }
         """
         result = parse_agentform(content)
-        assert result.agentform is not None
-        assert result.agentform.project == "test project"
+        assert result.af is not None
+        assert result.af.project == "test project"
 
     def test_parse_number_values(self) -> None:
         """Test parsing integer and float values."""
@@ -331,8 +331,8 @@ class TestComments:
         // Another comment
         """
         result = parse_agentform(content)
-        assert result.agentform is not None
-        assert result.agentform.version == "0.1"
+        assert result.af is not None
+        assert result.af.version == "0.1"
 
     def test_block_comments(self) -> None:
         """Test that block comments are ignored."""
@@ -347,8 +347,8 @@ class TestComments:
         }
         """
         result = parse_agentform(content)
-        assert result.agentform is not None
-        assert result.agentform.project == "test"
+        assert result.af is not None
+        assert result.af.project == "test"
 
 
 class TestParseErrors:
@@ -445,9 +445,9 @@ class TestFullExample:
         """
         result = parse_agentform(content)
 
-        assert result.agentform is not None
-        assert result.agentform.version == "0.2"
-        assert result.agentform.project == "models-demo"
+        assert result.af is not None
+        assert result.af.version == "0.2"
+        assert result.af.project == "models-demo"
 
         assert len(result.variables) == 1
         assert len(result.providers) == 1

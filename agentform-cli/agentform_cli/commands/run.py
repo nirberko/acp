@@ -18,6 +18,11 @@ from agentform_runtime.engine import WorkflowError
 from agentform_runtime.logging_config import configure_logging, get_logger
 from agentform_schema.ir import ResolvedWorkflow
 
+from agentform_cli.provider_packages import (
+    MissingProviderPackagesError,
+    validate_provider_packages,
+)
+
 console = Console()
 
 
@@ -98,31 +103,31 @@ def _find_default_spec_path() -> Path:
     """Find the default spec file or directory.
 
     Priority:
-    1. Current directory if it contains multiple .agentform files
-    2. agentform.agentform file
-    3. spec.agentform file
+    1. Current directory if it contains multiple .af files
+    2. agentform.af file
+    3. spec.af file
     4. Current directory (fallback)
     """
     cwd = Path()
 
-    # Check for .agentform files in current directory
-    agentform_files = list(cwd.glob("*.agentform"))
+    # Check for .af files in current directory
+    agentform_files = list(cwd.glob("*.af"))
 
-    # If multiple .agentform files exist, use directory mode
+    # If multiple .af files exist, use directory mode
     if len(agentform_files) > 1:
         return cwd
 
     # Single file: use specific files
-    for name in ["agentform.agentform", "spec.agentform"]:
+    for name in ["agentform.af", "spec.af"]:
         path = Path(name)
         if path.exists():
             return path
 
-    # If there's exactly one .agentform file, use it
+    # If there's exactly one .af file, use it
     if len(agentform_files) == 1:
         return agentform_files[0]
 
-    # Fallback to current directory (will error later if no .agentform files)
+    # Fallback to current directory (will error later if no .af files)
     return cwd
 
 
@@ -168,7 +173,7 @@ def run(
     workflow: str = typer.Argument(help="Name of the workflow to run"),
     path: Path | None = typer.Argument(
         None,
-        help="Path to .agentform file or directory. Defaults to current directory.",
+        help="Path to .af file or directory. Defaults to current directory.",
     ),
     input_data: str | None = typer.Option(
         None,
@@ -214,10 +219,10 @@ def run(
     """Run an Agentform workflow.
 
     Runs from the current directory by default, automatically discovering and
-    merging all .agentform files (Terraform-style). Optionally specify a path.
+    merging all .af files (Terraform-style). Optionally specify a path.
 
     This will:
-    1. Discover and compile all .agentform files
+    1. Discover and compile all .af files
     2. Connect to MCP servers (if any)
     3. Execute the specified workflow
     4. Output the result
@@ -243,9 +248,9 @@ def run(
 
     console.print(f"\n[bold]Running workflow:[/bold] {workflow}")
     if is_directory:
-        agentform_files = list(spec_path.glob("*.agentform"))
+        agentform_files = list(spec_path.glob("*.af"))
         console.print(
-            f"[bold]Using {len(agentform_files)} .agentform file(s) from:[/bold] {spec_path.resolve()}\n"
+            f"[bold]Using {len(agentform_files)} .af file(s) from:[/bold] {spec_path.resolve()}\n"
         )
     else:
         console.print(f"[bold]Using spec:[/bold] {spec_path}\n")
@@ -335,6 +340,16 @@ def run(
             raise typer.Exit(1) from None
 
     console.print("[green]✓[/green] Specification compiled")
+
+    # Validate required provider packages are installed
+    try:
+        validate_provider_packages(compiled, console)
+    except MissingProviderPackagesError as e:
+        logger.error(
+            "missing_provider_packages",
+            missing_packages=[(pt, pn) for pt, pn in e.missing_packages],
+        )
+        raise typer.Exit(1) from None
 
     # Check workflow exists
     if workflow not in compiled.workflows:

@@ -250,7 +250,7 @@ workflow "main" {
   step "end" { type = "end" }
 }
 """
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".agentform", delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".af", delete=False) as f:
             f.write(agentform_content)
             f.flush()
 
@@ -263,7 +263,7 @@ workflow "main" {
     def test_compile_nonexistent_file(self):
         """Test that non-existent file raises CompilationError."""
         with pytest.raises(CompilationError) as exc_info:
-            compile_agentform_file("/nonexistent/path.agentform")
+            compile_agentform_file("/nonexistent/path.af")
         assert "File not found" in str(exc_info.value) or "Parse error" in str(exc_info.value)
 
     def test_compile_file_with_path_object(self, monkeypatch):
@@ -274,7 +274,7 @@ agentform {
   project = "path-test"
 }
 """
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".agentform", delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".af", delete=False) as f:
             f.write(agentform_content)
             f.flush()
 
@@ -295,7 +295,7 @@ agentform {
   project = "valid-test"
 }
 """
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".agentform", delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".af", delete=False) as f:
             f.write(agentform_content)
             f.flush()
 
@@ -317,7 +317,7 @@ agent "assistant" {
   instructions = "Help."
 }
 """
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".agentform", delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".af", delete=False) as f:
             f.write(agentform_content)
             f.flush()
 
@@ -333,5 +333,5 @@ agent "assistant" {
     def test_validate_nonexistent_file(self):
         """Test that non-existent file raises CompilationError."""
         with pytest.raises(CompilationError) as exc_info:
-            validate_agentform_file("/nonexistent/path.agentform")
+            validate_agentform_file("/nonexistent/path.af")
         assert "File not found" in str(exc_info.value) or "Parse error" in str(exc_info.value)

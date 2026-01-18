@@ -64,6 +64,7 @@ class TestGenerateIR:
         assert "openai" in ir.providers
         provider = ir.providers["openai"]
         assert provider.name == "openai"
+        assert provider.provider_type == "openai"
         assert provider.api_key.env_var == "OPENAI_API_KEY"
         assert provider.api_key.value == "sk-test123"
         assert provider.default_params.temperature == 0.7
@@ -81,6 +82,7 @@ class TestGenerateIR:
         ir = generate_ir(spec, resolve_credentials=False)
 
         provider = ir.providers["openai"]
+        assert provider.provider_type == "openai"
         assert provider.api_key.env_var == "OPENAI_API_KEY"
         assert provider.api_key.value is None
 
@@ -426,5 +428,21 @@ class TestGenerateIR:
 
         # Direct values are allowed - they come from variable substitution
         ir = generate_ir(spec, resolve_credentials=False)
+        assert ir.providers["openai"].provider_type == "openai"
         assert ir.providers["openai"].api_key.value == "plain-text-key"
         assert ir.providers["openai"].api_key.env_var == "DIRECT_VALUE"
+
+    def test_provider_with_non_default_name(self):
+        """Test provider with non-default name extracts provider_type correctly."""
+        spec = SpecRoot(
+            project=ProjectConfig(name="test"),
+            providers=ProvidersConfig(
+                llm={"openai_production": LLMProviderConfig(api_key="env:OPENAI_API_KEY")}
+            ),
+        )
+
+        ir = generate_ir(spec, resolve_credentials=False)
+        assert "openai_production" in ir.providers
+        provider = ir.providers["openai_production"]
+        assert provider.name == "openai_production"
+        assert provider.provider_type == "openai"  # Extracted from name before underscore

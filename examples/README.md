@@ -259,14 +259,14 @@ All examples follow the same file naming convention:
 
 ```
 example/
-├── 00-project.agentform      # Project metadata (agentform block)
-├── 01-variables.agentform    # Variable definitions
-├── 02-providers.agentform    # Provider and model definitions
-├── 03-servers.agentform      # MCP server configuration (if needed)
-├── 04-capabilities.agentform # Capability definitions (if needed)
-├── 05-policies.agentform     # Policy definitions
-├── 06-agents.agentform       # Agent definitions
-├── 07-workflows.agentform    # Workflow definitions
+├── 00-project.af      # Project metadata (agentform block)
+├── 01-variables.af    # Variable definitions
+├── 02-providers.af    # Provider and model definitions
+├── 03-servers.af      # MCP server configuration (if needed)
+├── 04-capabilities.af # Capability definitions (if needed)
+├── 05-policies.af     # Policy definitions
+├── 06-agents.af       # Agent definitions
+├── 07-workflows.af    # Workflow definitions
 ├── input.yaml          # Sample input
 └── README.md           # Detailed documentation
 ```

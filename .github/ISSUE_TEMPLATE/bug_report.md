@@ -29,8 +29,8 @@
 
 ## Example Agentform File (if applicable)
 
-<!-- If the bug is related to parsing/compiling .agentform files, please include a minimal example -->
+<!-- If the bug is related to parsing/compiling .af files, please include a minimal example -->
 
 ```hcl
-<!-- Your .agentform file here -->
+<!-- Your .af file here -->
 ```

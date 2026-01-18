@@ -15,7 +15,7 @@ import asyncio
 from agentform_api import Agentform
 
 async def main():
-    # Load from directory containing .agentform files
+    # Load from directory containing .af files
     agentform = Agentform.from_path(
         "path/to/project/",
         variables={"openai_api_key": "sk-..."}
@@ -36,7 +36,7 @@ asyncio.run(main())
 
 ### Loading Specs
 
-Load from a directory (discovers all `.agentform` files):
+Load from a directory (discovers all `.af` files):
 
 ```python
 agentform = Agentform.from_path("./my-project/", variables={"api_key": "..."})
@@ -45,7 +45,7 @@ agentform = Agentform.from_path("./my-project/", variables={"api_key": "..."})
 Load from a single file:
 
 ```python
-agentform = Agentform.from_path("agent.agentform", variables={"api_key": "..."})
+agentform = Agentform.from_path("agent.af", variables={"api_key": "..."})
 ```
 
 ### Running Workflows
@@ -168,7 +168,7 @@ Main client class.
 
 Create an Agentform instance from a file or directory path.
 
-- `path`: Path to `.agentform` file or directory containing `.agentform` files
+- `path`: Path to `.af` file or directory containing `.af` files
 - `variables`: Dictionary of variable values to substitute
 - `approval_handler`: Custom handler for human approval steps
 - `verbose`: Enable verbose logging

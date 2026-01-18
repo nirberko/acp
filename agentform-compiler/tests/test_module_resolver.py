@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from agentform_compiler.agentform_module_resolver import (
+from agentform_compiler.af_module_resolver import (
     ModuleResolutionError,
     ModuleResolver,
     _get_cache_key,

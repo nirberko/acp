@@ -10,7 +10,7 @@ from typing import Any, cast
 from lark import Lark, Token, Transformer, v_args
 from lark.exceptions import LarkError, UnexpectedCharacters, UnexpectedToken
 
-from agentform_compiler.agentform_ast import (
+from agentform_compiler.af_ast import (
     AgentBlock,
     AgentformBlock,
     AgentformFile,
@@ -130,7 +130,7 @@ class AgentformTransformer(Transformer):
 
         for block in blocks:
             if isinstance(block, AgentformBlock):
-                agentform_file.agentform = block
+                agentform_file.af = block
             elif isinstance(block, VariableBlock):
                 agentform_file.variables.append(block)
             elif isinstance(block, ProviderBlock):
@@ -626,7 +626,7 @@ def parse_agentform_file(path: str | Path) -> AgentformFile:
     """Parse an Agentform file into an AST.
 
     Args:
-        path: Path to the .agentform file
+        path: Path to the .af file
 
     Returns:
         Parsed AgentformFile AST

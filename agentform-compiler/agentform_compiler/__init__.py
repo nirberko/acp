@@ -1,33 +1,33 @@
 """Agentform Compiler - Compilation and validation for Agentform.
 
-Compiles native Agentform schema (.agentform) files.
+Compiles native Agentform schema (.af) files.
 """
 
-from agentform_compiler.agentform_ast import MergeError, ModuleBlock, merge_agentform_files
-from agentform_compiler.agentform_module_loader import LoadedModule, ModuleLoader, ModuleLoadError
-from agentform_compiler.agentform_module_resolver import (
+from agentform_compiler.af_ast import MergeError, ModuleBlock, merge_agentform_files
+from agentform_compiler.af_module_loader import LoadedModule, ModuleLoader, ModuleLoadError
+from agentform_compiler.af_module_resolver import (
     ModuleResolutionError,
     ModuleResolver,
     ResolvedModule,
     is_git_url,
     resolve_module_source,
 )
-from agentform_compiler.agentform_normalizer import NormalizationError, normalize_agentform
+from agentform_compiler.af_normalizer import NormalizationError, normalize_agentform
 
 # Agentform native schema support
-from agentform_compiler.agentform_parser import (
+from agentform_compiler.af_parser import (
     AgentformParseError,
     discover_agentform_files,
     parse_agentform,
     parse_agentform_directory,
     parse_agentform_file,
 )
-from agentform_compiler.agentform_resolver import (
+from agentform_compiler.af_resolver import (
     ResolutionError,
     ResolutionResult,
     resolve_references,
 )
-from agentform_compiler.agentform_validator import (
+from agentform_compiler.af_validator import (
     AgentformValidationError,
     AgentformValidationResult,
     validate_agentform,

@@ -14,12 +14,12 @@ This example showcases advanced Agentform™ features including:
 
 ```
 multi-agent/
-├── 00-project.agentform      # Project metadata (agentform block)
-├── 01-variables.agentform    # Variable definitions
-├── 02-providers.agentform    # Provider and model definitions
-├── 03-policies.agentform     # Policy definitions
-├── 04-agents.agentform       # Agent definitions
-├── 05-workflows.agentform    # Workflow definitions
+├── 00-project.af      # Project metadata (agentform block)
+├── 01-variables.af    # Variable definitions
+├── 02-providers.af    # Provider and model definitions
+├── 03-policies.af     # Policy definitions
+├── 04-agents.af       # Agent definitions
+├── 05-workflows.af    # Workflow definitions
 ├── input.yaml          # Sample input
 └── README.md
 ```
@@ -63,7 +63,7 @@ agentform validate --var openai_api_key=test --var anthropic_api_key=test
 
 ## Key Concepts
 
-### Multiple Providers (`02-providers.agentform`)
+### Multiple Providers (`02-providers.af`)
 
 Configure different LLM providers:
 
@@ -79,7 +79,7 @@ provider "llm.anthropic" "default" {
 }
 ```
 
-### Differentiated Policies (`03-policies.agentform`)
+### Differentiated Policies (`03-policies.af`)
 
 ```hcl
 policy "fast" {
@@ -93,7 +93,7 @@ policy "thorough" {
 }
 ```
 
-### Specialized Agents (`04-agents.agentform`)
+### Specialized Agents (`04-agents.af`)
 
 Each agent has a specific role:
 
@@ -101,7 +101,7 @@ Each agent has a specific role:
 - **quick_responder**: Brief answers using GPT-4o
 - **deep_analyst**: Thorough analysis using Claude Sonnet
 
-### Conditional Workflow (`05-workflows.agentform`)
+### Conditional Workflow (`05-workflows.af`)
 
 ```hcl
 step "route" {

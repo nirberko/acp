@@ -43,7 +43,7 @@ export OPENAI_API_KEY="your-openai-key"
 
 ### Step 2: Create your first Agentform file
 
-Create a file called `my-agent.agentform`:
+Create a file called `my-agent.af`:
 
 ```hcl
 agentform {
@@ -110,7 +110,7 @@ workflow "ask" {
 ### Step 3: Validate your configuration
 
 ```bash
-agentform validate my-agent.agentform --var openai_api_key=$OPENAI_API_KEY
+agentform validate my-agent.af --var openai_api_key=$OPENAI_API_KEY
 ```
 
 This checks that your configuration is valid and all references are correct.
@@ -119,7 +119,7 @@ This checks that your configuration is valid and all references are correct.
 
 ```bash
 agentform run ask \
-  --spec my-agent.agentform \
+  --spec my-agent.af \
   --var openai_api_key=$OPENAI_API_KEY \
   --input '{"question": "What is the capital of France?"}'
 ```

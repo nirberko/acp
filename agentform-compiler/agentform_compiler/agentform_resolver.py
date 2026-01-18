@@ -6,7 +6,7 @@ to ensure they point to valid targets.
 
 from dataclasses import dataclass, field
 
-from agentform_compiler.agentform_ast import (
+from agentform_compiler.af_ast import (
     AgentBlock,
     AgentformFile,
     CapabilityBlock,
@@ -77,7 +77,7 @@ class ReferenceResolver:
     """
 
     def __init__(self, agentform_file: AgentformFile):
-        self.agentform_file = agentform_file
+        self.af_file = agentform_file
         self.result = ResolutionResult()
 
     def resolve(self) -> ResolutionResult:
@@ -97,7 +97,7 @@ class ReferenceResolver:
     def _build_symbol_table(self) -> None:
         """Build the symbol table from all named blocks."""
         # Variables: var.name
-        for variable in self.agentform_file.variables:
+        for variable in self.af_file.variables:
             full_name = f"var.{variable.name}"
             if full_name in self.result.symbols:
                 self.result.add_error(
@@ -115,7 +115,7 @@ class ReferenceResolver:
                 )
 
         # Providers: provider.llm.openai.default
-        for provider in self.agentform_file.providers:
+        for provider in self.af_file.providers:
             full_name = f"provider.{provider.full_name}"
             if full_name in self.result.symbols:
                 self.result.add_error(
@@ -133,7 +133,7 @@ class ReferenceResolver:
                 )
 
         # Servers: server.name
-        for server in self.agentform_file.servers:
+        for server in self.af_file.servers:
             full_name = f"server.{server.name}"
             if full_name in self.result.symbols:
                 self.result.add_error(
@@ -151,7 +151,7 @@ class ReferenceResolver:
                 )
 
         # Capabilities: capability.name
-        for capability in self.agentform_file.capabilities:
+        for capability in self.af_file.capabilities:
             full_name = f"capability.{capability.name}"
             if full_name in self.result.symbols:
                 self.result.add_error(
@@ -169,7 +169,7 @@ class ReferenceResolver:
                 )
 
         # Policies: policy.name
-        for policy in self.agentform_file.policies:
+        for policy in self.af_file.policies:
             full_name = f"policy.{policy.name}"
             if full_name in self.result.symbols:
                 self.result.add_error(
@@ -187,7 +187,7 @@ class ReferenceResolver:
                 )
 
         # Models: model.name
-        for model in self.agentform_file.models:
+        for model in self.af_file.models:
             full_name = f"model.{model.name}"
             if full_name in self.result.symbols:
                 self.result.add_error(
@@ -205,7 +205,7 @@ class ReferenceResolver:
                 )
 
         # Agents: agent.name
-        for agent in self.agentform_file.agents:
+        for agent in self.af_file.agents:
             full_name = f"agent.{agent.name}"
             if full_name in self.result.symbols:
                 self.result.add_error(
@@ -223,7 +223,7 @@ class ReferenceResolver:
                 )
 
         # Workflows and their steps
-        for workflow in self.agentform_file.workflows:
+        for workflow in self.af_file.workflows:
             workflow_name = f"workflow.{workflow.name}"
             if workflow_name in self.result.symbols:
                 self.result.add_error(
@@ -264,7 +264,7 @@ class ReferenceResolver:
                     )
 
         # Modules: module.name
-        for module in self.agentform_file.modules:
+        for module in self.af_file.modules:
             full_name = f"module.{module.name}"
             if full_name in self.result.symbols:
                 self.result.add_error(
@@ -284,23 +284,23 @@ class ReferenceResolver:
     def _resolve_references(self) -> None:
         """Resolve all references in the AST."""
         # Resolve provider references (variable references in api_key)
-        for provider in self.agentform_file.providers:
+        for provider in self.af_file.providers:
             self._resolve_provider_references(provider)
 
         # Resolve model references (provider)
-        for model in self.agentform_file.models:
+        for model in self.af_file.models:
             self._resolve_model_references(model)
 
         # Resolve agent references (model, policy, capabilities)
-        for agent in self.agentform_file.agents:
+        for agent in self.af_file.agents:
             self._resolve_agent_references(agent)
 
         # Resolve capability references (server)
-        for capability in self.agentform_file.capabilities:
+        for capability in self.af_file.capabilities:
             self._resolve_capability_references(capability)
 
         # Resolve workflow references (steps, agents)
-        for workflow in self.agentform_file.workflows:
+        for workflow in self.af_file.workflows:
             self._resolve_workflow_references(workflow)
 
     def _resolve_provider_references(self, provider: ProviderBlock) -> None:

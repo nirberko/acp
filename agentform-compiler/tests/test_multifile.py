@@ -5,11 +5,11 @@ from pathlib import Path
 
 import pytest
 
-from agentform_compiler.agentform_ast import (
+from agentform_compiler.af_ast import (
     MergeError,
     merge_agentform_files,
 )
-from agentform_compiler.agentform_parser import (
+from agentform_compiler.af_parser import (
     AgentformParseError,
     discover_agentform_files,
     parse_agentform,
@@ -36,8 +36,8 @@ class TestMergeAgentformFiles:
         agentform_file = parse_agentform(content)
         result = merge_agentform_files([agentform_file])
 
-        assert result.agentform is not None
-        assert result.agentform.version == "0.1"
+        assert result.af is not None
+        assert result.af.version == "0.1"
         assert len(result.variables) == 1
 
     def test_merge_empty_list_raises_error(self) -> None:
@@ -65,13 +65,13 @@ class TestMergeAgentformFiles:
         }
         """
 
-        file1 = parse_agentform(file1_content, file_path="main.agentform")
-        file2 = parse_agentform(file2_content, file_path="agents.agentform")
+        file1 = parse_agentform(file1_content, file_path="main.af")
+        file2 = parse_agentform(file2_content, file_path="agents.af")
 
         result = merge_agentform_files([file1, file2])
 
-        assert result.agentform is not None
-        assert result.agentform.version == "0.1"
+        assert result.af is not None
+        assert result.af.version == "0.1"
         assert len(result.variables) == 1
         assert len(result.models) == 1
         assert len(result.agents) == 1
@@ -85,7 +85,7 @@ class TestMergeAgentformFiles:
             variable "openai_key" { type = string sensitive = true }
             variable "anthropic_key" { type = string sensitive = true }
             """,
-            file_path="variables.agentform",
+            file_path="variables.af",
         )
 
         # File 2: providers + models
@@ -95,7 +95,7 @@ class TestMergeAgentformFiles:
             model "gpt4" { provider = provider.llm.openai.default id = "gpt-4o" }
             model "gpt4_mini" { provider = provider.llm.openai.default id = "gpt-4o-mini" }
             """,
-            file_path="providers.agentform",
+            file_path="providers.af",
         )
 
         # File 3: agents + policies
@@ -109,7 +109,7 @@ class TestMergeAgentformFiles:
                 instructions = "Be helpful"
             }
             """,
-            file_path="agents.agentform",
+            file_path="agents.af",
         )
 
         # File 4: workflows
@@ -125,13 +125,13 @@ class TestMergeAgentformFiles:
                 step "end" { type = "end" }
             }
             """,
-            file_path="workflows.agentform",
+            file_path="workflows.af",
         )
 
         result = merge_agentform_files([file1, file2, file3, file4])
 
-        assert result.agentform is not None
-        assert result.agentform.project == "multifile"
+        assert result.af is not None
+        assert result.af.project == "multifile"
         assert len(result.variables) == 2
         assert len(result.providers) == 1
         assert len(result.models) == 2
@@ -141,10 +141,10 @@ class TestMergeAgentformFiles:
 
     def test_merge_no_agentform_block_raises_error(self) -> None:
         """Test that merging files without agentform block raises error."""
-        file1 = parse_agentform('variable "key" { type = string }', file_path="vars.agentform")
+        file1 = parse_agentform('variable "key" { type = string }', file_path="vars.af")
         file2 = parse_agentform(
             'model "gpt4" { provider = provider.test id = "test" }',
-            file_path="models.agentform",
+            file_path="models.af",
         )
 
         with pytest.raises(MergeError, match="No 'agentform' metadata block found"):
@@ -153,10 +153,10 @@ class TestMergeAgentformFiles:
     def test_merge_multiple_agentform_blocks_raises_error(self) -> None:
         """Test that multiple agentform blocks raises error."""
         file1 = parse_agentform(
-            'agentform { version = "0.1" project = "test1" }', file_path="main.agentform"
+            'agentform { version = "0.1" project = "test1" }', file_path="main.af"
         )
         file2 = parse_agentform(
-            'agentform { version = "0.1" project = "test2" }', file_path="other.agentform"
+            'agentform { version = "0.1" project = "test2" }', file_path="other.af"
         )
 
         with pytest.raises(MergeError, match="Multiple 'agentform' blocks found"):
@@ -169,9 +169,9 @@ class TestMergeAgentformFiles:
             agentform { version = "0.1" project = "test" }
             variable "api_key" { type = string }
             """,
-            file_path="main.agentform",
+            file_path="main.af",
         )
-        file2 = parse_agentform('variable "api_key" { type = string }', file_path="vars.agentform")
+        file2 = parse_agentform('variable "api_key" { type = string }', file_path="vars.af")
 
         with pytest.raises(MergeError, match="Duplicate variable 'api_key'"):
             merge_agentform_files([file1, file2])
@@ -183,11 +183,11 @@ class TestMergeAgentformFiles:
             agentform { version = "0.1" project = "test" }
             provider "llm.openai" "default" { api_key = "test" }
             """,
-            file_path="main.agentform",
+            file_path="main.af",
         )
         file2 = parse_agentform(
             'provider "llm.openai" "default" { api_key = "test2" }',
-            file_path="providers.agentform",
+            file_path="providers.af",
         )
 
         with pytest.raises(MergeError, match=r"Duplicate provider 'llm\.openai\.default'"):
@@ -200,11 +200,11 @@ class TestMergeAgentformFiles:
             agentform { version = "0.1" project = "test" }
             model "gpt4" { provider = provider.test id = "gpt-4" }
             """,
-            file_path="main.agentform",
+            file_path="main.af",
         )
         file2 = parse_agentform(
             'model "gpt4" { provider = provider.test id = "gpt-4o" }',
-            file_path="models.agentform",
+            file_path="models.af",
         )
 
         with pytest.raises(MergeError, match="Duplicate model 'gpt4'"):
@@ -217,11 +217,11 @@ class TestMergeAgentformFiles:
             agentform { version = "0.1" project = "test" }
             agent "assistant" { model = model.gpt4 instructions = "v1" }
             """,
-            file_path="main.agentform",
+            file_path="main.af",
         )
         file2 = parse_agentform(
             'agent "assistant" { model = model.gpt4 instructions = "v2" }',
-            file_path="agents.agentform",
+            file_path="agents.af",
         )
 
         with pytest.raises(MergeError, match="Duplicate agent 'assistant'"):
@@ -237,7 +237,7 @@ class TestMergeAgentformFiles:
                 step "end" { type = "end" }
             }
             """,
-            file_path="main.agentform",
+            file_path="main.af",
         )
         file2 = parse_agentform(
             """
@@ -246,7 +246,7 @@ class TestMergeAgentformFiles:
                 step "done" { type = "end" }
             }
             """,
-            file_path="workflows.agentform",
+            file_path="workflows.af",
         )
 
         with pytest.raises(MergeError, match="Duplicate workflow 'ask'"):
@@ -259,11 +259,11 @@ class TestMergeAgentformFiles:
             agentform { version = "0.1" project = "test" }
             server "fs" { command = ["cmd1"] transport = "stdio" }
             """,
-            file_path="main.agentform",
+            file_path="main.af",
         )
         file2 = parse_agentform(
             'server "fs" { command = ["cmd2"] transport = "stdio" }',
-            file_path="servers.agentform",
+            file_path="servers.af",
         )
 
         with pytest.raises(MergeError, match="Duplicate server 'fs'"):
@@ -276,11 +276,11 @@ class TestMergeAgentformFiles:
             agentform { version = "0.1" project = "test" }
             capability "read" { server = server.fs method = "read" }
             """,
-            file_path="main.agentform",
+            file_path="main.af",
         )
         file2 = parse_agentform(
             'capability "read" { server = server.fs method = "read_v2" }',
-            file_path="caps.agentform",
+            file_path="caps.af",
         )
 
         with pytest.raises(MergeError, match="Duplicate capability 'read'"):
@@ -293,11 +293,11 @@ class TestMergeAgentformFiles:
             agentform { version = "0.1" project = "test" }
             policy "default" { budgets { max_cost_usd_per_run = 1.0 } }
             """,
-            file_path="main.agentform",
+            file_path="main.af",
         )
         file2 = parse_agentform(
             'policy "default" { budgets { max_cost_usd_per_run = 2.0 } }',
-            file_path="policies.agentform",
+            file_path="policies.af",
         )
 
         with pytest.raises(MergeError, match="Duplicate policy 'default'"):
@@ -314,7 +314,7 @@ class TestDiscoverAgentformFiles:
             assert files == []
 
     def test_discover_single_file(self) -> None:
-        """Test discovering a single .agentform file."""
+        """Test discovering a single .af file."""
         with tempfile.TemporaryDirectory() as tmpdir:
             Path(tmpdir, "spec.af").write_text('agentform { version = "0.1" }')
             files = discover_agentform_files(tmpdir)
@@ -322,7 +322,7 @@ class TestDiscoverAgentformFiles:
             assert files[0].name == "spec.af"
 
     def test_discover_multiple_files(self) -> None:
-        """Test discovering multiple .agentform files."""
+        """Test discovering multiple .af files."""
         with tempfile.TemporaryDirectory() as tmpdir:
             Path(tmpdir, "agents.af").write_text('agent "test" {}')
             Path(tmpdir, "main.af").write_text('agentform { version = "0.1" }')
@@ -336,7 +336,7 @@ class TestDiscoverAgentformFiles:
             assert files[2].name == "workflows.af"
 
     def test_discover_ignores_non_agentform_files(self) -> None:
-        """Test that non-.agentform files are ignored."""
+        """Test that non-.af files are ignored."""
         with tempfile.TemporaryDirectory() as tmpdir:
             Path(tmpdir, "spec.af").write_text('agentform { version = "0.1" }')
             Path(tmpdir, "readme.md").write_text("# README")
@@ -393,21 +393,21 @@ class TestParseAgentformDirectory:
             )
 
             result = parse_agentform_directory(tmpdir)
-            assert result.agentform is not None
-            assert result.agentform.project == "single"
+            assert result.af is not None
+            assert result.af.project == "single"
             assert len(result.variables) == 1
 
     def test_parse_multi_file_directory(self) -> None:
         """Test parsing directory with multiple files."""
         with tempfile.TemporaryDirectory() as tmpdir:
-            # main.agentform - contains agentform block
+            # main.af - contains agentform block
             Path(tmpdir, "main.af").write_text(
                 """
                 agentform { version = "0.2" project = "multifile-test" }
                 """
             )
 
-            # variables.agentform
+            # variables.af
             Path(tmpdir, "variables.af").write_text(
                 """
                 variable "openai_key" {
@@ -417,7 +417,7 @@ class TestParseAgentformDirectory:
                 """
             )
 
-            # models.agentform
+            # models.af
             Path(tmpdir, "models.af").write_text(
                 """
                 provider "llm.openai" "default" {
@@ -430,7 +430,7 @@ class TestParseAgentformDirectory:
                 """
             )
 
-            # agents.agentform
+            # agents.af
             Path(tmpdir, "agents.af").write_text(
                 """
                 policy "default" {
@@ -444,7 +444,7 @@ class TestParseAgentformDirectory:
                 """
             )
 
-            # workflows.agentform
+            # workflows.af
             Path(tmpdir, "workflows.af").write_text(
                 """
                 workflow "ask" {
@@ -461,9 +461,9 @@ class TestParseAgentformDirectory:
 
             result = parse_agentform_directory(tmpdir)
 
-            assert result.agentform is not None
-            assert result.agentform.version == "0.2"
-            assert result.agentform.project == "multifile-test"
+            assert result.af is not None
+            assert result.af.version == "0.2"
+            assert result.af.project == "multifile-test"
             assert len(result.variables) == 1
             assert len(result.providers) == 1
             assert len(result.models) == 1

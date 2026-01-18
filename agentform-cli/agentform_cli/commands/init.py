@@ -5,12 +5,19 @@ from pathlib import Path
 import typer
 from rich.console import Console
 
-from agentform_compiler.agentform_module_resolver import (
+from agentform_compiler.af_module_resolver import (
     ModuleResolutionError,
     ModuleResolver,
     is_git_url,
 )
-from agentform_compiler.agentform_parser import AgentformParseError, parse_agentform_directory
+from agentform_compiler.af_parser import AgentformParseError, parse_agentform_directory
+
+from agentform_cli.provider_packages import (
+    detect_required_providers,
+    get_langchain_package,
+    install_package,
+    is_package_installed,
+)
 
 console = Console()
 
@@ -21,12 +28,14 @@ def init(
         help="Path to Agentform project directory. Defaults to current directory.",
     ),
 ) -> None:
-    """Initialize Agentform project - download external modules.
+    """Initialize Agentform project - install required provider packages and download external modules.
 
-    Parses Agentform files in the directory to find module blocks with Git sources,
-    then clones them to the local .agentform/modules/ directory.
+    This command:
+    1. Detects required LangChain provider packages from your .af files
+    2. Installs missing provider packages (e.g., langchain-openai, langchain-anthropic)
+    3. Downloads external modules from Git sources to .af/modules/
 
-    Similar to 'terraform init'.
+    You must run this command before using 'agentform run'. Similar to 'terraform init'.
     """
     # Resolve to absolute path
     if directory is None:
@@ -41,14 +50,14 @@ def init(
         console.print(f"[red]✗[/red] Not a directory: {project_dir}")
         raise typer.Exit(1)
 
-    # Check for .agentform files
-    agentform_files = list(project_dir.glob("*.agentform"))
+    # Check for .af files
+    agentform_files = list(project_dir.glob("*.af"))
     if not agentform_files:
-        console.print(f"[red]✗[/red] No .agentform files found in: {project_dir}")
+        console.print(f"[red]✗[/red] No .af files found in: {project_dir}")
         raise typer.Exit(1)
 
     console.print(f"\n[bold]Initializing Agentform project:[/bold] {project_dir}")
-    console.print(f"Found {len(agentform_files)} .agentform file(s)\n")
+    console.print(f"Found {len(agentform_files)} .af file(s)\n")
 
     # Parse the Agentform files to find module blocks
     try:
@@ -56,6 +65,40 @@ def init(
     except AgentformParseError as e:
         console.print(f"[red]✗[/red] Failed to parse Agentform files:\n{e}")
         raise typer.Exit(1) from None
+
+    # Check for required LangChain provider packages
+    required_providers = detect_required_providers(agentform_file)
+    if required_providers:
+        console.print(f"[bold]Checking LangChain provider packages...[/bold]\n")
+
+        missing_packages = []
+        for provider_type in sorted(required_providers):
+            package_name = get_langchain_package(provider_type)
+            if is_package_installed(package_name):
+                console.print(f"  [green]✓[/green] {package_name} (already installed)")
+            else:
+                missing_packages.append((provider_type, package_name))
+
+        if missing_packages:
+            console.print(f"\n[bold]Installing {len(missing_packages)} package(s)...[/bold]\n")
+            install_error_count = 0
+            for provider_type, package_name in missing_packages:
+                console.print(f"  [dim]•[/dim] Installing {package_name}...")
+                if install_package(package_name):
+                    console.print(f"    [green]✓[/green] Installed {package_name}")
+                else:
+                    console.print(f"    [red]✗[/red] Failed to install {package_name}")
+                    install_error_count += 1
+
+            if install_error_count > 0:
+                console.print(
+                    f"\n[yellow]![/yellow] {install_error_count} package(s) failed to install. "
+                    "You may need to install them manually."
+                )
+            else:
+                console.print(f"\n[green]✓[/green] Successfully installed {len(missing_packages)} package(s)")
+
+        console.print()
 
     # Check for modules
     if not agentform_file.modules:

@@ -1,6 +1,6 @@
 """AST (Abstract Syntax Tree) models for Agentform native schema.
 
-These models represent the parsed structure of .agentform files before
+These models represent the parsed structure of .af files before
 normalization to the existing SpecRoot format.
 """
 
@@ -472,7 +472,7 @@ class ModuleBlock(ASTNode):
 
 
 class AgentformFile(ASTNode):
-    """Root node representing an entire .agentform file.
+    """Root node representing an entire .af file.
 
     Contains all top-level blocks parsed from the file.
     """
@@ -581,7 +581,7 @@ def _format_location(loc: SourceLocation | None) -> str:
 def merge_agentform_files(files: list[AgentformFile]) -> AgentformFile:
     """Merge multiple AgentformFile ASTs into a single AgentformFile.
 
-    This function combines all blocks from multiple .agentform files into one,
+    This function combines all blocks from multiple .af files into one,
     validating that:
     - Exactly one 'agentform {}' metadata block exists across all files
     - No duplicate symbols exist (variables, providers, servers, etc.)
@@ -600,7 +600,7 @@ def merge_agentform_files(files: list[AgentformFile]) -> AgentformFile:
 
     if len(files) == 1:
         # Single file, just validate it has an agentform block
-        if files[0].agentform is None:
+        if files[0].af is None:
             raise MergeError(
                 "No 'agentform' metadata block found. One file must contain an 'agentform {}' block."
             )
@@ -609,8 +609,8 @@ def merge_agentform_files(files: list[AgentformFile]) -> AgentformFile:
     # Collect all agentform blocks
     agentform_blocks: list[tuple[AgentformBlock, SourceLocation | None]] = []
     for f in files:
-        if f.agentform is not None:
-            agentform_blocks.append((f.agentform, f.agentform.location))
+        if f.af is not None:
+            agentform_blocks.append((f.af, f.af.location))
 
     # Validate exactly one agentform block
     if len(agentform_blocks) == 0:

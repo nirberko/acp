@@ -29,7 +29,7 @@ agent "reviewer" {
 }
 ```
 
-**The result:** Your agent configurations become version-controlled artifacts that are easy to review, share, and reproduce. The native `.agentform` format provides type safety, explicit references, and improved editor support.
+**The result:** Your agent configurations become version-controlled artifacts that are easy to review, share, and reproduce. The native `.af` format provides type safety, explicit references, and improved editor support.
 
 ---
 
@@ -49,7 +49,7 @@ export OPENAI_API_KEY="your-openai-key"
 
 ### 3. Create an agent spec
 
-Create a file called `my-agent.agentform`:
+Create a file called `my-agent.af`:
 
 ```hcl
 agentform {
@@ -117,10 +117,10 @@ workflow "ask" {
 
 ```bash
 # Validate your spec
-agentform validate my-agent.agentform
+agentform validate my-agent.af
 
 # Run with input
-agentform run ask --spec my-agent.agentform --input '{"question": "What is the capital of France?"}'
+agentform run ask --spec my-agent.af --input '{"question": "What is the capital of France?"}'
 ```
 
 ---
@@ -129,7 +129,7 @@ agentform run ask --spec my-agent.agentform --input '{"question": "What is the c
 
 | Feature | Description |
 |---------|-------------|
-| **Native Schema** | Define agents, workflows, and policies in type-safe `.agentform` format with explicit references |
+| **Native Schema** | Define agents, workflows, and policies in type-safe `.af` format with explicit references |
 | **Modules** | Terraform-style reusable modules for sharing agent configurations via Git |
 | **Multi-Provider** | Use OpenAI, Anthropic, or other LLM providers interchangeably |
 | **Multi-Agent** | Coordinate multiple specialized agents with conditional routing |

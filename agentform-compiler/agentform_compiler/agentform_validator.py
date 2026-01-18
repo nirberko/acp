@@ -6,7 +6,7 @@ such as required fields, valid values, and step type requirements.
 
 from dataclasses import dataclass, field
 
-from agentform_compiler.agentform_ast import (
+from agentform_compiler.af_ast import (
     AgentBlock,
     AgentformFile,
     CapabilityBlock,
@@ -20,7 +20,7 @@ from agentform_compiler.agentform_ast import (
     VarRef,
     WorkflowBlock,
 )
-from agentform_compiler.agentform_resolver import ResolutionResult
+from agentform_compiler.af_resolver import ResolutionResult
 
 # Valid variable types
 VALID_VAR_TYPES = {"string", "number", "bool", "list"}
@@ -89,7 +89,7 @@ class AgentformValidator:
         agentform_file: AgentformFile,
         resolution: ResolutionResult,
     ):
-        self.agentform_file = agentform_file
+        self.af_file = agentform_file
         self.resolution = resolution
         self.result = AgentformValidationResult()
 
@@ -103,46 +103,46 @@ class AgentformValidator:
         self._validate_agentform_block()
 
         # Check variables
-        for variable in self.agentform_file.variables:
+        for variable in self.af_file.variables:
             self._validate_variable(variable)
 
         # Check providers
-        for provider in self.agentform_file.providers:
+        for provider in self.af_file.providers:
             self._validate_provider(provider)
 
         # Check servers
-        for server in self.agentform_file.servers:
+        for server in self.af_file.servers:
             self._validate_server(server)
 
         # Check capabilities
-        for capability in self.agentform_file.capabilities:
+        for capability in self.af_file.capabilities:
             self._validate_capability(capability)
 
         # Check policies
-        for policy in self.agentform_file.policies:
+        for policy in self.af_file.policies:
             self._validate_policy(policy)
 
         # Check models
-        for model in self.agentform_file.models:
+        for model in self.af_file.models:
             self._validate_model(model)
 
         # Check agents
-        for agent in self.agentform_file.agents:
+        for agent in self.af_file.agents:
             self._validate_agent(agent)
 
         # Check workflows
-        for workflow in self.agentform_file.workflows:
+        for workflow in self.af_file.workflows:
             self._validate_workflow(workflow)
 
         return self.result
 
     def _validate_agentform_block(self) -> None:
         """Validate the agentform metadata block."""
-        if self.agentform_file.agentform is None:
+        if self.af_file.af is None:
             self.result.add_error("agentform", "Missing required 'agentform' block")
             return
 
-        agentform = self.agentform_file.agentform
+        agentform = self.af_file.af
 
         if not agentform.version:
             self.result.add_error(

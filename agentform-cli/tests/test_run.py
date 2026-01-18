@@ -214,7 +214,7 @@ class TestRunCommand:
 
     def test_run_nonexistent_spec_file(self):
         """Test running with a spec file that doesn't exist."""
-        result = runner.invoke(app, ["run", "test-workflow", "nonexistent.agentform"])
+        result = runner.invoke(app, ["run", "test-workflow", "nonexistent.af"])
         assert result.exit_code == 1
         assert "not found" in result.stdout.lower()
 
@@ -231,7 +231,7 @@ workflow "test-workflow" {
   step "end" { type = "end" }
 }
 """
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".agentform", delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".af", delete=False) as f:
             f.write(agentform_content)
             spec_path = Path(f.name)
 
@@ -260,7 +260,7 @@ workflow "test-workflow" {
 """
         input_data = {"key": "value"}
 
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".agentform", delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".af", delete=False) as f:
             f.write(agentform_content)
             spec_path = Path(f.name)
 
@@ -300,7 +300,7 @@ workflow "existing-workflow" {
   step "end" { type = "end" }
 }
 """
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".agentform", delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".af", delete=False) as f:
             f.write(agentform_content)
             spec_path = Path(f.name)
 
@@ -330,7 +330,7 @@ workflow "test-workflow" {
   step "end" { type = "end" }
 }
 """
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".agentform", delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".af", delete=False) as f:
             f.write(agentform_content)
             spec_path = Path(f.name)
 

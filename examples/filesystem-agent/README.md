@@ -10,14 +10,14 @@ This example showcases how to integrate external capabilities via MCP (Model Con
 
 ```
 filesystem-agent/
-├── 00-project.agentform       # Project metadata (agentform block)
-├── 01-variables.agentform     # Variable definitions
-├── 02-providers.agentform     # Provider and model definitions
-├── 03-servers.agentform       # MCP server configuration
-├── 04-capabilities.agentform  # Capability definitions
-├── 05-policies.agentform      # Policy definitions
-├── 06-agents.agentform        # Agent definitions
-├── 07-workflows.agentform     # Workflow definitions
+├── 00-project.af       # Project metadata (agentform block)
+├── 01-variables.af     # Variable definitions
+├── 02-providers.af     # Provider and model definitions
+├── 03-servers.af       # MCP server configuration
+├── 04-capabilities.af  # Capability definitions
+├── 05-policies.af      # Policy definitions
+├── 06-agents.af        # Agent definitions
+├── 07-workflows.af     # Workflow definitions
 ├── input.yaml           # Sample input
 └── README.md
 ```
@@ -58,7 +58,7 @@ agentform validate --var openai_api_key=test
 
 ## Key Concepts
 
-### MCP Server (`03-servers.agentform`)
+### MCP Server (`03-servers.af`)
 
 Define external MCP servers that provide capabilities:
 
@@ -70,7 +70,7 @@ server "filesystem" {
 }
 ```
 
-### Capabilities (`04-capabilities.agentform`)
+### Capabilities (`04-capabilities.af`)
 
 Map server methods to named capabilities with defined side effects:
 
@@ -89,7 +89,7 @@ capability "write_file" {
 }
 ```
 
-### Policy Budgets (`05-policies.agentform`)
+### Policy Budgets (`05-policies.af`)
 
 ```hcl
 policy "filesystem_policy" {

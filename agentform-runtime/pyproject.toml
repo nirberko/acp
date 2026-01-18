@@ -26,8 +26,8 @@ agentform-mcp = {path = "../agentform-mcp", develop = true}
 agentform-compiler = {path = "../agentform-compiler", develop = true}
 pydantic = "^2.5"
 langchain = "^0.3"
-langchain-openai = "^0.3"
-langchain-anthropic = "^0.3"
+# Provider-specific packages (langchain-openai, langchain-anthropic, etc.) must be installed
+# by running 'agentform init' in your project directory. No providers are installed by default.
 anyio = "^4.2"
 structlog = "^25.5.0"
 

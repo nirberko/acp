@@ -1,7 +1,7 @@
 """Tests for Agentform reference resolver."""
 
-from agentform_compiler.agentform_parser import parse_agentform
-from agentform_compiler.agentform_resolver import resolve_references
+from agentform_compiler.af_parser import parse_agentform
+from agentform_compiler.af_resolver import resolve_references
 
 
 class TestSymbolTableBuilding:

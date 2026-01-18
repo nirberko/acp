@@ -70,6 +70,6 @@ venv.bak/
 poetry.lock
 
 # Agentform specific
-.agentform/
+.af/
 *.trace.json
 

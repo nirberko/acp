@@ -22,7 +22,7 @@ class Agentform:
         ```python
         from agentform_api import Agentform
 
-        # Load from directory containing .agentform files
+        # Load from directory containing .af files
         agentform = Agentform.from_path("path/to/project/", variables={"api_key": "..."})
 
         # Run a workflow
@@ -39,7 +39,7 @@ class Agentform:
     ):
         """Initialize Agentform client with a compiled spec.
 
-        Use `Agentform.from_path()` to create an instance from .agentform files.
+        Use `Agentform.from_path()` to create an instance from .af files.
 
         Args:
             spec: Compiled Agentform specification
@@ -61,11 +61,11 @@ class Agentform:
     ) -> "Agentform":
         """Create an Agentform instance from a file or directory path.
 
-        If path is a directory, all .agentform files in it are discovered and compiled
+        If path is a directory, all .af files in it are discovered and compiled
         together (Terraform-style multi-file support).
 
         Args:
-            path: Path to .agentform file or directory containing .agentform files
+            path: Path to .af file or directory containing .af files
             variables: Variable values to substitute in the spec
             approval_handler: Custom handler for human approval steps (default: CLI)
             verbose: Enable verbose logging
@@ -82,7 +82,7 @@ class Agentform:
             agentform = Agentform.from_path("./my-project/", variables={"api_key": "sk-..."})
 
             # Load from single file
-            agentform = Agentform.from_path("agent.agentform", variables={"api_key": "sk-..."})
+            agentform = Agentform.from_path("agent.af", variables={"api_key": "sk-..."})
             ```
         """
         path = Path(path)

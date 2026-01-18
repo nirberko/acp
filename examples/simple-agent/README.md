@@ -10,17 +10,17 @@ This is the simplest possible Agentform™ configuration—a single agent with n
 
 ```
 simple-agent/
-├── 00-project.agentform      # Project metadata (agentform block)
-├── 01-variables.agentform    # Variable definitions
-├── 02-providers.agentform    # Provider and model definitions
-├── 03-policies.agentform     # Policy definitions
-├── 04-agents.agentform       # Agent definitions
-├── 05-workflows.agentform    # Workflow definitions
+├── 00-project.af      # Project metadata (agentform block)
+├── 01-variables.af    # Variable definitions
+├── 02-providers.af    # Provider and model definitions
+├── 03-policies.af     # Policy definitions
+├── 04-agents.af       # Agent definitions
+├── 05-workflows.af    # Workflow definitions
 ├── input.yaml          # Sample input
 └── README.md
 ```
 
-Files are processed in alphabetical order, so we use numbered prefixes to ensure proper ordering. References work across files—for example, `04-agents.agentform` can reference models defined in `02-providers.agentform`.
+Files are processed in alphabetical order, so we use numbered prefixes to ensure proper ordering. References work across files—for example, `04-agents.af` can reference models defined in `02-providers.af`.
 
 ## Prerequisites
 
@@ -54,7 +54,7 @@ agentform compile --var openai_api_key=test
 
 ## Key Concepts
 
-### Variables (`01-variables.agentform`)
+### Variables (`01-variables.af`)
 
 Define variables that can be provided at runtime:
 
@@ -66,7 +66,7 @@ variable "openai_api_key" {
 }
 ```
 
-### Providers & Models (`02-providers.agentform`)
+### Providers & Models (`02-providers.af`)
 
 Configure LLM providers and model definitions:
 
@@ -86,7 +86,7 @@ model "gpt4o_mini" {
 }
 ```
 
-### Policies (`03-policies.agentform`)
+### Policies (`03-policies.af`)
 
 Define resource constraints and budgets:
 
@@ -97,7 +97,7 @@ policy "default" {
 }
 ```
 
-### Agents (`04-agents.agentform`)
+### Agents (`04-agents.af`)
 
 Configure agents with models, instructions, and policies:
 
@@ -114,7 +114,7 @@ EOF
 }
 ```
 
-### Workflows (`05-workflows.agentform`)
+### Workflows (`05-workflows.af`)
 
 Define execution flow using steps:
 

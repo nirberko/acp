@@ -53,8 +53,14 @@ def generate_ir(spec: SpecRoot, resolve_credentials: bool = True) -> CompiledSpe
             # Direct value (from variable substitution)
             api_key = ResolvedCredential(env_var="DIRECT_VALUE", value=provider.api_key)
 
+        # Extract provider_type from name
+        # Name format is either "{vendor}" or "{vendor}_{name}"
+        # Provider type is the vendor part (before first underscore, or whole name if no underscore)
+        provider_type = name.split("_")[0] if "_" in name else name
+
         providers[name] = ResolvedProvider(
             name=name,
+            provider_type=provider_type,
             api_key=api_key,
             default_params=provider.default_params or LLMProviderParams(),
         )

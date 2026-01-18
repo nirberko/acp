@@ -113,7 +113,7 @@ class TestCompileAgentformFile:
             step "end" { type = "end" }
         }
         """
-        with tempfile.NamedTemporaryFile(suffix=".agentform", delete=False, mode="w") as f:
+        with tempfile.NamedTemporaryFile(suffix=".af", delete=False, mode="w") as f:
             f.write(content)
             f.flush()
 
@@ -131,7 +131,7 @@ class TestCompileAgentformFile:
     def test_file_not_found(self) -> None:
         """Test error when file doesn't exist."""
         with pytest.raises(CompilationError) as exc_info:
-            compile_agentform_file("/nonexistent/path.agentform")
+            compile_agentform_file("/nonexistent/path.af")
 
         assert "not found" in str(exc_info.value).lower()
 
@@ -168,7 +168,7 @@ class TestValidateAgentformFile:
             step "end" { type = "end" }
         }
         """
-        with tempfile.NamedTemporaryFile(suffix=".agentform", delete=False, mode="w") as f:
+        with tempfile.NamedTemporaryFile(suffix=".af", delete=False, mode="w") as f:
             f.write(content)
             f.flush()
 
@@ -191,7 +191,7 @@ class TestValidateAgentformFile:
             instructions = "test"
         }
         """
-        with tempfile.NamedTemporaryFile(suffix=".agentform", delete=False, mode="w") as f:
+        with tempfile.NamedTemporaryFile(suffix=".af", delete=False, mode="w") as f:
             f.write(content)
             f.flush()
 
@@ -207,7 +207,7 @@ class TestUnifiedCompileFile:
     """Test unified compile_file function with auto-detection."""
 
     def test_compiles_agentform_file(self) -> None:
-        """Test that .agentform files are compiled correctly."""
+        """Test that .af files are compiled correctly."""
         content = """
         agentform { version = "0.1" project = "agentform-test" }
 
@@ -235,7 +235,7 @@ class TestUnifiedCompileFile:
             step "end" { type = "end" }
         }
         """
-        with tempfile.NamedTemporaryFile(suffix=".agentform", delete=False, mode="w") as f:
+        with tempfile.NamedTemporaryFile(suffix=".af", delete=False, mode="w") as f:
             f.write(content)
             f.flush()
 
@@ -264,7 +264,7 @@ project:
             try:
                 with pytest.raises(CompilationError) as exc_info:
                     compile_file(f.name, check_env=False, resolve_credentials=False)
-                assert "Expected .agentform file" in str(exc_info.value) or ".yaml" in str(
+                assert "Expected .af file" in str(exc_info.value) or ".yaml" in str(
                     exc_info.value
                 )
             finally:
@@ -280,9 +280,9 @@ project:
                 with pytest.raises(CompilationError) as exc_info:
                     compile_file(f.name)
 
-                assert "Expected .agentform file" in str(
+                assert "Expected .af file" in str(
                     exc_info.value
-                ) or "Only .agentform files" in str(exc_info.value)
+                ) or "Only .af files" in str(exc_info.value)
             finally:
                 Path(f.name).unlink()
 
@@ -291,7 +291,7 @@ class TestUnifiedValidateFile:
     """Test unified validate_file function with auto-detection."""
 
     def test_validates_agentform_file(self) -> None:
-        """Test that .agentform files are validated correctly."""
+        """Test that .af files are validated correctly."""
         content = """
         agentform { version = "0.1" project = "test" }
 
@@ -319,7 +319,7 @@ class TestUnifiedValidateFile:
             step "end" { type = "end" }
         }
         """
-        with tempfile.NamedTemporaryFile(suffix=".agentform", delete=False, mode="w") as f:
+        with tempfile.NamedTemporaryFile(suffix=".af", delete=False, mode="w") as f:
             f.write(content)
             f.flush()
 
@@ -347,7 +347,7 @@ project:
             try:
                 with pytest.raises(CompilationError) as exc_info:
                     validate_file(f.name, check_env=False)
-                assert "Expected .agentform file" in str(exc_info.value) or ".yaml" in str(
+                assert "Expected .af file" in str(exc_info.value) or ".yaml" in str(
                     exc_info.value
                 )
             finally:

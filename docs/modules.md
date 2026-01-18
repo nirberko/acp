@@ -29,7 +29,7 @@ The `//` syntax separates the repository URL from the subdirectory path (like Te
 
 ### 2. Initialize your project
 
-Download all external modules to your local `.agentform/modules/` directory:
+Download all external modules to your local `.af/modules/` directory:
 
 ```bash
 agentform init
@@ -63,19 +63,19 @@ agentform run module.pr-reviewer.review_workflow .
 
 ## Creating Modules
 
-A module is simply a directory containing `.agentform` files. To create a shareable module:
+A module is simply a directory containing `.af` files. To create a shareable module:
 
 ### 1. Create the module structure
 
 ```
 my-module/
-├── 00-project.agentform      # Module metadata
-├── 01-variables.agentform    # Input parameters (variables)
-├── 02-providers.agentform    # LLM providers
-├── 03-policies.agentform     # Policies
-├── 04-models.agentform       # Model configurations
-├── 05-agents.agentform       # Agent definitions
-└── 06-workflows.agentform    # Workflows (optional)
+├── 00-project.af      # Module metadata
+├── 01-variables.af    # Input parameters (variables)
+├── 02-providers.af    # LLM providers
+├── 03-policies.af     # Policies
+├── 04-models.af       # Model configurations
+├── 05-agents.af       # Agent definitions
+└── 06-workflows.af    # Workflows (optional)
 ```
 
 ### 2. Define input variables
@@ -83,7 +83,7 @@ my-module/
 Variables without defaults become required parameters:
 
 ```hcl
-// 01-variables.agentform
+// 01-variables.af
 variable "api_key" {
   type        = string
   description = "API key for the LLM provider"
@@ -122,18 +122,18 @@ module "my-module" {
 
 ## Module Caching
 
-Modules are cached in `.agentform/modules/` within your project directory:
+Modules are cached in `.af/modules/` within your project directory:
 
 ```
 my-project/
-├── .agentform/
+├── .af/
 │   └── modules/
 │       └── github_com_org_repo_abc123/  # Cached module
-├── 00-project.agentform
-└── 01-modules.agentform
+├── 00-project.af
+└── 01-modules.af
 ```
 
-Add `.agentform/` to your `.gitignore` - these are downloaded dependencies.
+Add `.af/` to your `.gitignore` - these are downloaded dependencies.
 
 ## Best Practices
 

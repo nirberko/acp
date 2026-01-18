@@ -6,7 +6,7 @@ for validation and IR generation.
 
 from typing import Any
 
-from agentform_compiler.agentform_ast import (
+from agentform_compiler.af_ast import (
     AgentformFile,
     AndExpr,
     ComparisonExpr,
@@ -22,7 +22,7 @@ from agentform_compiler.agentform_ast import (
     VariableBlock,
     VarRef,
 )
-from agentform_compiler.agentform_resolver import ResolutionResult
+from agentform_compiler.af_resolver import ResolutionResult
 from agentform_schema.models import (
     AgentConfig,
     BudgetConfig,
@@ -65,7 +65,7 @@ class AgentformNormalizer:
         variables: dict[str, Any] | None = None,
         loaded_modules: dict[str, Any] | None = None,  # dict[str, LoadedModule]
     ):
-        self.agentform_file = agentform_file
+        self.af_file = agentform_file
         self.resolution = resolution
         self.variables = variables or {}
         self.loaded_modules = loaded_modules or {}
@@ -121,7 +121,7 @@ class AgentformNormalizer:
             module_name: Name of the module instance
             loaded_module: LoadedModule instance
         """
-        module_agentform = loaded_module.agentform_file
+        module_agentform = loaded_module.af_file
 
         for model in module_agentform.models:
             # Get provider reference
@@ -184,7 +184,7 @@ class AgentformNormalizer:
             workflows: Main workflows list to merge into
         """
         for module_name, loaded_module in self.loaded_modules.items():
-            module_agentform = loaded_module.agentform_file
+            module_agentform = loaded_module.af_file
             module_params = loaded_module.parameters
 
             # Resolve VarRefs in module parameters against parent's variables
@@ -273,15 +273,15 @@ class AgentformNormalizer:
 
     def _get_version(self) -> str:
         """Get version from agentform block."""
-        if self.agentform_file.agentform and self.agentform_file.agentform.version:
-            return self.agentform_file.agentform.version
+        if self.af_file.af and self.af_file.af.version:
+            return self.af_file.af.version
         return "0.1"
 
     def _normalize_project(self) -> ProjectConfig:
         """Normalize project configuration."""
         name = "unnamed"
-        if self.agentform_file.agentform and self.agentform_file.agentform.project:
-            name = self.agentform_file.agentform.project
+        if self.af_file.af and self.af_file.af.project:
+            name = self.af_file.af.project
         return ProjectConfig(name=name)
 
     def _resolve_variable(self, var_ref: VarRef) -> tuple[str, bool]:
@@ -325,7 +325,7 @@ class AgentformNormalizer:
         """Normalize provider blocks to ProvidersConfig."""
         llm_providers: dict[str, LLMProviderConfig] = {}
 
-        for provider in self.agentform_file.providers:
+        for provider in self.af_file.providers:
             # Parse provider type (e.g., "llm.openai" -> category="llm", vendor="openai")
             parts = provider.provider_type.split(".")
             if len(parts) >= 2 and parts[0] == "llm":
@@ -358,7 +358,7 @@ class AgentformNormalizer:
         """Normalize server blocks."""
         servers: list[ServerConfig] = []
 
-        for server in self.agentform_file.servers:
+        for server in self.af_file.servers:
             # Get command
             command = server.get_attribute("command")
             if not isinstance(command, list):
@@ -404,7 +404,7 @@ class AgentformNormalizer:
         """Normalize capability blocks."""
         capabilities: list[CapabilityConfig] = []
 
-        for cap in self.agentform_file.capabilities:
+        for cap in self.af_file.capabilities:
             # Get server reference
             server_ref = cap.get_attribute("server")
             server_name = self._ref_to_name(server_ref, "server")
@@ -446,7 +446,7 @@ class AgentformNormalizer:
         """Normalize policy blocks."""
         policies: list[PolicyConfig] = []
 
-        for policy in self.agentform_file.policies:
+        for policy in self.af_file.policies:
             # Merge all budget blocks
             budgets = BudgetConfig()
             for budget_block in policy.get_budgets_blocks():
@@ -469,7 +469,7 @@ class AgentformNormalizer:
 
     def _build_model_cache(self) -> None:
         """Build cache of model info for agent normalization."""
-        for model in self.agentform_file.models:
+        for model in self.af_file.models:
             # Get provider reference
             provider_ref = model.get_attribute("provider")
             provider_name = self._provider_ref_to_key(provider_ref)
@@ -494,7 +494,7 @@ class AgentformNormalizer:
         """Normalize agent blocks."""
         agents: list[AgentConfig] = []
 
-        for agent in self.agentform_file.agents:
+        for agent in self.af_file.agents:
             # Get primary model reference
             model_ref = agent.get_attribute("model")
             model_name = self._ref_to_name(model_ref, "model")
@@ -583,7 +583,7 @@ class AgentformNormalizer:
         """Normalize workflow blocks."""
         workflows: list[WorkflowConfig] = []
 
-        for workflow in self.agentform_file.workflows:
+        for workflow in self.af_file.workflows:
             # Get entry step
             entry_ref = workflow.get_attribute("entry")
             entry = self._ref_to_name(entry_ref, "step")

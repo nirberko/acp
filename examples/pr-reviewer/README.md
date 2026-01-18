@@ -14,14 +14,14 @@ This example showcases advanced Agentform™ features including:
 
 ```
 pr-reviewer/
-├── 00-project.agentform       # Project metadata (agentform block)
-├── 01-variables.agentform     # Variable definitions
-├── 02-providers.agentform     # Provider and model definitions
-├── 03-servers.agentform       # MCP server configuration
-├── 04-capabilities.agentform  # Capability definitions
-├── 05-policies.agentform      # Policy definitions
-├── 06-agents.agentform        # Agent definitions
-├── 07-workflows.agentform     # Workflow definitions
+├── 00-project.af       # Project metadata (agentform block)
+├── 01-variables.af     # Variable definitions
+├── 02-providers.af     # Provider and model definitions
+├── 03-servers.af       # MCP server configuration
+├── 04-capabilities.af  # Capability definitions
+├── 05-policies.af      # Policy definitions
+├── 06-agents.af        # Agent definitions
+├── 07-workflows.af     # Workflow definitions
 ├── input.yaml           # Sample input
 └── README.md
 ```
@@ -74,7 +74,7 @@ agentform validate --var openai_api_key=test --var github_personal_access_token=
 
 ## Key Concepts
 
-### Variables (`01-variables.agentform`)
+### Variables (`01-variables.af`)
 
 Sensitive credentials are defined as variables:
 
@@ -90,7 +90,7 @@ variable "github_personal_access_token" {
 }
 ```
 
-### Authenticated MCP Server (`03-servers.agentform`)
+### Authenticated MCP Server (`03-servers.af`)
 
 ```hcl
 server "github" {
@@ -103,7 +103,7 @@ server "github" {
 }
 ```
 
-### Capabilities with Approval (`04-capabilities.agentform`)
+### Capabilities with Approval (`04-capabilities.af`)
 
 ```hcl
 capability "create_review" {
@@ -114,7 +114,7 @@ capability "create_review" {
 }
 ```
 
-### Human Approval Gates (`07-workflows.agentform`)
+### Human Approval Gates (`07-workflows.af`)
 
 ```hcl
 step "approval" {

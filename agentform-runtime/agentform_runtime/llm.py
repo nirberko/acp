@@ -2,9 +2,8 @@
 
 from typing import Any
 
-from langchain_anthropic import ChatAnthropic
+from langchain.chat_models import init_chat_model
 from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
-from langchain_openai import ChatOpenAI
 
 from agentform_runtime.logging_config import get_logger
 from agentform_schema.ir import ResolvedAgent, ResolvedProvider
@@ -60,55 +59,39 @@ class LLMExecutor:
         if not api_key:
             raise LLMError(f"API key for provider '{provider_name}' not resolved")
 
-        # Build params
+        # Build params for init_chat_model
         llm_params: dict[str, Any] = {
             "model": model,
-            "api_key": api_key,
+            "model_provider": provider.provider_type,
         }
 
+        # Add API key if provided
+        if api_key:
+            llm_params["api_key"] = api_key
+
+        # Add temperature and max_tokens if provided
         if params.get("temperature") is not None:
             llm_params["temperature"] = params["temperature"]
         if params.get("max_tokens") is not None:
             llm_params["max_tokens"] = params["max_tokens"]
 
-        # Create LLM based on provider type
-        # Handle both direct names (openai) and module-namespaced names (module.llm.openai)
-        provider_type = self._extract_provider_type(provider_name)
-
-        llm: ChatOpenAI | ChatAnthropic
-        if provider_type == "openai":
-            llm = ChatOpenAI(**llm_params)
-        elif provider_type == "anthropic":
-            llm = ChatAnthropic(**llm_params)
-        else:
-            raise LLMError(f"Unsupported provider: {provider_name}")
+        # Create LLM using LangChain's generic init_chat_model
+        try:
+            llm = init_chat_model(**llm_params)
+        except ImportError as e:
+            package_name = f"langchain-{provider.provider_type}"
+            raise LLMError(
+                f"Provider '{provider.provider_type}' not installed. "
+                f"Run 'agentform init' to install required packages"
+            ) from e
+        except Exception as e:
+            raise LLMError(
+                f"Failed to initialize LLM for provider '{provider.provider_type}': {e}"
+            ) from e
 
         self._llm_cache[cache_key] = llm
         self._logger.debug("llm_creation_complete", provider=provider_name, model=model)
         return llm
-
-    def _extract_provider_type(self, provider_name: str) -> str:
-        """Extract the provider type from a provider name.
-
-        Handles both direct names and module-namespaced names:
-        - "openai" -> "openai"
-        - "module.llm.openai" -> "openai"
-        - "module.my-module.anthropic" -> "anthropic"
-
-        Args:
-            provider_name: Provider name (may be namespaced)
-
-        Returns:
-            The base provider type (openai, anthropic, etc.)
-        """
-        # For module-namespaced providers, extract the last part
-        # module.llm.openai -> openai
-        # module.mymod.anthropic_custom -> anthropic_custom
-        if provider_name.startswith("module."):
-            parts = provider_name.split(".")
-            if len(parts) >= 3:
-                return parts[-1]
-        return provider_name
 
     async def execute(
         self,

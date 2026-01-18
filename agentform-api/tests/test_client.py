@@ -17,7 +17,7 @@ class TestAgentformFromPath:
     def test_from_path_file_not_found(self):
         """Test error when file doesn't exist."""
         with pytest.raises(CompilationError, match="Failed to compile spec"):
-            Agentform.from_path("/nonexistent/file.agentform")
+            Agentform.from_path("/nonexistent/file.af")
 
     @patch("agentform_api.client.compile_file")
     def test_from_path_with_variables(self, mock_compile):
@@ -28,7 +28,7 @@ class TestAgentformFromPath:
         mock_compile.return_value = mock_spec
 
         variables = {"api_key": "test-key", "model": "gpt-4o"}
-        Agentform.from_path("test.agentform", variables=variables)
+        Agentform.from_path("test.af", variables=variables)
 
         mock_compile.assert_called_once()
         call_kwargs = mock_compile.call_args
@@ -43,7 +43,7 @@ class TestAgentformFromPath:
         mock_compile.return_value = mock_spec
 
         mock_handler = MagicMock()
-        agentform = Agentform.from_path("test.agentform", approval_handler=mock_handler)
+        agentform = Agentform.from_path("test.af", approval_handler=mock_handler)
 
         assert agentform._approval_handler == mock_handler
 
@@ -55,7 +55,7 @@ class TestAgentformFromPath:
         mock_spec.agents = {}
         mock_compile.return_value = mock_spec
 
-        agentform = Agentform.from_path("test.agentform", verbose=True)
+        agentform = Agentform.from_path("test.af", verbose=True)
 
         assert agentform._verbose is True
 
@@ -71,7 +71,7 @@ class TestAgentformProperties:
         mock_spec.agents = {}
         mock_compile.return_value = mock_spec
 
-        agentform = Agentform.from_path("test.agentform")
+        agentform = Agentform.from_path("test.af")
 
         assert set(agentform.workflows) == {"ask", "process"}
 
@@ -83,7 +83,7 @@ class TestAgentformProperties:
         mock_spec.agents = {"assistant": MagicMock(), "reviewer": MagicMock()}
         mock_compile.return_value = mock_spec
 
-        agentform = Agentform.from_path("test.agentform")
+        agentform = Agentform.from_path("test.af")
 
         assert set(agentform.agents) == {"assistant", "reviewer"}
 
@@ -95,7 +95,7 @@ class TestAgentformProperties:
         mock_spec.agents = {"a1": MagicMock()}
         mock_compile.return_value = mock_spec
 
-        agentform = Agentform.from_path("test.agentform")
+        agentform = Agentform.from_path("test.af")
 
         assert repr(agentform) == "<Agentform workflows=2 agents=1>"
 
@@ -185,7 +185,7 @@ class TestAgentformContextManager:
         mock_spec.agents = {}
         mock_compile.return_value = mock_spec
 
-        async with Agentform.from_path("test.agentform") as agentform:
+        async with Agentform.from_path("test.af") as agentform:
             assert isinstance(agentform, Agentform)
 
         # After exiting, engine should be None
@@ -202,7 +202,7 @@ class TestAgentformContextManager:
         mock_spec.servers = {}
         mock_compile.return_value = mock_spec
 
-        agentform = Agentform.from_path("test.agentform")
+        agentform = Agentform.from_path("test.af")
         # Create engine
         agentform._get_engine()
         assert agentform._engine is not None

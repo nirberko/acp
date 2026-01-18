@@ -8,7 +8,7 @@ Supports Terraform-style source syntax:
 - Git URLs: "github.com/org/repo"
 - Git URLs with subdirectory: "github.com/org/repo//path/to/module"
 
-Modules are cached locally in .agentform/modules/ within the project directory.
+Modules are cached locally in .af/modules/ within the project directory.
 """
 
 import hashlib
@@ -159,7 +159,7 @@ def _get_cache_key(source: str, version: str | None) -> str:
 def get_cache_dir(base_path: Path | None = None) -> Path:
     """Get the module cache directory.
 
-    Uses .agentform/modules/ within the project directory (like Terraform).
+    Uses .af/modules/ within the project directory (like Terraform).
     Falls back to Agentform_MODULE_CACHE_DIR env var if set.
 
     Args:
@@ -171,16 +171,16 @@ def get_cache_dir(base_path: Path | None = None) -> Path:
     if cache_dir := os.environ.get("AGENTFORM_MODULE_CACHE_DIR"):
         return Path(cache_dir)
 
-    # Use local .agentform/modules/ directory within the project
+    # Use local .af/modules/ directory within the project
     project_path = base_path or Path.cwd()
-    return project_path / ".agentform" / "modules"
+    return project_path / ".af" / "modules"
 
 
 class ModuleResolver:
     """Resolves module sources to local paths.
 
     Handles both local paths and Git URLs, with caching for Git modules.
-    Modules are cached in .agentform/modules/ within the project directory.
+    Modules are cached in .af/modules/ within the project directory.
 
     Git modules must be downloaded first using 'agentform init'.
     Use download_module() to download modules (called by init command).
@@ -197,7 +197,7 @@ class ModuleResolver:
             base_path: Base path for resolving relative local paths.
                       Defaults to current working directory.
             cache_dir: Directory to cache Git modules.
-                      Defaults to .agentform/modules/ in the project directory
+                      Defaults to .af/modules/ in the project directory
         """
         self.base_path = base_path or Path.cwd()
         self.cache_dir = cache_dir or get_cache_dir(self.base_path)

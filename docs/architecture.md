@@ -13,7 +13,7 @@ Agentform is built as a modular system with five core packages, each with a spec
 ```mermaid
 flowchart TB
     subgraph User["User Layer"]
-        Agentform["📄 .agentform Spec"]
+        Agentform["📄 .af Spec"]
         CLI["⚡ agentform-cli"]
         Agentform --> CLI
     end
@@ -43,7 +43,7 @@ flowchart TB
 | Package | Description |
 |---------|-------------|
 | **agentform-schema** | Core Pydantic models for specs and Intermediate Representation |
-| **agentform-compiler** | Parses `.agentform` files, validates specs, and generates IR for the runtime |
+| **agentform-compiler** | Parses `.af` files, validates specs, and generates IR for the runtime |
 | **agentform-runtime** | Workflow execution engine with LLM integration and policy enforcement |
 | **agentform-mcp** | MCP (Model Context Protocol) client for connecting to external tool servers |
 | **agentform-cli** | Command-line interface for validating and running workflows |
@@ -64,7 +64,7 @@ The foundation of Agentform, providing:
 
 ### agentform-compiler
 
-Transforms `.agentform` files into executable IR:
+Transforms `.af` files into executable IR:
 
 1. **Parsing**: Converts HCL-like syntax to Abstract Syntax Tree (AST)
 2. **Normalization**: Resolves references and applies defaults
@@ -72,7 +72,7 @@ Transforms `.agentform` files into executable IR:
 4. **IR Generation**: Produces the Intermediate Representation
 
 **Key Components:**
-- `agentform_parser.py`: Parses `.agentform` files
+- `agentform_parser.py`: Parses `.af` files
 - `agentform_resolver.py`: Resolves references and dependencies
 - `agentform_validator.py`: Validates configurations
 - `ir_generator.py`: Generates IR from validated AST
@@ -130,7 +130,7 @@ Provides the command-line interface:
 ### Compilation Flow
 
 ```
-.agentform files
+.af files
     ↓
 [Parser] → AST
     ↓
@@ -174,7 +174,7 @@ IR JSON
 ### Adding Capabilities
 
 1. Connect MCP server via `agentform-mcp`
-2. Define capabilities in `.agentform` files
+2. Define capabilities in `.af` files
 3. Use in workflows via `call` steps
 
 ## Design Principles

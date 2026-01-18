@@ -18,7 +18,7 @@ Initialize a project and download external modules.
 agentform init [directory]
 ```
 
-**Description:** Downloads all external modules referenced in your `.agentform` files to the local `.agentform/modules/` directory. You must run this before compiling or running workflows that use external modules.
+**Description:** Downloads all external modules referenced in your `.af` files to the local `.af/modules/` directory. You must run this before compiling or running workflows that use external modules.
 
 **Arguments:**
 - `directory` (optional): Project directory. Defaults to current directory.
@@ -42,7 +42,7 @@ agentform validate <spec-file> [options]
 **Description:** Checks that your Agentform configuration is valid, all references are correct, and all required variables are provided.
 
 **Arguments:**
-- `spec-file`: Path to `.agentform` spec file or directory containing `.agentform` files
+- `spec-file`: Path to `.af` spec file or directory containing `.af` files
 
 **Options:**
 - `-v, --var KEY=VALUE`: Set a variable value (can be used multiple times)
@@ -50,7 +50,7 @@ agentform validate <spec-file> [options]
 
 **Example:**
 ```bash
-agentform validate my-agent.agentform
+agentform validate my-agent.af
 agentform validate . --var openai_api_key=$OPENAI_API_KEY
 ```
 
@@ -64,10 +64,10 @@ Compile a specification to Intermediate Representation (IR).
 agentform compile <spec-file> [options]
 ```
 
-**Description:** Parses and validates your `.agentform` files and generates the Intermediate Representation (IR) JSON. Useful for debugging and understanding how Agentform interprets your configuration.
+**Description:** Parses and validates your `.af` files and generates the Intermediate Representation (IR) JSON. Useful for debugging and understanding how Agentform interprets your configuration.
 
 **Arguments:**
-- `spec-file`: Path to `.agentform` spec file or directory containing `.agentform` files
+- `spec-file`: Path to `.af` spec file or directory containing `.af` files
 
 **Options:**
 - `-o, --output PATH`: Write IR to file (default: stdout)
@@ -76,7 +76,7 @@ agentform compile <spec-file> [options]
 
 **Example:**
 ```bash
-agentform compile my-agent.agentform
+agentform compile my-agent.af
 agentform compile . --output ir.json --var openai_api_key=$OPENAI_API_KEY
 ```
 
@@ -96,7 +96,7 @@ agentform run <workflow-name> [options]
 - `workflow-name`: Name of the workflow to run
 
 **Options:**
-- `-s, --spec PATH`: Path to `.agentform` spec file or directory (default: `agentform.agentform` or current directory)
+- `-s, --spec PATH`: Path to `.af` spec file or directory (default: `agentform.af` or current directory)
 - `-i, --input JSON`: Input data as JSON string
 - `-f, --input-file PATH`: Input data from JSON file
 - `-o, --output PATH`: Write output to file (default: stdout)
@@ -108,7 +108,7 @@ agentform run <workflow-name> [options]
 **Example:**
 ```bash
 # Simple workflow
-agentform run ask --spec my-agent.agentform --input '{"question": "Hello!"}'
+agentform run ask --spec my-agent.af --input '{"question": "Hello!"}'
 
 # With input file
 agentform run ask --input-file input.json

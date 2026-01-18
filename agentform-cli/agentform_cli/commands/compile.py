@@ -17,31 +17,31 @@ def _find_default_spec_path() -> Path:
     """Find the default spec file or directory.
 
     Priority:
-    1. Current directory if it contains multiple .agentform files
-    2. agentform.agentform file
-    3. spec.agentform file
+    1. Current directory if it contains multiple .af files
+    2. agentform.af file
+    3. spec.af file
     4. Current directory (fallback)
     """
     cwd = Path()
 
-    # Check for .agentform files in current directory
-    agentform_files = list(cwd.glob("*.agentform"))
+    # Check for .af files in current directory
+    agentform_files = list(cwd.glob("*.af"))
 
-    # If multiple .agentform files exist, use directory mode
+    # If multiple .af files exist, use directory mode
     if len(agentform_files) > 1:
         return cwd
 
     # Single file: use specific files
-    for name in ["agentform.agentform", "spec.agentform"]:
+    for name in ["agentform.af", "spec.af"]:
         path = Path(name)
         if path.exists():
             return path
 
-    # If there's exactly one .agentform file, use it
+    # If there's exactly one .af file, use it
     if len(agentform_files) == 1:
         return agentform_files[0]
 
-    # Fallback to current directory (will error later if no .agentform files)
+    # Fallback to current directory (will error later if no .af files)
     return cwd
 
 
@@ -88,7 +88,7 @@ def _load_variables(
 def compile_cmd(
     spec_path: Path | None = typer.Argument(
         None,
-        help="Path to .agentform file or directory. Defaults to current directory.",
+        help="Path to .af file or directory. Defaults to current directory.",
     ),
     output: Path | None = typer.Option(
         None,
@@ -130,7 +130,7 @@ def compile_cmd(
     """Compile an Agentform specification to IR (Intermediate Representation).
 
     Runs from the current directory by default, automatically discovering and
-    merging all .agentform files (Terraform-style).
+    merging all .af files (Terraform-style).
 
     Outputs the compiled IR as JSON, useful for debugging and tooling.
     """
@@ -145,9 +145,9 @@ def compile_cmd(
     is_directory = spec_path.is_dir()
 
     if is_directory:
-        agentform_files = list(spec_path.glob("*.agentform"))
+        agentform_files = list(spec_path.glob("*.af"))
         console.print(
-            f"\n[bold]Compiling {len(agentform_files)} .agentform file(s) from:[/bold] {spec_path.resolve()}\n"
+            f"\n[bold]Compiling {len(agentform_files)} .af file(s) from:[/bold] {spec_path.resolve()}\n"
         )
     else:
         console.print(f"\n[bold]Compiling:[/bold] {spec_path}\n")

@@ -18,7 +18,7 @@ class CompilationError(Exception):
 
 
 # File extension detection
-Agentform_EXTENSIONS = {".agentform"}
+Agentform_EXTENSIONS = {".af"}
 
 
 def _is_agentform_file(path: Path) -> bool:
@@ -44,10 +44,10 @@ def parse_agentform_to_spec(
     Raises:
         CompilationError: If parsing fails
     """
-    from agentform_compiler.agentform_normalizer import NormalizationError, normalize_agentform
-    from agentform_compiler.agentform_parser import AgentformParseError, parse_agentform
-    from agentform_compiler.agentform_resolver import resolve_references
-    from agentform_compiler.agentform_validator import validate_agentform
+    from agentform_compiler.af_normalizer import NormalizationError, normalize_agentform
+    from agentform_compiler.af_parser import AgentformParseError, parse_agentform
+    from agentform_compiler.af_resolver import resolve_references
+    from agentform_compiler.af_validator import validate_agentform
 
     # Parse
     try:
@@ -167,10 +167,10 @@ def validate_agentform_file(
     Raises:
         CompilationError: If parsing fails
     """
-    from agentform_compiler.agentform_normalizer import NormalizationError, normalize_agentform
-    from agentform_compiler.agentform_parser import AgentformParseError, parse_agentform_file
-    from agentform_compiler.agentform_resolver import resolve_references
-    from agentform_compiler.agentform_validator import validate_agentform
+    from agentform_compiler.af_normalizer import NormalizationError, normalize_agentform
+    from agentform_compiler.af_parser import AgentformParseError, parse_agentform_file
+    from agentform_compiler.af_resolver import resolve_references
+    from agentform_compiler.af_validator import validate_agentform
 
     path = Path(path)
 
@@ -232,12 +232,12 @@ def compile_agentform_directory(
 ) -> CompiledSpec:
     """Compile all Agentform files in a directory to IR.
 
-    This function discovers all .agentform files in the directory, parses and merges
+    This function discovers all .af files in the directory, parses and merges
     them, then compiles the merged specification. Files are processed in
     alphabetical order for consistent results.
 
     Args:
-        directory: Path to directory containing .agentform files
+        directory: Path to directory containing .af files
         check_env: Whether to check env vars exist during validation
         resolve_credentials: Whether to resolve credentials to actual values
         variables: Dictionary of variable values to substitute
@@ -248,16 +248,16 @@ def compile_agentform_directory(
     Raises:
         CompilationError: If compilation fails
     """
-    from agentform_compiler.agentform_ast import MergeError
-    from agentform_compiler.agentform_module_loader import (
+    from agentform_compiler.af_ast import MergeError
+    from agentform_compiler.af_module_loader import (
         LoadedModule,
         ModuleLoader,
         ModuleLoadError,
     )
-    from agentform_compiler.agentform_normalizer import NormalizationError, normalize_agentform
-    from agentform_compiler.agentform_parser import AgentformParseError, parse_agentform_directory
-    from agentform_compiler.agentform_resolver import add_module_symbols, resolve_references
-    from agentform_compiler.agentform_validator import validate_agentform
+    from agentform_compiler.af_normalizer import NormalizationError, normalize_agentform
+    from agentform_compiler.af_parser import AgentformParseError, parse_agentform_directory
+    from agentform_compiler.af_resolver import add_module_symbols, resolve_references
+    from agentform_compiler.af_validator import validate_agentform
 
     directory = Path(directory)
 
@@ -289,7 +289,7 @@ def compile_agentform_directory(
 
     # Add module symbols to the resolution result
     for module_name, loaded_module in loaded_modules.items():
-        add_module_symbols(resolution, module_name, loaded_module.agentform_file)
+        add_module_symbols(resolution, module_name, loaded_module.af_file)
 
     if not resolution.is_valid:
         errors_str = "\n".join(f"  - {e}" for e in resolution.errors)
@@ -324,11 +324,11 @@ def validate_agentform_directory(
 ) -> ValidationResult:
     """Validate all Agentform files in a directory without full compilation.
 
-    This function discovers all .agentform files in the directory, parses and merges
+    This function discovers all .af files in the directory, parses and merges
     them, then validates the merged specification.
 
     Args:
-        directory: Path to directory containing .agentform files
+        directory: Path to directory containing .af files
         check_env: Whether to check env vars exist
         variables: Dictionary of variable values to substitute
 
@@ -338,16 +338,16 @@ def validate_agentform_directory(
     Raises:
         CompilationError: If parsing or merging fails
     """
-    from agentform_compiler.agentform_ast import MergeError
-    from agentform_compiler.agentform_module_loader import (
+    from agentform_compiler.af_ast import MergeError
+    from agentform_compiler.af_module_loader import (
         LoadedModule,
         ModuleLoader,
         ModuleLoadError,
     )
-    from agentform_compiler.agentform_normalizer import NormalizationError, normalize_agentform
-    from agentform_compiler.agentform_parser import AgentformParseError, parse_agentform_directory
-    from agentform_compiler.agentform_resolver import add_module_symbols, resolve_references
-    from agentform_compiler.agentform_validator import validate_agentform
+    from agentform_compiler.af_normalizer import NormalizationError, normalize_agentform
+    from agentform_compiler.af_parser import AgentformParseError, parse_agentform_directory
+    from agentform_compiler.af_resolver import add_module_symbols, resolve_references
+    from agentform_compiler.af_validator import validate_agentform
 
     directory = Path(directory)
 
@@ -379,7 +379,7 @@ def validate_agentform_directory(
 
     # Add module symbols to the resolution result
     for module_name, loaded_module in loaded_modules.items():
-        add_module_symbols(resolution, module_name, loaded_module.agentform_file)
+        add_module_symbols(resolution, module_name, loaded_module.af_file)
 
     if not resolution.is_valid:
         errors_str = "\n".join(f"  - {e}" for e in resolution.errors)
@@ -428,11 +428,11 @@ def compile_file(
 ) -> CompiledSpec:
     """Compile an Agentform file or directory to IR.
 
-    If path is a directory, all .agentform files in it are discovered, parsed,
+    If path is a directory, all .af files in it are discovered, parsed,
     merged, and compiled together (Terraform-style multi-file support).
 
     Args:
-        path: Path to .agentform spec file or directory containing .agentform files
+        path: Path to .af spec file or directory containing .af files
         check_env: Whether to check env vars exist during validation
         resolve_credentials: Whether to resolve credentials to actual values
         variables: Dictionary of variable values to substitute
@@ -452,7 +452,7 @@ def compile_file(
     # Handle single file compilation
     if not _is_agentform_file(path):
         raise CompilationError(
-            f"Expected .agentform file, got: {path.suffix}. Only .agentform files are supported."
+            f"Expected .af file, got: {path.suffix}. Only .af files are supported."
         )
 
     return compile_agentform_file(path, check_env, resolve_credentials, variables)
@@ -465,11 +465,11 @@ def validate_file(
 ) -> ValidationResult:
     """Validate an Agentform file or directory.
 
-    If path is a directory, all .agentform files in it are discovered, parsed,
+    If path is a directory, all .af files in it are discovered, parsed,
     merged, and validated together (Terraform-style multi-file support).
 
     Args:
-        path: Path to .agentform spec file or directory containing .agentform files
+        path: Path to .af spec file or directory containing .af files
         check_env: Whether to check env vars exist
         variables: Dictionary of variable values to substitute
 
@@ -488,7 +488,7 @@ def validate_file(
     # Handle single file validation
     if not _is_agentform_file(path):
         raise CompilationError(
-            f"Expected .agentform file, got: {path.suffix}. Only .agentform files are supported."
+            f"Expected .af file, got: {path.suffix}. Only .af files are supported."
         )
 
     return validate_agentform_file(path, check_env, variables)
