@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CLI Reference - Agentform Documentation</title>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="wrapper">
+        <!-- Mobile menu toggle -->
+        <button class="mobile-menu-toggle" aria-label="Toggle menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="/" class="logo">
+                    <span class="logo-text">Agentform</span>
+                    <span class="logo-tagline">Documentation</span>
+                </a>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    
+                    
+                    
+                    
+                    <li>
+                        <a href="/" 
+                           >
+                            Home
+                        </a>
+                    </li>
+                    
+                    
+                    
+                    
+                    <li>
+                        <a href="/getting-started/" 
+                           >
+                            Getting Started
+                        </a>
+                    </li>
+                    
+                    
+                    
+                    
+                    <li>
+                        <a href="/examples/" 
+                           >
+                            Examples
+                        </a>
+                    </li>
+                    
+                    
+                    
+                    
+                    <li>
+                        <a href="/modules/" 
+                           >
+                            Modules
+                        </a>
+                    </li>
+                    
+                    
+                    
+                    
+                    <li>
+                        <a href="/cli-reference/" 
+                           class="active">
+                            CLI Reference
+                        </a>
+                    </li>
+                    
+                    
+                    
+                    
+                    <li>
+                        <a href="/architecture/" 
+                           >
+                            Architecture
+                        </a>
+                    </li>
+                    
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="sidebar-links">
+                    <a href="https://github.com/agentform-team/agentform" target="_blank" rel="noopener" class="sidebar-link">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+                        </svg>
+                        GitHub
+                    </a>
+                    <a href="https://pypi.org/project/agentform-cli/" target="_blank" rel="noopener" class="sidebar-link">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zM7 11.5a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0v7zm3-1a.5.5 0 0 1-1 0v-6a.5.5 0 0 1 1 0v6z"/>
+                        </svg>
+                        PyPI
+                    </a>
+                </div>
+                <p class="sidebar-footer-text">Built with ❤️ for the AI agent community</p>
+            </div>
+        </aside>
+        
+        <!-- Main content -->
+        <main class="site-main">
+            <div class="content-wrapper">
+                <article class="content">
+                    <h1 id="cli-reference">CLI Reference</h1>
+
+<p>Complete reference for the <code class="language-plaintext highlighter-rouge">agentform</code> command-line interface.</p>
+
+<h2 id="commands">Commands</h2>
+
+<h3 id="agentform-init"><code class="language-plaintext highlighter-rouge">agentform init</code></h3>
+
+<p>Initialize a project and download external modules.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>agentform init <span class="o">[</span>directory]
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>Description:</strong> Downloads all external modules referenced in your <code class="language-plaintext highlighter-rouge">.agentform</code> files to the local <code class="language-plaintext highlighter-rouge">.agentform/modules/</code> directory. You must run this before compiling or running workflows that use external modules.</p>
+
+<p><strong>Arguments:</strong></p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">directory</code> (optional): Project directory. Defaults to current directory.</li>
+</ul>
+
+<p><strong>Example:</strong></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre>agentform init
+agentform init ./my-project
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<hr />
+
+<h3 id="agentform-validate"><code class="language-plaintext highlighter-rouge">agentform validate</code></h3>
+
+<p>Validate a specification file.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>agentform validate &lt;spec-file&gt; <span class="o">[</span>options]
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>Description:</strong> Checks that your Agentform configuration is valid, all references are correct, and all required variables are provided.</p>
+
+<p><strong>Arguments:</strong></p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">spec-file</code>: Path to <code class="language-plaintext highlighter-rouge">.agentform</code> spec file or directory containing <code class="language-plaintext highlighter-rouge">.agentform</code> files</li>
+</ul>
+
+<p><strong>Options:</strong></p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">-v, --var KEY=VALUE</code>: Set a variable value (can be used multiple times)</li>
+  <li><code class="language-plaintext highlighter-rouge">--var-file PATH</code>: Load variables from a JSON file</li>
+</ul>
+
+<p><strong>Example:</strong></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre>agentform validate my-agent.agentform
+agentform validate <span class="nb">.</span> <span class="nt">--var</span> <span class="nv">openai_api_key</span><span class="o">=</span><span class="nv">$OPENAI_API_KEY</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<hr />
+
+<h3 id="agentform-compile"><code class="language-plaintext highlighter-rouge">agentform compile</code></h3>
+
+<p>Compile a specification to Intermediate Representation (IR).</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>agentform compile &lt;spec-file&gt; <span class="o">[</span>options]
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>Description:</strong> Parses and validates your <code class="language-plaintext highlighter-rouge">.agentform</code> files and generates the Intermediate Representation (IR) JSON. Useful for debugging and understanding how Agentform interprets your configuration.</p>
+
+<p><strong>Arguments:</strong></p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">spec-file</code>: Path to <code class="language-plaintext highlighter-rouge">.agentform</code> spec file or directory containing <code class="language-plaintext highlighter-rouge">.agentform</code> files</li>
+</ul>
+
+<p><strong>Options:</strong></p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">-o, --output PATH</code>: Write IR to file (default: stdout)</li>
+  <li><code class="language-plaintext highlighter-rouge">-v, --var KEY=VALUE</code>: Set a variable value (can be used multiple times)</li>
+  <li><code class="language-plaintext highlighter-rouge">--var-file PATH</code>: Load variables from a JSON file</li>
+</ul>
+
+<p><strong>Example:</strong></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre>agentform compile my-agent.agentform
+agentform compile <span class="nb">.</span> <span class="nt">--output</span> ir.json <span class="nt">--var</span> <span class="nv">openai_api_key</span><span class="o">=</span><span class="nv">$OPENAI_API_KEY</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<hr />
+
+<h3 id="agentform-run"><code class="language-plaintext highlighter-rouge">agentform run</code></h3>
+
+<p>Run a workflow.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>agentform run &lt;workflow-name&gt; <span class="o">[</span>options]
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>Description:</strong> Executes a workflow from your Agentform specification. The workflow name can be a simple name (e.g., <code class="language-plaintext highlighter-rouge">ask</code>) or a module-qualified name (e.g., <code class="language-plaintext highlighter-rouge">module.my-module.workflow_name</code>).</p>
+
+<p><strong>Arguments:</strong></p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">workflow-name</code>: Name of the workflow to run</li>
+</ul>
+
+<p><strong>Options:</strong></p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">-s, --spec PATH</code>: Path to <code class="language-plaintext highlighter-rouge">.agentform</code> spec file or directory (default: <code class="language-plaintext highlighter-rouge">agentform.agentform</code> or current directory)</li>
+  <li><code class="language-plaintext highlighter-rouge">-i, --input JSON</code>: Input data as JSON string</li>
+  <li><code class="language-plaintext highlighter-rouge">-f, --input-file PATH</code>: Input data from JSON file</li>
+  <li><code class="language-plaintext highlighter-rouge">-o, --output PATH</code>: Write output to file (default: stdout)</li>
+  <li><code class="language-plaintext highlighter-rouge">-t, --trace PATH</code>: Write execution trace to file</li>
+  <li><code class="language-plaintext highlighter-rouge">-v, --var KEY=VALUE</code>: Set a variable value (can be used multiple times)</li>
+  <li><code class="language-plaintext highlighter-rouge">--var-file PATH</code>: Load variables from a JSON file</li>
+  <li><code class="language-plaintext highlighter-rouge">--verbose</code>: Enable verbose output</li>
+</ul>
+
+<p><strong>Example:</strong></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+</pre></td><td class="rouge-code"><pre><span class="c"># Simple workflow</span>
+agentform run ask <span class="nt">--spec</span> my-agent.agentform <span class="nt">--input</span> <span class="s1">'{"question": "Hello!"}'</span>
+
+<span class="c"># With input file</span>
+agentform run ask <span class="nt">--input-file</span> input.json
+
+<span class="c"># With variables</span>
+agentform run ask <span class="nt">--var</span> <span class="nv">openai_api_key</span><span class="o">=</span><span class="nv">$OPENAI_API_KEY</span> <span class="nt">--input</span> <span class="s1">'{"question": "Hello!"}'</span>
+
+<span class="c"># Save trace for debugging</span>
+agentform run ask <span class="nt">--trace</span> trace.json <span class="nt">--input</span> <span class="s1">'{"question": "Hello!"}'</span>
+
+<span class="c"># Module workflow</span>
+agentform run module.pr-reviewer.review_workflow <span class="nb">.</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<hr />
+
+<h2 id="global-options">Global Options</h2>
+
+<p>These options are available for all commands:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">-h, --help</code>: Show help message</li>
+  <li><code class="language-plaintext highlighter-rouge">--version</code>: Show version information</li>
+</ul>
+
+<hr />
+
+<h2 id="environment-variables">Environment Variables</h2>
+
+<p>You can also set variables using environment variables with the <code class="language-plaintext highlighter-rouge">AGENTFORM_VAR_</code> prefix:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre><span class="nb">export </span><span class="nv">AGENTFORM_VAR_openai_api_key</span><span class="o">=</span><span class="s2">"your-key"</span>
+agentform run ask <span class="nt">--input</span> <span class="s1">'{"question": "Hello!"}'</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<hr />
+
+<h2 id="exit-codes">Exit Codes</h2>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">0</code>: Success</li>
+  <li><code class="language-plaintext highlighter-rouge">1</code>: General error</li>
+  <li><code class="language-plaintext highlighter-rouge">2</code>: Validation error</li>
+  <li><code class="language-plaintext highlighter-rouge">3</code>: Compilation error</li>
+  <li><code class="language-plaintext highlighter-rouge">4</code>: Runtime error</li>
+</ul>
+
+<hr />
+
+<h2 id="examples">Examples</h2>
+
+<h3 id="complete-workflow">Complete workflow</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+</pre></td><td class="rouge-code"><pre><span class="c"># 1. Initialize project (download modules)</span>
+agentform init
+
+<span class="c"># 2. Validate configuration</span>
+agentform validate <span class="nb">.</span> <span class="nt">--var</span> <span class="nv">openai_api_key</span><span class="o">=</span><span class="nv">$OPENAI_API_KEY</span>
+
+<span class="c"># 3. Run workflow</span>
+agentform run ask <span class="se">\</span>
+  <span class="nt">--var</span> <span class="nv">openai_api_key</span><span class="o">=</span><span class="nv">$OPENAI_API_KEY</span> <span class="se">\</span>
+  <span class="nt">--input-file</span> input.json <span class="se">\</span>
+  <span class="nt">--output</span> result.json <span class="se">\</span>
+  <span class="nt">--trace</span> trace.json
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<h3 id="debugging">Debugging</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+</pre></td><td class="rouge-code"><pre><span class="c"># Compile to see IR</span>
+agentform compile <span class="nb">.</span> <span class="nt">--output</span> ir.json <span class="nt">--var</span> <span class="nv">openai_api_key</span><span class="o">=</span><span class="nv">$OPENAI_API_KEY</span>
+
+<span class="c"># Run with verbose output</span>
+agentform run ask <span class="nt">--verbose</span> <span class="nt">--input</span> <span class="s1">'{"question": "Hello!"}'</span>
+
+<span class="c"># Save trace for analysis</span>
+agentform run ask <span class="nt">--trace</span> trace.json <span class="nt">--input</span> <span class="s1">'{"question": "Hello!"}'</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+                </article>
+                
+                <footer class="site-footer">
+                    <div class="footer-content">
+                        <p class="footer-text">Built with ❤️ for the AI agent community</p>
+                        <div class="footer-links">
+                            <a href="https://github.com/agentform-team/agentform" target="_blank" rel="noopener">GitHub</a>
+                            <span class="separator">•</span>
+                            <a href="https://pypi.org/project/agentform-cli/" target="_blank" rel="noopener">PyPI</a>
+                        </div>
+                    </div>
+                </footer>
+            </div>
+        </main>
+        
+        <!-- Overlay for mobile -->
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+    </div>
+    
+    <script>
+        // Mobile menu toggle
+        const menuToggle = document.querySelector('.mobile-menu-toggle');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        
+        function toggleMenu() {
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+            document.body.classList.toggle('menu-open');
+        }
+        
+        if (menuToggle) {
+            menuToggle.addEventListener('click', toggleMenu);
+        }
+        
+        if (overlay) {
+            overlay.addEventListener('click', toggleMenu);
+        }
+        
+        // Close menu when clicking on a link (mobile)
+        const navLinks = document.querySelectorAll('.sidebar-nav a');
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth < 1024) {
+                    toggleMenu();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

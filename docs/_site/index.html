@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agentform Documentation - Agentform Documentation</title>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="wrapper">
+        <!-- Mobile menu toggle -->
+        <button class="mobile-menu-toggle" aria-label="Toggle menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="/" class="logo">
+                    <span class="logo-text">Agentform</span>
+                    <span class="logo-tagline">Documentation</span>
+                </a>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    
+                    
+                    
+                    
+                    <li>
+                        <a href="/" 
+                           class="active">
+                            Home
+                        </a>
+                    </li>
+                    
+                    
+                    
+                    
+                    <li>
+                        <a href="/getting-started/" 
+                           >
+                            Getting Started
+                        </a>
+                    </li>
+                    
+                    
+                    
+                    
+                    <li>
+                        <a href="/examples/" 
+                           >
+                            Examples
+                        </a>
+                    </li>
+                    
+                    
+                    
+                    
+                    <li>
+                        <a href="/modules/" 
+                           >
+                            Modules
+                        </a>
+                    </li>
+                    
+                    
+                    
+                    
+                    <li>
+                        <a href="/cli-reference/" 
+                           >
+                            CLI Reference
+                        </a>
+                    </li>
+                    
+                    
+                    
+                    
+                    <li>
+                        <a href="/architecture/" 
+                           >
+                            Architecture
+                        </a>
+                    </li>
+                    
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="sidebar-links">
+                    <a href="https://github.com/agentform-team/agentform" target="_blank" rel="noopener" class="sidebar-link">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+                        </svg>
+                        GitHub
+                    </a>
+                    <a href="https://pypi.org/project/agentform-cli/" target="_blank" rel="noopener" class="sidebar-link">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zM7 11.5a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0v7zm3-1a.5.5 0 0 1-1 0v-6a.5.5 0 0 1 1 0v6z"/>
+                        </svg>
+                        PyPI
+                    </a>
+                </div>
+                <p class="sidebar-footer-text">Built with ❤️ for the AI agent community</p>
+            </div>
+        </aside>
+        
+        <!-- Main content -->
+        <main class="site-main">
+            <div class="content-wrapper">
+                <article class="content">
+                    <h1 id="agentform">Agentform™</h1>
+
+<p align="center">
+  <strong>Define AI agent systems declaratively using Agentform™ native schema</strong>
+</p>
+
+<p align="center">
+  Think <em>Infrastructure as Code</em>, but for AI agents
+</p>
+
+<hr />
+
+<h2 id="why-agentform">Why Agentform™?</h2>
+
+<p>Most AI agent frameworks require you to write imperative code - managing state, handling retries, wiring up tools. Agentform takes a different approach: <strong>describe your agents declaratively in Agentform native schema, and let the runtime engine handle the rest.</strong></p>
+
+<div class="language-hcl highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+</pre></td><td class="rouge-code"><pre><span class="nx">agent</span> <span class="s2">"reviewer"</span> <span class="p">{</span>
+  <span class="nx">model</span>        <span class="o">=</span> <span class="nx">model</span><span class="p">.</span><span class="nx">gpt4o</span>
+  <span class="nx">instructions</span> <span class="o">=</span> <span class="s2">"Review code for security issues"</span>
+  <span class="nx">allow</span>        <span class="o">=</span> <span class="p">[</span><span class="nx">capability</span><span class="p">.</span><span class="nx">read_file</span><span class="p">,</span> <span class="nx">capability</span><span class="p">.</span><span class="nx">get_diff</span><span class="p">]</span>
+  <span class="nx">policy</span>       <span class="o">=</span> <span class="nx">policy</span><span class="p">.</span><span class="nx">strict</span>
+<span class="p">}</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>The result:</strong> Your agent configurations become version-controlled artifacts that are easy to review, share, and reproduce. The native <code class="language-plaintext highlighter-rouge">.agentform</code> format provides type safety, explicit references, and improved editor support.</p>
+
+<hr />
+
+<h2 id="quick-start">Quick Start</h2>
+
+<h3 id="1-installation">1. Installation</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>pip <span class="nb">install </span>agentform-cli
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<h3 id="2-set-up-your-api-key">2. Set up your API key</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">export </span><span class="nv">OPENAI_API_KEY</span><span class="o">=</span><span class="s2">"your-openai-key"</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<h3 id="3-create-an-agent-spec">3. Create an agent spec</h3>
+
+<p>Create a file called <code class="language-plaintext highlighter-rouge">my-agent.agentform</code>:</p>
+
+<div class="language-hcl highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+</pre></td><td class="rouge-code"><pre><span class="nx">agentform</span> <span class="p">{</span>
+  <span class="nx">version</span> <span class="o">=</span> <span class="s2">"0.1"</span>
+  <span class="nx">project</span> <span class="o">=</span> <span class="s2">"my-first-agent"</span>
+<span class="p">}</span>
+
+<span class="nx">variable</span> <span class="s2">"openai_api_key"</span> <span class="p">{</span>
+  <span class="nx">type</span>        <span class="o">=</span> <span class="nx">string</span>
+  <span class="nx">description</span> <span class="o">=</span> <span class="s2">"OpenAI API key"</span>
+  <span class="nx">sensitive</span>   <span class="o">=</span> <span class="kc">true</span>
+<span class="p">}</span>
+
+<span class="nx">provider</span> <span class="s2">"llm.openai"</span> <span class="s2">"default"</span> <span class="p">{</span>
+  <span class="nx">api_key</span> <span class="o">=</span> <span class="nx">var</span><span class="p">.</span><span class="nx">openai_api_key</span>
+  <span class="nx">default_params</span> <span class="p">{</span>
+    <span class="nx">temperature</span> <span class="o">=</span> <span class="mf">0.7</span>
+    <span class="nx">max_tokens</span>  <span class="o">=</span> <span class="mi">2000</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nx">policy</span> <span class="s2">"default"</span> <span class="p">{</span>
+  <span class="nx">budgets</span> <span class="p">{</span> <span class="nx">max_cost_usd_per_run</span> <span class="o">=</span> <span class="mf">0.50</span> <span class="p">}</span>
+  <span class="nx">budgets</span> <span class="p">{</span> <span class="nx">timeout_seconds</span> <span class="o">=</span> <span class="mi">60</span> <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nx">model</span> <span class="s2">"gpt4o_mini"</span> <span class="p">{</span>
+  <span class="nx">provider</span> <span class="o">=</span> <span class="nx">provider</span><span class="p">.</span><span class="nx">llm</span><span class="p">.</span><span class="nx">openai</span><span class="p">.</span><span class="nx">default</span>
+  <span class="nx">id</span>       <span class="o">=</span> <span class="s2">"gpt-4o-mini"</span>
+<span class="p">}</span>
+
+<span class="nx">model</span> <span class="s2">"gpt4o"</span> <span class="p">{</span>
+  <span class="nx">provider</span> <span class="o">=</span> <span class="nx">provider</span><span class="p">.</span><span class="nx">llm</span><span class="p">.</span><span class="nx">openai</span><span class="p">.</span><span class="nx">default</span>
+  <span class="nx">id</span>       <span class="o">=</span> <span class="s2">"gpt-4o"</span>
+<span class="p">}</span>
+
+<span class="nx">agent</span> <span class="s2">"assistant"</span> <span class="p">{</span>
+  <span class="nx">model</span>           <span class="o">=</span> <span class="nx">model</span><span class="p">.</span><span class="nx">gpt4o_mini</span>
+  <span class="nx">fallback_models</span> <span class="o">=</span> <span class="p">[</span><span class="nx">model</span><span class="p">.</span><span class="nx">gpt4o</span><span class="p">]</span>
+
+  <span class="nx">instructions</span> <span class="o">=</span> <span class="s2">"You are a helpful assistant. Answer questions clearly and concisely."</span>
+
+  <span class="nx">policy</span> <span class="o">=</span> <span class="nx">policy</span><span class="p">.</span><span class="nx">default</span>
+<span class="p">}</span>
+
+<span class="nx">workflow</span> <span class="s2">"ask"</span> <span class="p">{</span>
+  <span class="nx">entry</span> <span class="o">=</span> <span class="nx">step</span><span class="p">.</span><span class="nx">process</span>
+
+  <span class="nx">step</span> <span class="s2">"process"</span> <span class="p">{</span>
+    <span class="nx">type</span>  <span class="o">=</span> <span class="s2">"llm"</span>
+    <span class="nx">agent</span> <span class="o">=</span> <span class="nx">agent</span><span class="p">.</span><span class="nx">assistant</span>
+
+    <span class="nx">input</span> <span class="p">{</span> <span class="nx">question</span> <span class="o">=</span> <span class="nx">input</span><span class="p">.</span><span class="nx">question</span> <span class="p">}</span>
+
+    <span class="nx">output</span> <span class="s2">"answer"</span> <span class="p">{</span> <span class="nx">from</span> <span class="o">=</span> <span class="nx">result</span><span class="p">.</span><span class="nx">text</span> <span class="p">}</span>
+
+    <span class="nx">next</span> <span class="o">=</span> <span class="nx">step</span><span class="p">.</span><span class="nx">end</span>
+  <span class="p">}</span>
+
+  <span class="nx">step</span> <span class="s2">"end"</span> <span class="p">{</span> <span class="nx">type</span> <span class="o">=</span> <span class="s2">"end"</span> <span class="p">}</span>
+<span class="p">}</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<h3 id="4-run-it">4. Run it</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+</pre></td><td class="rouge-code"><pre><span class="c"># Validate your spec</span>
+agentform validate my-agent.agentform
+
+<span class="c"># Run with input</span>
+agentform run ask <span class="nt">--spec</span> my-agent.agentform <span class="nt">--input</span> <span class="s1">'{"question": "What is the capital of France?"}'</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<hr />
+
+<h2 id="features">Features</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Feature</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Native Schema</strong></td>
+      <td>Define agents, workflows, and policies in type-safe <code class="language-plaintext highlighter-rouge">.agentform</code> format with explicit references</td>
+    </tr>
+    <tr>
+      <td><strong>Modules</strong></td>
+      <td>Terraform-style reusable modules for sharing agent configurations via Git</td>
+    </tr>
+    <tr>
+      <td><strong>Multi-Provider</strong></td>
+      <td>Use OpenAI, Anthropic, or other LLM providers interchangeably</td>
+    </tr>
+    <tr>
+      <td><strong>Multi-Agent</strong></td>
+      <td>Coordinate multiple specialized agents with conditional routing</td>
+    </tr>
+    <tr>
+      <td><strong>MCP Integration</strong></td>
+      <td>Connect to external tools via Model Context Protocol servers</td>
+    </tr>
+    <tr>
+      <td><strong>Policy Enforcement</strong></td>
+      <td>Set budgets, timeouts, and capability limits per agent</td>
+    </tr>
+    <tr>
+      <td><strong>Human-in-the-Loop</strong></td>
+      <td>Built-in approval gates for sensitive operations</td>
+    </tr>
+    <tr>
+      <td><strong>Execution Tracing</strong></td>
+      <td>Full visibility into workflow execution for debugging</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2 id="next-steps">Next Steps</h2>
+
+<ul>
+  <li><a href="/getting-started/">Getting Started Guide</a> - Detailed installation and setup</li>
+  <li><a href="/examples/">Examples</a> - Learn from real-world examples</li>
+  <li><a href="/modules/">Modules</a> - Create and share reusable agent configurations</li>
+  <li><a href="/cli-reference/">CLI Reference</a> - Complete command reference</li>
+  <li><a href="/architecture/">Architecture</a> - Understand how Agentform works</li>
+</ul>
+
+<hr />
+
+<p align="center">
+  <sub>Built with ❤️ for the AI agent community</sub>
+</p>
+
+                </article>
+                
+                <footer class="site-footer">
+                    <div class="footer-content">
+                        <p class="footer-text">Built with ❤️ for the AI agent community</p>
+                        <div class="footer-links">
+                            <a href="https://github.com/agentform-team/agentform" target="_blank" rel="noopener">GitHub</a>
+                            <span class="separator">•</span>
+                            <a href="https://pypi.org/project/agentform-cli/" target="_blank" rel="noopener">PyPI</a>
+                        </div>
+                    </div>
+                </footer>
+            </div>
+        </main>
+        
+        <!-- Overlay for mobile -->
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+    </div>
+    
+    <script>
+        // Mobile menu toggle
+        const menuToggle = document.querySelector('.mobile-menu-toggle');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        
+        function toggleMenu() {
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+            document.body.classList.toggle('menu-open');
+        }
+        
+        if (menuToggle) {
+            menuToggle.addEventListener('click', toggleMenu);
+        }
+        
+        if (overlay) {
+            overlay.addEventListener('click', toggleMenu);
+        }
+        
+        // Close menu when clicking on a link (mobile)
+        const navLinks = document.querySelectorAll('.sidebar-nav a');
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth < 1024) {
+                    toggleMenu();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

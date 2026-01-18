@@ -4,4 +4,4 @@ gem "jekyll", "~> 4.3"
 
 # GitHub Pages compatible plugins
 gem "jekyll-feed", "~> 0.17"
-gem "jekyll-sitemap", "~> 1.5"
+gem "jekyll-sitemap"

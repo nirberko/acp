@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Examples - Agentform Documentation</title>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="wrapper">
+        <!-- Mobile menu toggle -->
+        <button class="mobile-menu-toggle" aria-label="Toggle menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="/" class="logo">
+                    <span class="logo-text">Agentform</span>
+                    <span class="logo-tagline">Documentation</span>
+                </a>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    
+                    
+                    
+                    
+                    <li>
+                        <a href="/" 
+                           >
+                            Home
+                        </a>
+                    </li>
+                    
+                    
+                    
+                    
+                    <li>
+                        <a href="/getting-started/" 
+                           >
+                            Getting Started
+                        </a>
+                    </li>
+                    
+                    
+                    
+                    
+                    <li>
+                        <a href="/examples/" 
+                           class="active">
+                            Examples
+                        </a>
+                    </li>
+                    
+                    
+                    
+                    
+                    <li>
+                        <a href="/modules/" 
+                           >
+                            Modules
+                        </a>
+                    </li>
+                    
+                    
+                    
+                    
+                    <li>
+                        <a href="/cli-reference/" 
+                           >
+                            CLI Reference
+                        </a>
+                    </li>
+                    
+                    
+                    
+                    
+                    <li>
+                        <a href="/architecture/" 
+                           >
+                            Architecture
+                        </a>
+                    </li>
+                    
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="sidebar-links">
+                    <a href="https://github.com/agentform-team/agentform" target="_blank" rel="noopener" class="sidebar-link">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+                        </svg>
+                        GitHub
+                    </a>
+                    <a href="https://pypi.org/project/agentform-cli/" target="_blank" rel="noopener" class="sidebar-link">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zM7 11.5a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0v7zm3-1a.5.5 0 0 1-1 0v-6a.5.5 0 0 1 1 0v6z"/>
+                        </svg>
+                        PyPI
+                    </a>
+                </div>
+                <p class="sidebar-footer-text">Built with ❤️ for the AI agent community</p>
+            </div>
+        </aside>
+        
+        <!-- Main content -->
+        <main class="site-main">
+            <div class="content-wrapper">
+                <article class="content">
+                    <h1 id="agentform-examples">Agentform Examples</h1>
+
+<p>The <a href="https://github.com/agentform-team/agentform/tree/main/examples"><code class="language-plaintext highlighter-rouge">examples/</code></a> directory contains ready-to-use configurations demonstrating various Agentform features. Each example includes detailed documentation explaining the concepts it covers.</p>
+
+<h2 id="examples-overview">Examples Overview</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Example</th>
+      <th>Difficulty</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="#simple-agent">Simple Agent</a></td>
+      <td>Beginner</td>
+      <td>Basic LLM agent answering questions</td>
+    </tr>
+    <tr>
+      <td><a href="#multi-agent">Multi-Agent</a></td>
+      <td>Intermediate</td>
+      <td>Multiple agents with conditional routing</td>
+    </tr>
+    <tr>
+      <td><a href="#filesystem-agent">Filesystem Agent</a></td>
+      <td>Intermediate</td>
+      <td>File operations via MCP server</td>
+    </tr>
+    <tr>
+      <td><a href="#pr-reviewer">PR Reviewer</a></td>
+      <td>Advanced</td>
+      <td>GitHub PR reviews with human approval</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2 id="simple-agent">Simple Agent</h2>
+
+<p><strong>Directory:</strong> <a href="https://github.com/agentform-team/agentform/tree/main/examples/simple-agent"><code class="language-plaintext highlighter-rouge">simple-agent/</code></a></p>
+
+<p>The simplest possible Agentform configuration. A single agent that answers questions using OpenAI.</p>
+
+<h3 id="what-youll-learn">What You’ll Learn</h3>
+
+<ul>
+  <li>Basic Agentform file structure with numbered prefixes</li>
+  <li>Defining variables, providers, and models</li>
+  <li>Creating an agent with instructions</li>
+  <li>Building a simple workflow</li>
+</ul>
+
+<h3 id="features-used">Features Used</h3>
+
+<ul>
+  <li>Variables with <code class="language-plaintext highlighter-rouge">sensitive = true</code></li>
+  <li>LLM provider configuration</li>
+  <li>Policy budgets (cost and timeout)</li>
+  <li>Fallback models</li>
+  <li>Single-step LLM workflow</li>
+</ul>
+
+<h3 id="run-it">Run It</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre><span class="nb">cd </span>examples/simple-agent
+agentform run ask <span class="nt">--var</span> <span class="nv">openai_api_key</span><span class="o">=</span><span class="nv">$OPENAI_API_KEY</span> <span class="nt">--input</span> <span class="s1">'{"question": "What is Agentform™?"}'</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<hr />
+
+<h2 id="multi-agent">Multi-Agent</h2>
+
+<p><strong>Directory:</strong> <a href="https://github.com/agentform-team/agentform/tree/main/examples/multi-agent"><code class="language-plaintext highlighter-rouge">multi-agent/</code></a></p>
+
+<p>Multiple specialized agents working together with intelligent task routing.</p>
+
+<h3 id="what-youll-learn-1">What You’ll Learn</h3>
+
+<ul>
+  <li>Using multiple LLM providers (OpenAI + Anthropic)</li>
+  <li>Creating specialized agents for different tasks</li>
+  <li>Conditional workflow routing based on classification</li>
+  <li>Differentiated policies for fast vs. thorough processing</li>
+</ul>
+
+<h3 id="features-used-1">Features Used</h3>
+
+<ul>
+  <li>Multiple providers (OpenAI and Anthropic)</li>
+  <li>Multiple models across providers</li>
+  <li>Different policies (<code class="language-plaintext highlighter-rouge">fast</code> vs <code class="language-plaintext highlighter-rouge">thorough</code>)</li>
+  <li>Classifier agent for task routing</li>
+  <li>Conditional steps (<code class="language-plaintext highlighter-rouge">type = "condition"</code>)</li>
+  <li>State passing between steps</li>
+</ul>
+
+<h3 id="run-it-1">Run It</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+</pre></td><td class="rouge-code"><pre><span class="nb">cd </span>examples/multi-agent
+
+<span class="c"># Simple task → quick_responder (GPT-4o)</span>
+agentform run smart_respond <span class="se">\</span>
+  <span class="nt">--var</span> <span class="nv">openai_api_key</span><span class="o">=</span><span class="nv">$OPENAI_API_KEY</span> <span class="se">\</span>
+  <span class="nt">--var</span> <span class="nv">anthropic_api_key</span><span class="o">=</span><span class="nv">$ANTHROPIC_API_KEY</span> <span class="se">\</span>
+  <span class="nt">--input</span> <span class="s1">'{"task": "What is 2+2?"}'</span>
+
+<span class="c"># Complex task → deep_analyst (Claude)</span>
+agentform run smart_respond <span class="se">\</span>
+  <span class="nt">--var</span> <span class="nv">openai_api_key</span><span class="o">=</span><span class="nv">$OPENAI_API_KEY</span> <span class="se">\</span>
+  <span class="nt">--var</span> <span class="nv">anthropic_api_key</span><span class="o">=</span><span class="nv">$ANTHROPIC_API_KEY</span> <span class="se">\</span>
+  <span class="nt">--input</span> <span class="s1">'{"task": "Analyze the impact of AI on employment"}'</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<hr />
+
+<h2 id="filesystem-agent">Filesystem Agent</h2>
+
+<p><strong>Directory:</strong> <a href="https://github.com/agentform-team/agentform/tree/main/examples/filesystem-agent"><code class="language-plaintext highlighter-rouge">filesystem-agent/</code></a></p>
+
+<p>An agent that interacts with the filesystem via MCP (Model Context Protocol) server.</p>
+
+<h3 id="what-youll-learn-2">What You’ll Learn</h3>
+
+<ul>
+  <li>Integrating MCP servers for external capabilities</li>
+  <li>Defining capabilities from server methods</li>
+  <li>Using <code class="language-plaintext highlighter-rouge">call</code> steps to invoke capabilities</li>
+  <li>Human approval for write operations</li>
+  <li>Capability call budgets</li>
+</ul>
+
+<h3 id="features-used-2">Features Used</h3>
+
+<ul>
+  <li>MCP server configuration (<code class="language-plaintext highlighter-rouge">server</code> block)</li>
+  <li>Capability definitions with side effects</li>
+  <li><code class="language-plaintext highlighter-rouge">requires_approval = true</code> for sensitive operations</li>
+  <li><code class="language-plaintext highlighter-rouge">type = "call"</code> workflow steps</li>
+  <li><code class="language-plaintext highlighter-rouge">max_capability_calls</code> budget</li>
+  <li>Multiple workflows in one project</li>
+</ul>
+
+<h3 id="run-it-2">Run It</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+</pre></td><td class="rouge-code"><pre><span class="nb">cd </span>examples/filesystem-agent
+
+<span class="c"># Read and summarize a file</span>
+agentform run read_and_summarize <span class="se">\</span>
+  <span class="nt">--var</span> <span class="nv">openai_api_key</span><span class="o">=</span><span class="nv">$OPENAI_API_KEY</span> <span class="se">\</span>
+  <span class="nt">--input</span> <span class="s1">'{"file_path": "article.txt", "task": "Summarize this"}'</span>
+
+<span class="c"># List directory contents</span>
+agentform run list_and_read <span class="se">\</span>
+  <span class="nt">--var</span> <span class="nv">openai_api_key</span><span class="o">=</span><span class="nv">$OPENAI_API_KEY</span> <span class="se">\</span>
+  <span class="nt">--input</span> <span class="s1">'{"directory_path": ".", "task": "What files are here?"}'</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<hr />
+
+<h2 id="pr-reviewer">PR Reviewer</h2>
+
+<p><strong>Directory:</strong> <a href="https://github.com/agentform-team/agentform/tree/main/examples/pr-reviewer"><code class="language-plaintext highlighter-rouge">pr-reviewer/</code></a></p>
+
+<p>Automated GitHub pull request reviewer with human-in-the-loop approval.</p>
+
+<h3 id="what-youll-learn-3">What You’ll Learn</h3>
+
+<ul>
+  <li>GitHub MCP integration with authentication</li>
+  <li>Multi-step data gathering workflows</li>
+  <li>Human approval gates before write operations</li>
+  <li>Building context from multiple API calls</li>
+  <li>Safe patterns for automated actions</li>
+</ul>
+
+<h3 id="features-used-3">Features Used</h3>
+
+<ul>
+  <li>MCP server with <code class="language-plaintext highlighter-rouge">auth</code> block for tokens</li>
+  <li>Capabilities: read (<code class="language-plaintext highlighter-rouge">get_pr</code>, <code class="language-plaintext highlighter-rouge">list_files</code>) and write (<code class="language-plaintext highlighter-rouge">create_review</code>)</li>
+  <li><code class="language-plaintext highlighter-rouge">requires_approval = true</code> on write capabilities</li>
+  <li><code class="language-plaintext highlighter-rouge">type = "human_approval"</code> workflow step</li>
+  <li>Sequential capability calls to build context</li>
+  <li>Passing state between steps</li>
+</ul>
+
+<h3 id="run-it-3">Run It</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+</pre></td><td class="rouge-code"><pre><span class="nb">cd </span>examples/pr-reviewer
+
+agentform run review_pr <span class="se">\</span>
+  <span class="nt">--var</span> <span class="nv">openai_api_key</span><span class="o">=</span><span class="nv">$OPENAI_API_KEY</span> <span class="se">\</span>
+  <span class="nt">--var</span> <span class="nv">github_personal_access_token</span><span class="o">=</span><span class="nv">$GITHUB_TOKEN</span> <span class="se">\</span>
+  <span class="nt">--input</span> <span class="s1">'{"owner": "your-org", "repo": "your-repo", "pr_number": 123}'</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>The workflow will pause for your approval before submitting the review to GitHub.</p>
+
+<hr />
+
+<h2 id="file-structure-convention">File Structure Convention</h2>
+
+<p>All examples follow the same file naming convention:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+</pre></td><td class="rouge-code"><pre>example/
+├── 00-project.agentform      # Project metadata (agentform block)
+├── 01-variables.agentform    # Variable definitions
+├── 02-providers.agentform    # Provider and model definitions
+├── 03-servers.agentform      # MCP server configuration (if needed)
+├── 04-capabilities.agentform # Capability definitions (if needed)
+├── 05-policies.agentform     # Policy definitions
+├── 06-agents.agentform       # Agent definitions
+├── 07-workflows.agentform    # Workflow definitions
+├── input.yaml          # Sample input
+└── README.md           # Detailed documentation
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>Numbered prefixes ensure files are processed in the correct order. References work across files—for example, agents can reference models defined in the providers file.</p>
+
+<hr />
+
+<h2 id="next-steps">Next Steps</h2>
+
+<p>After exploring these examples:</p>
+
+<ol>
+  <li><strong>Create your own agent</strong>: Start with <code class="language-plaintext highlighter-rouge">simple-agent</code> as a template</li>
+  <li><strong>Add capabilities</strong>: Use <code class="language-plaintext highlighter-rouge">filesystem-agent</code> as a guide for MCP integration</li>
+  <li><strong>Build complex workflows</strong>: Use <code class="language-plaintext highlighter-rouge">multi-agent</code> patterns for routing</li>
+</ol>
+
+                </article>
+                
+                <footer class="site-footer">
+                    <div class="footer-content">
+                        <p class="footer-text">Built with ❤️ for the AI agent community</p>
+                        <div class="footer-links">
+                            <a href="https://github.com/agentform-team/agentform" target="_blank" rel="noopener">GitHub</a>
+                            <span class="separator">•</span>
+                            <a href="https://pypi.org/project/agentform-cli/" target="_blank" rel="noopener">PyPI</a>
+                        </div>
+                    </div>
+                </footer>
+            </div>
+        </main>
+        
+        <!-- Overlay for mobile -->
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+    </div>
+    
+    <script>
+        // Mobile menu toggle
+        const menuToggle = document.querySelector('.mobile-menu-toggle');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        
+        function toggleMenu() {
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+            document.body.classList.toggle('menu-open');
+        }
+        
+        if (menuToggle) {
+            menuToggle.addEventListener('click', toggleMenu);
+        }
+        
+        if (overlay) {
+            overlay.addEventListener('click', toggleMenu);
+        }
+        
+        // Close menu when clicking on a link (mobile)
+        const navLinks = document.querySelectorAll('.sidebar-nav a');
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth < 1024) {
+                    toggleMenu();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
