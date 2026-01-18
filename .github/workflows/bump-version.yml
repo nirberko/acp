@@ -88,11 +88,20 @@ jobs:
         run: |
           NEW_VERSION=$(grep -Po '(?<=^version = ")[^"]*' agentform-cli/pyproject.toml)
           BUMP_TYPE="${{ steps.bump_type.outputs.bump_type }}"
+          TAG_NAME="v${NEW_VERSION}"
           
           git add -A
           git commit -m "[version bump] Bump version to ${NEW_VERSION} (${BUMP_TYPE})"
-          git tag "v${NEW_VERSION}"
-          git push origin main
-          git push origin "v${NEW_VERSION}"
           
-          echo "Successfully bumped version to ${NEW_VERSION} and created tag v${NEW_VERSION}"
+          # Check if tag already exists
+          if git rev-parse "$TAG_NAME" >/dev/null 2>&1; then
+            echo "Tag $TAG_NAME already exists, skipping tag creation"
+          else
+            git tag "$TAG_NAME"
+            git push origin "$TAG_NAME"
+            echo "Created and pushed tag $TAG_NAME"
+          fi
+          
+          git push origin main
+          
+          echo "Successfully bumped version to ${NEW_VERSION}"
