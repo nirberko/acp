@@ -5,8 +5,8 @@ from pathlib import Path
 
 import pytest
 
-from agentform_compiler.af_parser import parse_agentform
-from agentform_compiler.af_resolver import add_module_symbols, resolve_references
+from agentform_compiler.agentform_parser import parse_agentform
+from agentform_compiler.agentform_resolver import add_module_symbols, resolve_references
 from agentform_compiler.compiler import compile_agentform_directory
 
 
@@ -71,7 +71,7 @@ class TestModuleParsing:
         module = result.modules[0]
         params = module.get_parameters()
         # Should be a VarRef, not a resolved string
-        from agentform_compiler.af_ast import VarRef
+        from agentform_compiler.agentform_ast import VarRef
 
         assert isinstance(params["api_key"], VarRef)
         assert params["api_key"].var_name == "api_key"

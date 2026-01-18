@@ -44,10 +44,10 @@ def parse_agentform_to_spec(
     Raises:
         CompilationError: If parsing fails
     """
-    from agentform_compiler.af_normalizer import NormalizationError, normalize_agentform
-    from agentform_compiler.af_parser import AgentformParseError, parse_agentform
-    from agentform_compiler.af_resolver import resolve_references
-    from agentform_compiler.af_validator import validate_agentform
+    from agentform_compiler.agentform_normalizer import NormalizationError, normalize_agentform
+    from agentform_compiler.agentform_parser import AgentformParseError, parse_agentform
+    from agentform_compiler.agentform_resolver import resolve_references
+    from agentform_compiler.agentform_validator import validate_agentform
 
     # Parse
     try:
@@ -167,10 +167,10 @@ def validate_agentform_file(
     Raises:
         CompilationError: If parsing fails
     """
-    from agentform_compiler.af_normalizer import NormalizationError, normalize_agentform
-    from agentform_compiler.af_parser import AgentformParseError, parse_agentform_file
-    from agentform_compiler.af_resolver import resolve_references
-    from agentform_compiler.af_validator import validate_agentform
+    from agentform_compiler.agentform_normalizer import NormalizationError, normalize_agentform
+    from agentform_compiler.agentform_parser import AgentformParseError, parse_agentform_file
+    from agentform_compiler.agentform_resolver import resolve_references
+    from agentform_compiler.agentform_validator import validate_agentform
 
     path = Path(path)
 
@@ -248,16 +248,16 @@ def compile_agentform_directory(
     Raises:
         CompilationError: If compilation fails
     """
-    from agentform_compiler.af_ast import MergeError
-    from agentform_compiler.af_module_loader import (
+    from agentform_compiler.agentform_ast import MergeError
+    from agentform_compiler.agentform_module_loader import (
         LoadedModule,
         ModuleLoader,
         ModuleLoadError,
     )
-    from agentform_compiler.af_normalizer import NormalizationError, normalize_agentform
-    from agentform_compiler.af_parser import AgentformParseError, parse_agentform_directory
-    from agentform_compiler.af_resolver import add_module_symbols, resolve_references
-    from agentform_compiler.af_validator import validate_agentform
+    from agentform_compiler.agentform_normalizer import NormalizationError, normalize_agentform
+    from agentform_compiler.agentform_parser import AgentformParseError, parse_agentform_directory
+    from agentform_compiler.agentform_resolver import add_module_symbols, resolve_references
+    from agentform_compiler.agentform_validator import validate_agentform
 
     directory = Path(directory)
 
@@ -338,16 +338,16 @@ def validate_agentform_directory(
     Raises:
         CompilationError: If parsing or merging fails
     """
-    from agentform_compiler.af_ast import MergeError
-    from agentform_compiler.af_module_loader import (
+    from agentform_compiler.agentform_ast import MergeError
+    from agentform_compiler.agentform_module_loader import (
         LoadedModule,
         ModuleLoader,
         ModuleLoadError,
     )
-    from agentform_compiler.af_normalizer import NormalizationError, normalize_agentform
-    from agentform_compiler.af_parser import AgentformParseError, parse_agentform_directory
-    from agentform_compiler.af_resolver import add_module_symbols, resolve_references
-    from agentform_compiler.af_validator import validate_agentform
+    from agentform_compiler.agentform_normalizer import NormalizationError, normalize_agentform
+    from agentform_compiler.agentform_parser import AgentformParseError, parse_agentform_directory
+    from agentform_compiler.agentform_resolver import add_module_symbols, resolve_references
+    from agentform_compiler.agentform_validator import validate_agentform
 
     directory = Path(directory)
 

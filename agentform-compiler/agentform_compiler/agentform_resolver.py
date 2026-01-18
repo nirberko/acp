@@ -6,7 +6,7 @@ to ensure they point to valid targets.
 
 from dataclasses import dataclass, field
 
-from agentform_compiler.af_ast import (
+from agentform_compiler.agentform_ast import (
     AgentBlock,
     AgentformFile,
     CapabilityBlock,

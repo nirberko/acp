@@ -79,7 +79,6 @@ class LLMExecutor:
         try:
             llm = init_chat_model(**llm_params)
         except ImportError as e:
-            package_name = f"langchain-{provider.provider_type}"
             raise LLMError(
                 f"Provider '{provider.provider_type}' not installed. "
                 f"Run 'agentform init' to install required packages"

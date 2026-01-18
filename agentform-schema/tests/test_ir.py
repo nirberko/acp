@@ -43,6 +43,7 @@ class TestResolvedProvider:
         """Test creating resolved provider."""
         provider = ResolvedProvider(
             name="openai",
+            provider_type="openai",
             api_key=ResolvedCredential(env_var="OPENAI_API_KEY", value="sk-test"),
             default_params=LLMProviderParams(temperature=0.7),
         )
@@ -291,6 +292,7 @@ class TestCompiledSpec:
         """Test creating a full compiled spec."""
         provider = ResolvedProvider(
             name="openai",
+            provider_type="openai",
             api_key=ResolvedCredential(env_var="OPENAI_API_KEY"),
             default_params=LLMProviderParams(),
         )

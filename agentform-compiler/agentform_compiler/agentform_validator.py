@@ -6,7 +6,7 @@ such as required fields, valid values, and step type requirements.
 
 from dataclasses import dataclass, field
 
-from agentform_compiler.af_ast import (
+from agentform_compiler.agentform_ast import (
     AgentBlock,
     AgentformFile,
     CapabilityBlock,
@@ -20,7 +20,7 @@ from agentform_compiler.af_ast import (
     VarRef,
     WorkflowBlock,
 )
-from agentform_compiler.af_resolver import ResolutionResult
+from agentform_compiler.agentform_resolver import ResolutionResult
 
 # Valid variable types
 VALID_VAR_TYPES = {"string", "number", "bool", "list"}
@@ -138,11 +138,11 @@ class AgentformValidator:
 
     def _validate_agentform_block(self) -> None:
         """Validate the agentform metadata block."""
-        if self.af_file.af is None:
+        if self.af_file.agentform is None:
             self.result.add_error("agentform", "Missing required 'agentform' block")
             return
 
-        agentform = self.af_file.af
+        agentform = self.af_file.agentform
 
         if not agentform.version:
             self.result.add_error(

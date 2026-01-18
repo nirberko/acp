@@ -4,8 +4,8 @@ from pathlib import Path
 
 import pytest
 
-from agentform_compiler.af_ast import Attribute, ModuleBlock
-from agentform_compiler.af_module_loader import (
+from agentform_compiler.agentform_ast import Attribute, ModuleBlock
+from agentform_compiler.agentform_module_loader import (
     ModuleLoader,
     ModuleLoadError,
 )

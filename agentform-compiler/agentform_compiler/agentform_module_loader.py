@@ -6,18 +6,18 @@ Handles loading, parsing, and parameter injection for Agentform modules.
 from pathlib import Path
 from typing import Any
 
-from agentform_compiler.af_ast import (
+from agentform_compiler.agentform_ast import (
     AgentformFile,
     ModuleBlock,
     VariableBlock,
     VarRef,
 )
-from agentform_compiler.af_module_resolver import (
+from agentform_compiler.agentform_module_resolver import (
     ModuleResolutionError,
     ModuleResolver,
     ResolvedModule,
 )
-from agentform_compiler.af_parser import (
+from agentform_compiler.agentform_parser import (
     AgentformParseError,
     parse_agentform_directory,
 )

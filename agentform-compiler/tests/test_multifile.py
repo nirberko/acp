@@ -5,11 +5,11 @@ from pathlib import Path
 
 import pytest
 
-from agentform_compiler.af_ast import (
+from agentform_compiler.agentform_ast import (
     MergeError,
     merge_agentform_files,
 )
-from agentform_compiler.af_parser import (
+from agentform_compiler.agentform_parser import (
     AgentformParseError,
     discover_agentform_files,
     parse_agentform,
@@ -36,8 +36,8 @@ class TestMergeAgentformFiles:
         agentform_file = parse_agentform(content)
         result = merge_agentform_files([agentform_file])
 
-        assert result.af is not None
-        assert result.af.version == "0.1"
+        assert result.agentform is not None
+        assert result.agentform.version == "0.1"
         assert len(result.variables) == 1
 
     def test_merge_empty_list_raises_error(self) -> None:
@@ -70,8 +70,8 @@ class TestMergeAgentformFiles:
 
         result = merge_agentform_files([file1, file2])
 
-        assert result.af is not None
-        assert result.af.version == "0.1"
+        assert result.agentform is not None
+        assert result.agentform.version == "0.1"
         assert len(result.variables) == 1
         assert len(result.models) == 1
         assert len(result.agents) == 1
@@ -130,8 +130,8 @@ class TestMergeAgentformFiles:
 
         result = merge_agentform_files([file1, file2, file3, file4])
 
-        assert result.af is not None
-        assert result.af.project == "multifile"
+        assert result.agentform is not None
+        assert result.agentform.project == "multifile"
         assert len(result.variables) == 2
         assert len(result.providers) == 1
         assert len(result.models) == 2
@@ -393,8 +393,8 @@ class TestParseAgentformDirectory:
             )
 
             result = parse_agentform_directory(tmpdir)
-            assert result.af is not None
-            assert result.af.project == "single"
+            assert result.agentform is not None
+            assert result.agentform.project == "single"
             assert len(result.variables) == 1
 
     def test_parse_multi_file_directory(self) -> None:
@@ -461,9 +461,9 @@ class TestParseAgentformDirectory:
 
             result = parse_agentform_directory(tmpdir)
 
-            assert result.af is not None
-            assert result.af.version == "0.2"
-            assert result.af.project == "multifile-test"
+            assert result.agentform is not None
+            assert result.agentform.version == "0.2"
+            assert result.agentform.project == "multifile-test"
             assert len(result.variables) == 1
             assert len(result.providers) == 1
             assert len(result.models) == 1

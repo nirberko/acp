@@ -5,9 +5,10 @@ import subprocess
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from agentform_compiler.af_ast import AgentformFile
-    from agentform_schema.ir import CompiledSpec
     from rich.console import Console
+
+    from agentform_compiler.agentform_ast import AgentformFile
+    from agentform_schema.ir import CompiledSpec
 
 
 class MissingProviderPackagesError(Exception):
@@ -142,7 +143,7 @@ def validate_provider_packages(compiled: "CompiledSpec", console: "Console | Non
     """
     missing_packages = []
 
-    for provider_name, provider in compiled.providers.items():
+    for _provider_name, provider in compiled.providers.items():
         package_name = get_langchain_package(provider.provider_type)
         if not is_package_installed(package_name):
             missing_packages.append((provider.provider_type, package_name))
@@ -152,7 +153,9 @@ def validate_provider_packages(compiled: "CompiledSpec", console: "Console | Non
             console.print("[red]✗ Missing required LangChain provider packages:[/red]")
             for provider_type, package_name in missing_packages:
                 console.print(f"  • {provider_type}: {package_name}")
-            console.print("\n[yellow]Run 'agentform init' to install missing packages automatically[/yellow]")
+            console.print(
+                "\n[yellow]Run 'agentform init' to install missing packages automatically[/yellow]"
+            )
             console.print("Or install manually:")
             for _, package_name in missing_packages:
                 console.print(f"  pip install {package_name}")

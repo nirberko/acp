@@ -27,7 +27,9 @@ class ResolvedProvider(BaseModel):
     """A resolved LLM provider configuration."""
 
     name: str
-    provider_type: str  # LangChain provider identifier (e.g., "openai", "anthropic", "google", "mistral")
+    provider_type: (
+        str  # LangChain provider identifier (e.g., "openai", "anthropic", "google", "mistral")
+    )
     api_key: ResolvedCredential
     default_params: LLMProviderParams
 

@@ -5,19 +5,18 @@ from pathlib import Path
 import typer
 from rich.console import Console
 
-from agentform_compiler.af_module_resolver import (
-    ModuleResolutionError,
-    ModuleResolver,
-    is_git_url,
-)
-from agentform_compiler.af_parser import AgentformParseError, parse_agentform_directory
-
 from agentform_cli.provider_packages import (
     detect_required_providers,
     get_langchain_package,
     install_package,
     is_package_installed,
 )
+from agentform_compiler.agentform_module_resolver import (
+    ModuleResolutionError,
+    ModuleResolver,
+    is_git_url,
+)
+from agentform_compiler.agentform_parser import AgentformParseError, parse_agentform_directory
 
 console = Console()
 
@@ -69,7 +68,7 @@ def init(
     # Check for required LangChain provider packages
     required_providers = detect_required_providers(agentform_file)
     if required_providers:
-        console.print(f"[bold]Checking LangChain provider packages...[/bold]\n")
+        console.print("[bold]Checking LangChain provider packages...[/bold]\n")
 
         missing_packages = []
         for provider_type in sorted(required_providers):
@@ -82,7 +81,7 @@ def init(
         if missing_packages:
             console.print(f"\n[bold]Installing {len(missing_packages)} package(s)...[/bold]\n")
             install_error_count = 0
-            for provider_type, package_name in missing_packages:
+            for _provider_type, package_name in missing_packages:
                 console.print(f"  [dim]•[/dim] Installing {package_name}...")
                 if install_package(package_name):
                     console.print(f"    [green]✓[/green] Installed {package_name}")
@@ -96,7 +95,9 @@ def init(
                     "You may need to install them manually."
                 )
             else:
-                console.print(f"\n[green]✓[/green] Successfully installed {len(missing_packages)} package(s)")
+                console.print(
+                    f"\n[green]✓[/green] Successfully installed {len(missing_packages)} package(s)"
+                )
 
         console.print()
 

@@ -11,17 +11,16 @@ from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich.syntax import Syntax
 
+from agentform_cli.provider_packages import (
+    MissingProviderPackagesError,
+    validate_provider_packages,
+)
 from agentform_compiler import compile_file
 from agentform_compiler.compiler import CompilationError
 from agentform_runtime import WorkflowEngine
 from agentform_runtime.engine import WorkflowError
 from agentform_runtime.logging_config import configure_logging, get_logger
 from agentform_schema.ir import ResolvedWorkflow
-
-from agentform_cli.provider_packages import (
-    MissingProviderPackagesError,
-    validate_provider_packages,
-)
 
 console = Console()
 

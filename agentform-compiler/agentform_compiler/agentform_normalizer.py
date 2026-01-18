@@ -6,7 +6,7 @@ for validation and IR generation.
 
 from typing import Any
 
-from agentform_compiler.af_ast import (
+from agentform_compiler.agentform_ast import (
     AgentformFile,
     AndExpr,
     ComparisonExpr,
@@ -22,7 +22,7 @@ from agentform_compiler.af_ast import (
     VariableBlock,
     VarRef,
 )
-from agentform_compiler.af_resolver import ResolutionResult
+from agentform_compiler.agentform_resolver import ResolutionResult
 from agentform_schema.models import (
     AgentConfig,
     BudgetConfig,
@@ -273,15 +273,15 @@ class AgentformNormalizer:
 
     def _get_version(self) -> str:
         """Get version from agentform block."""
-        if self.af_file.af and self.af_file.af.version:
-            return self.af_file.af.version
+        if self.af_file.agentform and self.af_file.agentform.version:
+            return self.af_file.agentform.version
         return "0.1"
 
     def _normalize_project(self) -> ProjectConfig:
         """Normalize project configuration."""
         name = "unnamed"
-        if self.af_file.af and self.af_file.af.project:
-            name = self.af_file.af.project
+        if self.af_file.agentform and self.af_file.agentform.project:
+            name = self.af_file.agentform.project
         return ProjectConfig(name=name)
 
     def _resolve_variable(self, var_ref: VarRef) -> tuple[str, bool]:

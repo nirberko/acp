@@ -4,7 +4,7 @@ from typing import Any, cast
 
 # Import AST types for expression evaluation (optional dependency)
 try:
-    from agentform_compiler.af_ast import (
+    from agentform_compiler.agentform_ast import (
         AndExpr,
         ComparisonExpr,
         ConditionalExpr,

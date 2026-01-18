@@ -1,8 +1,8 @@
 """Tests for Agentform normalizer."""
 
-from agentform_compiler.af_normalizer import normalize_agentform
-from agentform_compiler.af_parser import parse_agentform
-from agentform_compiler.af_resolver import resolve_references
+from agentform_compiler.agentform_normalizer import normalize_agentform
+from agentform_compiler.agentform_parser import parse_agentform
+from agentform_compiler.agentform_resolver import resolve_references
 from agentform_schema.models import SideEffect, StepType
 
 

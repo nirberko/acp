@@ -600,7 +600,7 @@ def merge_agentform_files(files: list[AgentformFile]) -> AgentformFile:
 
     if len(files) == 1:
         # Single file, just validate it has an agentform block
-        if files[0].af is None:
+        if files[0].agentform is None:
             raise MergeError(
                 "No 'agentform' metadata block found. One file must contain an 'agentform {}' block."
             )
@@ -609,8 +609,8 @@ def merge_agentform_files(files: list[AgentformFile]) -> AgentformFile:
     # Collect all agentform blocks
     agentform_blocks: list[tuple[AgentformBlock, SourceLocation | None]] = []
     for f in files:
-        if f.af is not None:
-            agentform_blocks.append((f.af, f.af.location))
+        if f.agentform is not None:
+            agentform_blocks.append((f.agentform, f.agentform.location))
 
     # Validate exactly one agentform block
     if len(agentform_blocks) == 0:

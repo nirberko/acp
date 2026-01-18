@@ -264,9 +264,7 @@ project:
             try:
                 with pytest.raises(CompilationError) as exc_info:
                     compile_file(f.name, check_env=False, resolve_credentials=False)
-                assert "Expected .af file" in str(exc_info.value) or ".yaml" in str(
-                    exc_info.value
-                )
+                assert "Expected .af file" in str(exc_info.value) or ".yaml" in str(exc_info.value)
             finally:
                 Path(f.name).unlink()
 
@@ -280,9 +278,9 @@ project:
                 with pytest.raises(CompilationError) as exc_info:
                     compile_file(f.name)
 
-                assert "Expected .af file" in str(
+                assert "Expected .af file" in str(exc_info.value) or "Only .af files" in str(
                     exc_info.value
-                ) or "Only .af files" in str(exc_info.value)
+                )
             finally:
                 Path(f.name).unlink()
 
@@ -347,9 +345,7 @@ project:
             try:
                 with pytest.raises(CompilationError) as exc_info:
                     validate_file(f.name, check_env=False)
-                assert "Expected .af file" in str(exc_info.value) or ".yaml" in str(
-                    exc_info.value
-                )
+                assert "Expected .af file" in str(exc_info.value) or ".yaml" in str(exc_info.value)
             finally:
                 Path(f.name).unlink()
 
