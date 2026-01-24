@@ -21,9 +21,7 @@
 
 <br />
 
-<p align="center">
-  [![Watch the video](https://img.youtube.com/vi/jw9SKOUKaoo/maxresdefault.jpg)](https://youtu.be/jw9SKOUKaoo)
-</p>
+[![Watch the video](https://img.youtube.com/vi/jw9SKOUKaoo/maxresdefault.jpg)](https://youtu.be/jw9SKOUKaoo)
 
 ---
 
