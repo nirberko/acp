@@ -157,22 +157,26 @@ hide:
     }
     ```
 
-=== "Python SDK"
+=== "Python SDK (Coming Soon)"
 
     ```python
-    from agentform import Agent
-
-    researcher = Agent(
-        name="researcher",
-        model="gpt-4-turbo",
-        temperature=0.7,
-        system_prompt="You are a senior research analyst.",
-        tools=["web_search", "summarize_page"],
-        limits={
-            "budget": "5.00",
-            "max_steps": 10
-        }
-    )
+    # Planned Python SDK example.
+    # The agentform Python package and Agent class are not yet available.
+    # This example illustrates the intended future interface.
+    #
+    # from agentform import Agent
+    #
+    # researcher = Agent(
+    #     name="researcher",
+    #     model="gpt-4-turbo",
+    #     temperature=0.7,
+    #     system_prompt="You are a senior research analyst.",
+    #     tools=["web_search", "summarize_page"],
+    #     limits={
+    #         "budget": "5.00",
+    #         "max_steps": 10
+    #     }
+    # )
     ```
 
 <div style="margin-top: 4rem;"></div>
