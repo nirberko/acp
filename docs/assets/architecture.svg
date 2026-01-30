@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" style="background-color: transparent;">
+  <!-- Style -->
+  <style>
+    .node { fill: #1e293b; stroke: #6366f1; stroke-width: 2px; }
+    .node-text { fill: #e2e8f0; font-family: sans-serif; font-size: 14px; text-anchor: middle; dominant-baseline: middle; }
+    .edge { stroke: #94a3b8; stroke-width: 2px; fill: none; }
+    .arrow { fill: #94a3b8; }
+  </style>
+
+  <!-- Defs for markers -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" class="arrow" />
+    </marker>
+  </defs>
+
+  <!-- Nodes -->
+  <!-- User Request -->
+  <rect x="50" y="180" width="120" height="50" rx="8" class="node" />
+  <text x="110" y="205" class="node-text">User Request</text>
+
+  <!-- Controller -->
+  <rect x="230" y="180" width="140" height="50" rx="8" class="node" />
+  <text x="300" y="205" class="node-text">Form Controller</text>
+
+  <!-- Router (Diamond) -->
+  <polygon points="450,180 500,205 450,230 400,205" class="node" />
+  <text x="450" y="205" class="node-text">Router</text>
+
+  <!-- Agents -->
+  <rect x="550" y="100" width="120" height="50" rx="8" class="node" style="stroke: #ec4899;" />
+  <text x="610" y="125" class="node-text">Action Agent</text>
+
+  <rect x="550" y="300" width="120" height="50" rx="8" class="node" style="stroke: #a855f7;" />
+  <text x="610" y="325" class="node-text">Planning Agent</text>
+
+  <!-- Result -->
+  <rect x="700" y="205" width="80" height="40" rx="20" class="node" style="fill: #22c55e; stroke: none;" />
+  <text x="740" y="225" class="node-text" style="fill: #fff; font-weight: bold;">Result</text>
+
+  <!-- Edges -->
+  <line x1="170" y1="205" x2="220" y2="205" class="edge" marker-end="url(#arrowhead)" />
+  <line x1="370" y1="205" x2="390" y2="205" class="edge" marker-end="url(#arrowhead)" />
+  
+  <!-- Router to Up -->
+  <path d="M450,180 Q450,125 540,125" class="edge" marker-end="url(#arrowhead)" />
+  
+  <!-- Router to Down -->
+  <path d="M450,230 Q450,325 540,325" class="edge" marker-end="url(#arrowhead)" />
+
+  <!-- Agents to Result -->
+  <path d="M670,125 Q740,125 740,195" class="edge" marker-end="url(#arrowhead)" />
+  <path d="M670,325 Q740,325 740,255" class="edge" marker-end="url(#arrowhead)" />
+
+</svg>

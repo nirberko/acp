@@ -1,0 +1,193 @@
+/* Import Outfit Font */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
+
+:root {
+  --glass-bg: rgba(30, 41, 59, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  --hero-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+}
+
+/* Global Styles */
+body,
+.md-typeset {
+  font-family: 'Outfit', sans-serif;
+}
+
+/* Hero Section */
+.hero-section {
+  position: relative;
+  text-align: center;
+  padding: 4rem 1rem;
+  /* Reduced from 6rem */
+  margin-bottom: 3rem;
+  background: var(--hero-gradient);
+  background-size: 200% 200%;
+  animation: gradientBG 10s ease infinite;
+  color: white;
+  border-radius: 1.5rem;
+  overflow: hidden;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* ... existing keyframes ... */
+
+@keyframes gradientBG {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.hero-section h1 {
+  font-size: 3.5rem;
+  /* Reduced from 4.5rem */
+  font-weight: 800;
+  margin-bottom: 1rem;
+  color: white !important;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  line-height: 1.1;
+}
+
+.hero-section .tagline {
+  font-size: 1.5rem;
+  font-weight: 300;
+  opacity: 0.95;
+  max-width: 800px;
+  margin: 0 auto 2.5rem;
+}
+
+/* Glassmorphism Buttons */
+.hero-buttons .md-button {
+  font-size: 1.1rem;
+  padding: 1rem 2rem;
+  margin: 0.5rem;
+  border-radius: 12px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(4px);
+}
+
+.hero-buttons .md-button--primary {
+  background: rgba(255, 255, 255, 0.9) !important;
+  color: #4f46e5 !important;
+  border: 1px solid white;
+}
+
+.hero-buttons .md-button--primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.hero-buttons .md-button:not(.md-button--primary) {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: white !important;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.hero-buttons .md-button:not(.md-button--primary):hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border-color: white;
+}
+
+/* Feature Grid Styles Removed */
+
+/* Terminal Animation */
+.terminal-window {
+  background: #1e1e2e;
+  /* Darker than slate */
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  border: 1px solid #333;
+  margin: 4rem auto;
+  max-width: 800px;
+  overflow: hidden;
+  font-family: 'JetBrains Mono', monospace;
+  text-align: left;
+}
+
+.terminal-header {
+  background: #2d2d3f;
+  padding: 10px 15px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.terminal-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #5f5f61;
+}
+
+.terminal-dot.red {
+  background: #ff5f56;
+}
+
+.terminal-dot.yellow {
+  background: #ffbd2e;
+}
+
+.terminal-dot.green {
+  background: #27c93f;
+}
+
+.terminal-body {
+  padding: 20px;
+  color: #a9b1d6;
+  font-size: 0.95rem;
+}
+
+.command-line {
+  color: #fff;
+  display: flex;
+  gap: 10px;
+}
+
+.prompt {
+  color: #27c93f;
+  font-weight: bold;
+}
+
+.cursor {
+  display: inline-block;
+  width: 8px;
+  height: 18px;
+  background: #fff;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+  }
+}
+
+/* Code Blocks */
+.md-typeset pre>code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* Admonitions */
+.md-typeset .admonition {
+  border-radius: 0.75rem;
+  box-shadow: none;
+  border: 1px solid var(--glass-border);
+}

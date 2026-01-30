@@ -74,3 +74,4 @@ poetry.lock
 .af/
 *.trace.json
 
+site/
