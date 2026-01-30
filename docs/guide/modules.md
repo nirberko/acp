@@ -128,3 +128,42 @@ my-project/
 ```
 
 Add `.af/` to your `.gitignore` - these are downloaded dependencies.
+
+## Module Best Practices
+
+When creating reusable modules, follow these guidelines to make them reliable and easy for others to adopt:
+
+### Version control
+
+- Commit all module source files (`.af` and supporting files) to a Git repository.
+- Do **not** commit the `.af/modules/` cache directory – treat it like any other build artifact.
+- Use tags or version branches (e.g., `v1.0.0`) so users can pin a specific module version.
+
+### Documentation
+
+- Include a `README.md` in the module root that explains:
+  - What the module does.
+  - Required and optional input variables.
+  - Any external dependencies (APIs, credentials, tools).
+  - Example usage showing a `module` block and how to call its workflows or agents.
+- Use `description` fields on variables, agents, and workflows to make the module self-describing.
+
+### Defaults and configuration
+
+- Provide sensible defaults for non-sensitive, non-environment-specific values to make modules easy to adopt.
+- Omit `default` for values that must be explicitly provided (like API keys) so they are clearly required.
+- Keep variable names stable across versions; if you must change them, document the migration path.
+
+### Testing
+
+- Create one or more example workflows in the module that exercise the main behavior end to end.
+- Test modules locally before publishing by:
+  - Running `agentform init` against a consuming project.
+  - Executing key workflows (`agentform run module.<name>.<workflow> .`).
+- When possible, pin provider models or critical settings so behavior is consistent across environments.
+
+### Naming conventions
+
+- Use clear, descriptive module names (e.g., `pr-reviewer`, `code-audit`, `data-enrichment`).
+- Keep file ordering predictable (e.g., `00-project.af`, `01-variables.af`, `02-providers.af`, …) so users can navigate easily.
+- Avoid breaking changes to exported names (agents, workflows, variables). If a breaking change is unavoidable, publish it under a new major version or a new module name.
