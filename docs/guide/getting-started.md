@@ -102,3 +102,46 @@ agentform run ask \
 ```
 
 You should see the agent's response!
+
+## Understanding the Configuration
+
+Let's break down what we just created:
+
+### `agentform` block
+Defines the project metadata and version.
+
+### `variable` block
+Declares input variables. The `sensitive = true` flag ensures the value isn't logged.
+
+### `provider` block
+Configures the LLM provider (OpenAI in this case) with your API key and default parameters.
+
+### `policy` block
+Sets budgets and limits for agent execution:
+- `max_cost_usd_per_run`: Maximum cost per workflow run
+- `timeout_seconds`: Maximum execution time
+
+### `model` block
+Defines specific models from your provider. You can reference multiple models.
+
+### `agent` block
+Creates an agent with:
+- A primary model (`model.gpt4o_mini`)
+- Fallback models if the primary fails
+- Instructions that define the agent's behavior
+- A policy for resource limits
+
+### `workflow` block
+Defines the execution flow:
+- `entry`: The starting step
+- `step`: Individual workflow steps
+  - `type = "llm"`: Uses an LLM agent
+  - `input`: Maps input data
+  - `output`: Extracts results
+  - `next`: The next step in the flow
+
+## Next Steps
+
+- Explore the [Examples](../examples/index.md) to see more complex configurations
+- Learn about [Modules](modules.md) for reusable agent configurations
+- Check the [CLI Reference](../reference/cli.md) for all available commands
