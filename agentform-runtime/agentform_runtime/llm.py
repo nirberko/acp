@@ -1,12 +1,13 @@
 """LLM integration via LangChain."""
 
-from typing import Any
+from typing import Any, cast
 
 from langchain.chat_models import init_chat_model
 from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
+from pydantic import BaseModel, create_model
 
 from agentform_runtime.logging_config import get_logger
-from agentform_schema.ir import ResolvedAgent, ResolvedProvider
+from agentform_schema.ir import ResolvedAgent, ResolvedProvider, ResolvedSchema
 
 
 class LLMError(Exception):
@@ -15,18 +16,34 @@ class LLMError(Exception):
     pass
 
 
+# Type mapping from schema types to Python types
+_SCHEMA_TYPE_MAP: dict[str, type] = {
+    "string": str,
+    "number": float,
+    "boolean": bool,
+}
+
+
 class LLMExecutor:
     """Executes LLM calls using LangChain."""
 
-    def __init__(self, providers: dict[str, ResolvedProvider], verbose: bool = False):
+    def __init__(
+        self,
+        providers: dict[str, ResolvedProvider],
+        schemas: dict[str, ResolvedSchema] | None = None,
+        verbose: bool = False,
+    ):
         """Initialize LLM executor.
 
         Args:
             providers: Resolved provider configurations
+            schemas: Resolved schema definitions for structured output
             verbose: Enable verbose logging
         """
         self._providers = providers
+        self._schemas = schemas or {}
         self._llm_cache: dict[str, Any] = {}
+        self._pydantic_model_cache: dict[str, type[BaseModel]] = {}
         self._verbose = verbose
         self._logger = get_logger("agentform_runtime.llm")
 
@@ -91,6 +108,47 @@ class LLMExecutor:
         self._llm_cache[cache_key] = llm
         self._logger.debug("llm_creation_complete", provider=provider_name, model=model)
         return llm
+
+    def _schema_to_pydantic(self, schema: ResolvedSchema) -> type[BaseModel]:
+        """Convert a ResolvedSchema to a Pydantic model.
+
+        Args:
+            schema: The schema to convert
+
+        Returns:
+            A dynamically created Pydantic model class
+        """
+        # Check cache first
+        if schema.name in self._pydantic_model_cache:
+            return self._pydantic_model_cache[schema.name]
+
+        # Build field definitions for create_model
+        field_definitions: dict[str, Any] = {}
+        for field_name, field_def in schema.fields.items():
+            if field_def.type == "list" and field_def.item_type:
+                # List type
+                item_type = _SCHEMA_TYPE_MAP.get(field_def.item_type, str)
+                field_definitions[field_name] = (list[item_type], ...)  # type: ignore[valid-type]
+            else:
+                # Scalar type
+                python_type = _SCHEMA_TYPE_MAP.get(field_def.type, str)
+                field_definitions[field_name] = (python_type, ...)
+
+        # Create the Pydantic model dynamically
+        model_name = schema.name.title().replace("_", "")
+        pydantic_model = create_model(model_name, **field_definitions)
+
+        # Cache and return
+        # create_model returns Any, but we know it's a BaseModel subclass
+        typed_model = cast("type[BaseModel]", pydantic_model)
+        self._pydantic_model_cache[schema.name] = typed_model
+        self._logger.debug(
+            "pydantic_model_created",
+            schema_name=schema.name,
+            model_name=model_name,
+            fields=list(field_definitions.keys()),
+        )
+        return typed_model
 
     async def execute(
         self,
@@ -160,29 +218,66 @@ class LLMExecutor:
                     messages.append(HumanMessage(content="Please proceed with your task."))
                     self._logger.debug("llm_empty_input_message_added")
 
-                # Execute
+                # Execute - check for structured output
                 self._logger.debug("llm_invoke_start", model=model, message_count=len(messages))
-                response = await llm.ainvoke(messages)
-                self._logger.debug(
-                    "llm_invoke_complete",
-                    model=model,
-                    response_length=len(response.content) if response.content else 0,
-                )
 
-                usage = getattr(response, "usage_metadata", None)
-                result = {
-                    "response": response.content,
-                    "model": model,
-                    "provider": agent.provider_name,
-                    "usage": usage,
-                }
+                # Check if agent has output schema
+                output_schema_name = getattr(agent, "output_schema_name", None)
+                if output_schema_name and output_schema_name in self._schemas:
+                    # Use structured output
+                    schema = self._schemas[output_schema_name]
+                    pydantic_model = self._schema_to_pydantic(schema)
+
+                    self._logger.debug(
+                        "llm_structured_output_enabled",
+                        schema_name=output_schema_name,
+                        model=model,
+                    )
+
+                    structured_llm = llm.with_structured_output(pydantic_model)
+                    response = await structured_llm.ainvoke(messages)
+
+                    # Convert Pydantic model to dict
+                    response_data = response.model_dump()
+
+                    self._logger.debug(
+                        "llm_invoke_complete_structured",
+                        model=model,
+                        schema_name=output_schema_name,
+                        response_keys=list(response_data.keys()),
+                    )
+
+                    usage = None  # Usage metadata not available for structured output
+                    result = {
+                        "response": response_data,
+                        "model": model,
+                        "provider": agent.provider_name,
+                        "usage": usage,
+                        "structured": True,
+                        "schema_name": output_schema_name,
+                    }
+                else:
+                    # Standard invocation
+                    response = await llm.ainvoke(messages)
+                    self._logger.debug(
+                        "llm_invoke_complete",
+                        model=model,
+                        response_length=len(response.content) if response.content else 0,
+                    )
+
+                    usage = getattr(response, "usage_metadata", None)
+                    result = {
+                        "response": response.content,
+                        "model": model,
+                        "provider": agent.provider_name,
+                        "usage": usage,
+                    }
 
                 self._logger.info(
                     "llm_execution_success",
                     model=model,
                     provider=agent.provider_name,
-                    response_length=len(response.content) if response.content else 0,
-                    usage=usage,
+                    structured=output_schema_name is not None,
                 )
 
                 return result

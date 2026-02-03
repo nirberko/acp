@@ -96,8 +96,34 @@ def compile_agentform(
     Raises:
         CompilationError: If compilation fails
     """
-    # Parse and normalize to SpecRoot
-    spec = parse_agentform_to_spec(content, file_path, variables)
+    from agentform_compiler.agentform_normalizer import NormalizationError, normalize_agentform
+    from agentform_compiler.agentform_parser import AgentformParseError, parse_agentform
+    from agentform_compiler.agentform_resolver import resolve_references
+    from agentform_compiler.agentform_validator import validate_agentform
+
+    # Parse to AST
+    try:
+        agentform_file = parse_agentform(content, file_path=file_path)
+    except AgentformParseError as e:
+        raise CompilationError(f"Parse error: {e}") from e
+
+    # Resolve references
+    resolution = resolve_references(agentform_file)
+    if not resolution.is_valid:
+        errors_str = "\n".join(f"  - {e}" for e in resolution.errors)
+        raise CompilationError(f"Reference resolution failed:\n{errors_str}")
+
+    # Validate
+    validation = validate_agentform(agentform_file, resolution)
+    if not validation.is_valid:
+        errors_str = "\n".join(f"  - {e}" for e in validation.errors)
+        raise CompilationError(f"Validation failed:\n{errors_str}")
+
+    # Normalize to SpecRoot
+    try:
+        spec = normalize_agentform(agentform_file, resolution, variables)
+    except NormalizationError as e:
+        raise CompilationError(f"Normalization error: {e}") from e
 
     # Validate using existing validator
     result = validate_spec(spec, check_env=check_env)
@@ -105,8 +131,8 @@ def compile_agentform(
         errors_str = "\n".join(f"  - {e.path}: {e.message}" for e in result.errors)
         raise CompilationError(f"Validation failed:\n{errors_str}", result)
 
-    # Generate IR
-    return generate_ir(spec, resolve_credentials=resolve_credentials)
+    # Generate IR (pass AST for schema extraction)
+    return generate_ir(spec, resolve_credentials=resolve_credentials, agentform_file=agentform_file)
 
 
 def compile_agentform_file(
@@ -313,8 +339,8 @@ def compile_agentform_directory(
         errors_str = "\n".join(f"  - {e.path}: {e.message}" for e in result.errors)
         raise CompilationError(f"Validation failed:\n{errors_str}", result)
 
-    # Generate IR
-    return generate_ir(spec, resolve_credentials=resolve_credentials)
+    # Generate IR (pass AST for schema extraction)
+    return generate_ir(spec, resolve_credentials=resolve_credentials, agentform_file=agentform_file)
 
 
 def validate_agentform_directory(

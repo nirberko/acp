@@ -14,9 +14,10 @@ simple-agent/
 ├── 01-variables.af    # Variable definitions
 ├── 02-providers.af    # Provider and model definitions
 ├── 03-policies.af     # Policy definitions
-├── 04-agents.af       # Agent definitions
-├── 05-workflows.af    # Workflow definitions
-├── input.yaml          # Sample input
+├── 04-schemas.af      # Schema definitions for structured output
+├── 05-agents.af       # Agent definitions
+├── 06-workflows.af    # Workflow definitions
+├── input.yaml         # Sample input
 └── README.md
 ```
 
@@ -97,9 +98,25 @@ policy "default" {
 }
 ```
 
-### Agents (`04-agents.af`)
+### Schemas (`04-schemas.af`)
 
-Configure agents with models, instructions, and policies:
+Define structured output types for agents. Schemas ensure the LLM returns data in a predictable JSON format:
+
+```hcl
+schema "assistant_response" {
+  answer     = string
+  confidence = number
+  sources    = list(string)
+}
+```
+
+Supported types:
+- Scalars: `string`, `number`, `boolean`
+- Lists: `list(string)`, `list(number)`, `list(boolean)`
+
+### Agents (`05-agents.af`)
+
+Configure agents with models, instructions, policies, and optional output schemas:
 
 ```hcl
 agent "assistant" {
@@ -111,10 +128,15 @@ You are a helpful assistant. Answer questions clearly and concisely.
 EOF
 
   policy = policy.default
+
+  // Optional: enforce structured output format
+  output_schema = schema.assistant_response
 }
 ```
 
-### Workflows (`05-workflows.af`)
+When `output_schema` is specified, the runtime uses LangChain's structured output mode to ensure the LLM returns data matching the schema.
+
+### Workflows (`06-workflows.af`)
 
 Define execution flow using steps:
 
@@ -143,3 +165,13 @@ workflow "ask" {
 ## Output
 
 The workflow produces output containing the agent's response, stored in `state.answer`.
+
+With the `output_schema` configured, the response is structured JSON:
+
+```json
+{
+  "answer": "The meaning of life is subjective and varies by individual...",
+  "confidence": 0.85,
+  "sources": ["philosophical reasoning", "common interpretations"]
+}
+```

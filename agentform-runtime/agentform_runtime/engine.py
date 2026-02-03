@@ -37,7 +37,7 @@ class WorkflowEngine:
         """
         self._spec = spec
         self._approval_handler = approval_handler or CLIApprovalHandler()
-        self._llm_executor = LLMExecutor(spec.providers, verbose=verbose)
+        self._llm_executor = LLMExecutor(spec.providers, schemas=spec.schemas, verbose=verbose)
         self._policy_enforcer = PolicyEnforcer(spec.policies)
         self._mcp_client: MCPClient | None = None
         self._verbose = verbose

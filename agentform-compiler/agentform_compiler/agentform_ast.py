@@ -335,6 +335,36 @@ class ModelBlock(ASTNode):
         return None
 
 
+class SchemaBlock(ASTNode):
+    """Schema definition block for structured output.
+
+    schema "person" {
+        name    = string
+        age     = number
+        hobbies = list(string)
+    }
+    """
+
+    name: str
+    attributes: list[Attribute] = Field(default_factory=list)
+
+    def get_attribute(self, name: str) -> Value | None:
+        """Get attribute value by name."""
+        for attr in self.attributes:
+            if attr.name == name:
+                return cast("Value", attr.value)
+        return None
+
+    def get_fields(self) -> dict[str, str]:
+        """Get all fields as a dict mapping field name to type string."""
+        fields: dict[str, str] = {}
+        for attr in self.attributes:
+            # Field types are stored as string identifiers (e.g., "string", "number", "list(string)")
+            if isinstance(attr.value, str):
+                fields[attr.name] = attr.value
+        return fields
+
+
 class AgentBlock(ASTNode):
     """Agent definition block.
 
@@ -484,6 +514,7 @@ class AgentformFile(ASTNode):
     capabilities: list[CapabilityBlock] = Field(default_factory=list)
     policies: list[PolicyBlock] = Field(default_factory=list)
     models: list[ModelBlock] = Field(default_factory=list)
+    schemas: list[SchemaBlock] = Field(default_factory=list)
     agents: list[AgentBlock] = Field(default_factory=list)
     workflows: list[WorkflowBlock] = Field(default_factory=list)
     modules: list[ModuleBlock] = Field(default_factory=list)
@@ -500,6 +531,13 @@ class AgentformFile(ASTNode):
         for model in self.models:
             if model.name == name:
                 return model
+        return None
+
+    def get_schema(self, name: str) -> SchemaBlock | None:
+        """Get schema by name."""
+        for schema in self.schemas:
+            if schema.name == name:
+                return schema
         return None
 
     def get_agent(self, name: str) -> AgentBlock | None:
@@ -634,6 +672,7 @@ def merge_agentform_files(files: list[AgentformFile]) -> AgentformFile:
     seen_capabilities: dict[str, SourceLocation | None] = {}
     seen_policies: dict[str, SourceLocation | None] = {}
     seen_models: dict[str, SourceLocation | None] = {}
+    seen_schemas: dict[str, SourceLocation | None] = {}
     seen_agents: dict[str, SourceLocation | None] = {}
     seen_workflows: dict[str, SourceLocation | None] = {}
     seen_modules: dict[str, SourceLocation | None] = {}
@@ -706,6 +745,17 @@ def merge_agentform_files(files: list[AgentformFile]) -> AgentformFile:
                 )
             seen_models[model.name] = model.location
             merged.models.append(model)
+
+        # Merge schemas
+        for schema in f.schemas:
+            if schema.name in seen_schemas:
+                existing_loc = _format_location(seen_schemas[schema.name])
+                new_loc = _format_location(schema.location)
+                raise MergeError(
+                    f"Duplicate schema '{schema.name}' defined in both {existing_loc} and {new_loc}"
+                )
+            seen_schemas[schema.name] = schema.location
+            merged.schemas.append(schema)
 
         # Merge agents
         for agent in f.agents:

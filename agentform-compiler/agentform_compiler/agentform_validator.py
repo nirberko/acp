@@ -4,6 +4,7 @@ Validates Agentform-specific rules beyond reference resolution,
 such as required fields, valid values, and step type requirements.
 """
 
+import re
 from dataclasses import dataclass, field
 
 from agentform_compiler.agentform_ast import (
@@ -13,6 +14,8 @@ from agentform_compiler.agentform_ast import (
     ModelBlock,
     PolicyBlock,
     ProviderBlock,
+    Reference,
+    SchemaBlock,
     ServerBlock,
     SourceLocation,
     StepBlock,
@@ -24,6 +27,12 @@ from agentform_compiler.agentform_resolver import ResolutionResult
 
 # Valid variable types
 VALID_VAR_TYPES = {"string", "number", "bool", "list"}
+
+# Valid schema field types (scalars)
+VALID_SCHEMA_SCALAR_TYPES = {"string", "number", "boolean"}
+
+# Regex for list(T) type syntax
+LIST_TYPE_PATTERN = re.compile(r"^list\((\w+)\)$")
 
 
 @dataclass
@@ -126,6 +135,10 @@ class AgentformValidator:
         for model in self.af_file.models:
             self._validate_model(model)
 
+        # Check schemas
+        for schema in self.af_file.schemas:
+            self._validate_schema(schema)
+
         # Check agents
         for agent in self.af_file.agents:
             self._validate_agent(agent)
@@ -187,7 +200,7 @@ class AgentformValidator:
         if var_type == "string":
             type_valid = isinstance(default, str)
         elif var_type == "number":
-            type_valid = isinstance(default, (int, float)) and not isinstance(default, bool)
+            type_valid = isinstance(default, int | float) and not isinstance(default, bool)
         elif var_type == "bool":
             type_valid = isinstance(default, bool)
         elif var_type == "list":
@@ -318,6 +331,81 @@ class AgentformValidator:
                 model.location,
             )
 
+    def _validate_schema(self, schema: SchemaBlock) -> None:
+        """Validate a schema block."""
+        path = f"schema.{schema.name}"
+
+        # Check for at least one field
+        fields = schema.get_fields()
+        if not fields:
+            self.result.add_error(
+                path,
+                "Schema must have at least one field",
+                schema.location,
+            )
+            return
+
+        # Track field names for duplicate detection
+        seen_fields: set[str] = set()
+
+        for attr in schema.attributes:
+            field_name = attr.name
+            field_path = f"{path}.{field_name}"
+
+            # Check for duplicate field names
+            if field_name in seen_fields:
+                self.result.add_error(
+                    field_path,
+                    f"Duplicate field name: {field_name}",
+                    attr.location,
+                )
+                continue
+            seen_fields.add(field_name)
+
+            # Validate field type
+            if not isinstance(attr.value, str):
+                self.result.add_error(
+                    field_path,
+                    "Field type must be a type identifier (string, number, boolean, or list(T))",
+                    attr.location,
+                )
+                continue
+
+            field_type = attr.value
+            self._validate_schema_field_type(field_type, field_path, attr.location)
+
+    def _validate_schema_field_type(
+        self,
+        field_type: str,
+        field_path: str,
+        location: SourceLocation | None,
+    ) -> None:
+        """Validate a schema field type."""
+        # Check for scalar types
+        if field_type in VALID_SCHEMA_SCALAR_TYPES:
+            return
+
+        # Check for list(T) type
+        list_match = LIST_TYPE_PATTERN.match(field_type)
+        if list_match:
+            item_type = list_match.group(1)
+            if item_type not in VALID_SCHEMA_SCALAR_TYPES:
+                self.result.add_error(
+                    field_path,
+                    f"Invalid list item type: {item_type}. "
+                    f"Valid types: {', '.join(sorted(VALID_SCHEMA_SCALAR_TYPES))}",
+                    location,
+                )
+            return
+
+        # Unknown type
+        self.result.add_error(
+            field_path,
+            f"Invalid field type: {field_type}. "
+            f"Valid types: {', '.join(sorted(VALID_SCHEMA_SCALAR_TYPES))}, or list(T)",
+            location,
+        )
+
     def _validate_agent(self, agent: AgentBlock) -> None:
         """Validate an agent block."""
         path = f"agent.{agent.name}"
@@ -346,6 +434,15 @@ class AgentformValidator:
             self.result.add_error(
                 f"{path}.fallback_models",
                 "fallback_models must be an array",
+                agent.location,
+            )
+
+        # Validate output_schema is a reference if present
+        output_schema = agent.get_attribute("output_schema")
+        if output_schema is not None and not isinstance(output_schema, Reference):
+            self.result.add_error(
+                f"{path}.output_schema",
+                "output_schema must be a schema reference (schema.<name>)",
                 agent.location,
             )
 

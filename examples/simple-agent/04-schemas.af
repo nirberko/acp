@@ -1,0 +1,8 @@
+// Schema definitions
+// Schemas define structured output types for agents
+
+schema "assistant_response" {
+  answer     = string
+  confidence = number
+  sources    = list(string)
+}
