@@ -1,19 +1,19 @@
 """Pydantic models for Agentform YAML specification."""
 
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field
 
 
-class SideEffect(str, Enum):
+class SideEffect(StrEnum):
     """Side effect classification for capabilities."""
 
     READ = "read"
     WRITE = "write"
 
 
-class StepType(str, Enum):
+class StepType(StrEnum):
     """Workflow step types."""
 
     LLM = "llm"
@@ -23,7 +23,7 @@ class StepType(str, Enum):
     END = "end"
 
 
-class Transport(str, Enum):
+class Transport(StrEnum):
     """MCP server transport types."""
 
     STDIO = "stdio"

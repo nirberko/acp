@@ -140,7 +140,7 @@ class LLMExecutor:
 
         # Cache and return
         # create_model returns Any, but we know it's a BaseModel subclass
-        typed_model = cast(type[BaseModel], pydantic_model)
+        typed_model = cast("type[BaseModel]", pydantic_model)
         self._pydantic_model_cache[schema.name] = typed_model
         self._logger.debug(
             "pydantic_model_created",
