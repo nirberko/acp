@@ -200,7 +200,7 @@ class AgentformValidator:
         if var_type == "string":
             type_valid = isinstance(default, str)
         elif var_type == "number":
-            type_valid = isinstance(default, (int, float)) and not isinstance(default, bool)
+            type_valid = isinstance(default, int | float) and not isinstance(default, bool)
         elif var_type == "bool":
             type_valid = isinstance(default, bool)
         elif var_type == "list":

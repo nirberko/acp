@@ -451,7 +451,7 @@ class AgentformNormalizer:
             budgets = BudgetConfig()
             for budget_block in policy.get_budgets_blocks():
                 for attr in budget_block.attributes:
-                    if attr.name == "max_cost_usd_per_run" and isinstance(attr.value, (int, float)):
+                    if attr.name == "max_cost_usd_per_run" and isinstance(attr.value, int | float):
                         budgets.max_cost_usd_per_run = float(attr.value)
                     elif attr.name == "max_capability_calls" and isinstance(attr.value, int):
                         budgets.max_capability_calls = attr.value
@@ -646,7 +646,7 @@ class AgentformNormalizer:
         if isinstance(condition_val, str):
             condition = condition_val
         elif isinstance(
-            condition_val, (ConditionalExpr, ComparisonExpr, AndExpr, OrExpr, NotExpr, StateRef)
+            condition_val, ConditionalExpr | ComparisonExpr | AndExpr | OrExpr | NotExpr | StateRef
         ):
             # Convert expression AST to string for runtime evaluation
             condition = self._expr_to_string(condition_val)
@@ -710,11 +710,11 @@ class AgentformNormalizer:
         top_p = None
 
         for attr in block.attributes:
-            if attr.name == "temperature" and isinstance(attr.value, (int, float)):
+            if attr.name == "temperature" and isinstance(attr.value, int | float):
                 temperature = float(attr.value)
             elif attr.name == "max_tokens" and isinstance(attr.value, int):
                 max_tokens = attr.value
-            elif attr.name == "top_p" and isinstance(attr.value, (int, float)):
+            elif attr.name == "top_p" and isinstance(attr.value, int | float):
                 top_p = float(attr.value)
 
         return LLMProviderParams(
@@ -797,7 +797,7 @@ class AgentformNormalizer:
                 return self._eval_static_conditional(value)
             # Convert to string representation for runtime evaluation
             return self._expr_to_string(value)
-        elif isinstance(value, (ComparisonExpr, AndExpr, OrExpr, NotExpr)):
+        elif isinstance(value, ComparisonExpr | AndExpr | OrExpr | NotExpr):
             # Check if static
             if self._is_static_expr(value):
                 return self._eval_static_expr(value)
@@ -823,13 +823,13 @@ class AgentformNormalizer:
             )
         elif isinstance(expr, ComparisonExpr):
             return self._is_static_expr(expr.left) and self._is_static_expr(expr.right)
-        elif isinstance(expr, (AndExpr, OrExpr)):
+        elif isinstance(expr, AndExpr | OrExpr):
             return all(self._is_static_expr(op) for op in expr.operands)
         elif isinstance(expr, NotExpr):
             return self._is_static_expr(expr.operand)
-        elif isinstance(expr, (Reference, VarRef)):
+        elif isinstance(expr, Reference | VarRef):
             return True  # These don't depend on runtime state
-        elif isinstance(expr, (str, int, float, bool)):
+        elif isinstance(expr, str | int | float | bool):
             return True
         return True
 
@@ -855,7 +855,7 @@ class AgentformNormalizer:
             return any(self._eval_static_expr(op) for op in expr.operands)
         elif isinstance(expr, NotExpr):
             return not self._eval_static_expr(expr.operand)
-        elif isinstance(expr, (str, int, float, bool)):
+        elif isinstance(expr, str | int | float | bool):
             return expr
         return expr
 
@@ -875,7 +875,7 @@ class AgentformNormalizer:
             return value.lower() not in ("false", "no", "0", "")
         if value is None:
             return False
-        if isinstance(value, (int, float)):
+        if isinstance(value, int | float):
             return value != 0
         return bool(value)
 
@@ -909,7 +909,7 @@ class AgentformNormalizer:
         elif isinstance(expr, str):
             # Quote strings for safety
             return f'"{expr}"'
-        elif isinstance(expr, (int, float, bool)):
+        elif isinstance(expr, int | float | bool):
             return str(expr).lower() if isinstance(expr, bool) else str(expr)
         return str(expr)
 
