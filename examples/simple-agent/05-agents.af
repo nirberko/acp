@@ -1,0 +1,21 @@
+// Agent definitions
+// Agents combine models, policies, and instructions
+
+agent "assistant" {
+  model           = model.gpt4o_mini
+  fallback_models = [model.gpt4o]
+
+  instructions = <<EOF
+You are a helpful assistant. Answer questions clearly and concisely.
+If you don't know something, say so and set confidence to 0.
+
+Provide your response as structured data with:
+- answer: Your response to the question
+- confidence: A number from 0.0 to 1.0 indicating how confident you are
+- sources: A list of sources or reasoning steps (can be empty if none)
+EOF
+
+  policy = policy.default
+
+  output_schema = schema.assistant_response
+}

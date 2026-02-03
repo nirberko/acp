@@ -68,6 +68,20 @@ class ResolvedPolicy(BaseModel):
     budgets: BudgetConfig
 
 
+class SchemaField(BaseModel):
+    """A field in a resolved schema."""
+
+    type: str  # "string", "number", "boolean", or "list"
+    item_type: str | None = None  # For list types, the item type (e.g., "string")
+
+
+class ResolvedSchema(BaseModel):
+    """A resolved schema definition for structured output."""
+
+    name: str
+    fields: dict[str, SchemaField]  # Field name -> field definition
+
+
 class ResolvedAgent(BaseModel):
     """A resolved agent configuration."""
 
@@ -79,6 +93,7 @@ class ResolvedAgent(BaseModel):
     instructions: str
     allowed_capabilities: list[str]
     policy_name: str | None
+    output_schema_name: str | None = None  # Reference to a schema for structured output
 
 
 class ResolvedStep(BaseModel):
@@ -127,5 +142,6 @@ class CompiledSpec(BaseModel):
     servers: dict[str, ResolvedServer] = Field(default_factory=dict)
     capabilities: dict[str, ResolvedCapability] = Field(default_factory=dict)
     policies: dict[str, ResolvedPolicy] = Field(default_factory=dict)
+    schemas: dict[str, ResolvedSchema] = Field(default_factory=dict)
     agents: dict[str, ResolvedAgent] = Field(default_factory=dict)
     workflows: dict[str, ResolvedWorkflow] = Field(default_factory=dict)

@@ -26,7 +26,7 @@ class Symbol:
     """A symbol in the symbol table."""
 
     name: str
-    kind: str  # "provider", "model", "agent", "policy", "workflow", "step", "server", "capability", "variable", "module"
+    kind: str  # "provider", "model", "schema", "agent", "policy", "workflow", "step", "server", "capability", "variable", "module"
     location: SourceLocation | None = None
     parent: str | None = None  # For nested symbols (e.g., steps belong to workflows)
     block: object | None = None  # Reference to the actual block
@@ -204,6 +204,24 @@ class ReferenceResolver:
                     )
                 )
 
+        # Schemas: schema.name
+        for schema in self.af_file.schemas:
+            full_name = f"schema.{schema.name}"
+            if full_name in self.result.symbols:
+                self.result.add_error(
+                    f"Duplicate schema: {schema.name}",
+                    schema.location,
+                )
+            else:
+                self.result.add_symbol(
+                    Symbol(
+                        name=full_name,
+                        kind="schema",
+                        location=schema.location,
+                        block=schema,
+                    )
+                )
+
         # Agents: agent.name
         for agent in self.af_file.agents:
             full_name = f"agent.{agent.name}"
@@ -339,6 +357,11 @@ class ReferenceResolver:
         policy_attr = agent.get_attribute("policy")
         if isinstance(policy_attr, Reference):
             self._check_reference(policy_attr, "policy", agent.location)
+
+        # Check output_schema reference
+        output_schema_attr = agent.get_attribute("output_schema")
+        if isinstance(output_schema_attr, Reference):
+            self._check_reference(output_schema_attr, "schema", agent.location)
 
         # Check allow array (capabilities)
         allow_attr = agent.get_attribute("allow")

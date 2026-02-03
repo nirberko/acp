@@ -27,6 +27,7 @@ from agentform_compiler.agentform_ast import (
     PolicyBlock,
     ProviderBlock,
     Reference,
+    SchemaBlock,
     ServerBlock,
     SourceLocation,
     StateRef,
@@ -143,6 +144,8 @@ class AgentformTransformer(Transformer):
                 agentform_file.policies.append(block)
             elif isinstance(block, ModelBlock):
                 agentform_file.models.append(block)
+            elif isinstance(block, SchemaBlock):
+                agentform_file.schemas.append(block)
             elif isinstance(block, AgentBlock):
                 agentform_file.agents.append(block)
             elif isinstance(block, WorkflowBlock):
@@ -299,6 +302,22 @@ class AgentformTransformer(Transformer):
     def model_body(self, meta: Any, children: list) -> list:
         return children
 
+    # Schema block
+    def schema_block(self, meta: Any, children: list) -> SchemaBlock:
+        name = _unquote(str(children[0]))
+        body = children[1] if len(children) > 1 else []
+
+        attributes = [c for c in body if isinstance(c, Attribute)]
+
+        return SchemaBlock(
+            name=name,
+            attributes=attributes,
+            location=self._loc(meta),
+        )
+
+    def schema_body(self, meta: Any, children: list) -> list[Attribute]:
+        return [c for c in children if isinstance(c, Attribute)]
+
     # Agent block
     def agent_block(self, meta: Any, children: list) -> AgentBlock:
         name = _unquote(str(children[0]))
@@ -438,6 +457,21 @@ class AgentformTransformer(Transformer):
     def identifier_value(self, meta: Any, children: list) -> str:
         """Parse a bare identifier as a string value (e.g., type = string)."""
         return str(children[0])
+
+    def type_call_value(self, meta: Any, children: list) -> str:
+        """Handle type call expression value."""
+        result = children[0]
+        assert isinstance(result, str)
+        return result
+
+    def type_call(self, meta: Any, children: list) -> str:
+        """Parse type call expression: list(string), list(number), etc.
+
+        Returns the type as a string like "list(string)".
+        """
+        type_name = str(children[0])
+        arg_type = str(children[1])
+        return f"{type_name}({arg_type})"
 
     def reference_value(self, meta: Any, children: list) -> Reference:
         result = children[0]

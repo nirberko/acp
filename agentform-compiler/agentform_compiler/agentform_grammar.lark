@@ -11,6 +11,7 @@ block: agentform_block
      | capability_block
      | policy_block
      | model_block
+     | schema_block
      | agent_block
      | workflow_block
      | module_block
@@ -42,6 +43,10 @@ policy_body: (attribute | nested_block)*
 // Model block: model "name" { ... }
 model_block: "model" STRING "{" model_body "}"
 model_body: (attribute | nested_block)*
+
+// Schema block: schema "name" { field = type, ... }
+schema_block: "schema" STRING "{" schema_body "}"
+schema_body: attribute*
 
 // Agent block: agent "name" { ... }
 agent_block: "agent" STRING "{" agent_body "}"
@@ -97,7 +102,11 @@ value: HEREDOC          -> heredoc_value
      | state_ref        -> state_ref_value
      | array            -> array_value
      | "(" expr ")"     -> paren_expr
+     | type_call        -> type_call_value
      | IDENTIFIER       -> identifier_value
+
+// Type call expression: list(string), list(number), etc.
+type_call: IDENTIFIER "(" IDENTIFIER ")"
 
 // State reference: $input.field or $state.step.field
 state_ref: STATE_REF
