@@ -1,0 +1,22 @@
+project "customer-support-agent"
+
+agent support_agent {
+  role = "Customer Support Agent"
+  goal = "Resolve common customer issues clearly and politely"
+
+  fallback = escalation_agent
+}
+
+agent escalation_agent {
+  role = "Human Escalation Agent"
+  goal = "Handle complex or unresolved customer issues"
+}
+
+workflow customer_support_flow {
+  description = "Customer support workflow with escalation logic"
+
+  step {
+    agent = support_agent
+    on_failure = escalation_agent
+  }
+}
