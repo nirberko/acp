@@ -58,9 +58,14 @@ This pattern mirrors real-world support systems used in production.
 ---
 
 ## Files
-- `agentform.yaml`  
-  Defines the agents involved and the customer support workflow,
-  including escalation behavior.
+  - `customer-support.af` 
+
+- Defines agents and the support workflow using the Agentform DSL
+
+- This example uses the Agentform DSL (`.af`), which is the recommended
+and current format for defining Agentform projects.
+
+
 
 ---
 
