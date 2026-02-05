@@ -69,7 +69,7 @@ my-module/
 ├── 03-policies.af     # Policies
 ├── 04-models.af       # Model configurations
 ├── 05-agents.af       # Agent definitions
-└── 06-workflows.af    # Workflows (optional)
+├── 06-workflows.af    # Workflows (optional)
 ```
 
 ### 2. Define input variables
@@ -131,7 +131,6 @@ Add `.af/` to your `.gitignore` - these are downloaded dependencies.
 
 ## Module Best Practices
 
-<<<<<<< Updated upstream
 When creating reusable modules, follow these guidelines to make them reliable and easy for others to adopt:
 
 ### Version control
@@ -168,10 +167,3 @@ When creating reusable modules, follow these guidelines to make them reliable an
 - Use clear, descriptive module names (e.g., `pr-reviewer`, `code-audit`, `data-enrichment`).
 - Keep file ordering predictable (e.g., `00-project.af`, `01-variables.af`, `02-providers.af`, …) so users can navigate easily.
 - Avoid breaking changes to exported names (agents, workflows, variables). If a breaking change is unavoidable, publish it under a new major version or a new module name.
-=======
-1. **Version your modules**: Use Git tags for stable releases.
-2. **Document variables**: Provide clear descriptions for all variables.
-3. **Use sensible defaults**: Make modules easy to use out of the box.
-4. **Test modules**: Ensure modules work before publishing.
-5. **Follow naming conventions**: Use descriptive names for resources.
->>>>>>> Stashed changes

@@ -56,8 +56,10 @@ provider "llm.openai" "default" {
 }
 
 policy "default" {
-  budgets { max_cost_usd_per_run = 0.50 }
-  budgets { timeout_seconds = 60 }
+  budgets {
+    max_cost_usd_per_run = 0.50
+    timeout_seconds      = 60
+  }
 }
 
 model "gpt4o_mini" {
@@ -66,9 +68,10 @@ model "gpt4o_mini" {
 }
 
 agent "assistant" {
-  model = model.gpt4o_mini
-  instructions = "You are a helpful assistant. Answer questions clearly and concisely."
-  policy = policy.default
+  model           = model.gpt4o_mini
+  fallback_models = [model.gpt4o_mini] # Example fallback
+  instructions    = "You are a helpful assistant. Answer questions clearly and concisely."
+  policy          = policy.default
 }
 
 workflow "ask" {

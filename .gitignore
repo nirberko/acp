@@ -75,3 +75,6 @@ poetry.lock
 *.trace.json
 
 site/
+
+# Build logs
+build_log.txt

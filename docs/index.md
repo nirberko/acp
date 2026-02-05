@@ -45,7 +45,9 @@ hide:
 ## How It Works
 
 <div style="margin: 4rem auto; max-width: 800px;">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" style="background-color: transparent; width: 100%; height: auto;">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" style="background-color: transparent; width: 100%; height: auto;" aria-labelledby="diagram-title diagram-desc" role="img">
+  <title id="diagram-title">Agentform Architecture Diagram</title>
+  <desc id="diagram-desc">A flowchart showing the process flow from User Request to Form Controller, Router, splitting to Action Agent or Planning Agent, and converging to a Result.</desc>
   <style>
     .node { fill: #1e293b; stroke: #6366f1; stroke-width: 2px; }
     .node-text { fill: #e2e8f0; font-family: sans-serif; font-size: 14px; text-anchor: middle; dominant-baseline: middle; }

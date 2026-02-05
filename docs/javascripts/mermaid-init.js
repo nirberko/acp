@@ -1,6 +1,6 @@
 var mermaidConfig = {
     startOnLoad: true,
     theme: 'dark',
-    securityLevel: 'loose',
+    securityLevel: 'strict',
 };
 mermaid.initialize(mermaidConfig);

@@ -135,7 +135,7 @@ Automated GitHub pull request reviewer with human-in-the-loop approval.
 ### What You'll Learn
 
 - GitHub MCP integration with authentication
-- Multi-step data gathering workflows
+- Multi-step data-gathering workflows
 - Human approval gates before write operations
 - Building context from multiple API calls
 - Safe patterns for automated actions

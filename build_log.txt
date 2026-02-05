@@ -1,5 +1,0 @@
-INFO    -  Cleaning site directory
-INFO    -  Building documentation to directory: C:\Users\aksha\Desktop\agent_work\agentform\site
-INFO    -  The following pages exist in the docs directory, but are not included in the "nav" configuration:
-  - index.md
-INFO    -  Building page 'index.md' with default template 'main.html'

@@ -114,7 +114,7 @@ agentform run ask --var openai_api_key=$OPENAI_API_KEY --input '{"question": "He
 agentform run ask --trace trace.json --input '{"question": "Hello!"}'
 
 # Module workflow
-agentform run module.pr-reviewer.review_workflow .
+agentform run module.pr-reviewer.review_workflow --spec .
 ```
 
 ---
