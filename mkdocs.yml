@@ -1,0 +1,91 @@
+site_name: Agentform
+site_description: Define AI agent systems declaratively using Agentform native schema
+repo_name: agentform-org/agentform
+repo_url: https://github.com/agentform-org/agentform
+copyright: Copyright &copy; 2024-2026 Agentform Team
+
+theme:
+  name: material
+  logo: assets/logo.png
+  favicon: assets/logo.png
+  palette:
+    # Default to Dark Mode (Slate)
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: cyan
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+    # Light Mode Option
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: cyan
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - navigation.tracking
+    - navigation.indexes
+    - navigation.instant
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.action.edit
+  font:
+    text: Outfit
+    code: JetBrains Mono
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+
+nav:
+  - Home: index.md
+  - Docs: 
+    - Introduction: guide/index.md
+    - Getting Started: guide/getting-started.md
+    - Core Concepts: guide/core-concepts.md
+    - Modules: guide/modules.md
+  - Examples: examples/index.md
+  - DSL: reference/dsl.md
+  - Reference: reference/cli.md
+  - Contributing: contributing/index.md
+
+extra_css:
+  - stylesheets/extra_v4.css
+
+extra_javascript:
+  - https://unpkg.com/mermaid@10.6.1/dist/mermaid.min.js
+  - javascripts/mermaid-init.js
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/agentform-org/agentform
+    - icon: fontawesome/brands/discord
+      link: https://discord.gg/agentform
+

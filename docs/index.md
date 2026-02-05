@@ -1,155 +1,184 @@
 ---
-layout: default
-title: Agentform Documentation
-permalink: /
+hide:
+  - navigation
+  - toc
 ---
 
-# Agentform™
+<div class="hero-section">
+  <h1>Agentform</h1>
+  <p class="tagline">Define AI agent systems declaratively.<br>Infrastructure as Code for the AI Era.</p>
 
-<p align="center">
-  <strong>Define AI agent systems declaratively using Agentform™ native schema</strong>
-</p>
+  <div class="hero-buttons">
+    <a class="md-button md-button--primary" href="guide/getting-started/">Get Started</a>
+    <a class="md-button" href="examples/">View Examples</a>
+  </div>
+</div>
 
-<p align="center">
-  Think <em>Infrastructure as Code</em>, but for AI agents
-</p>
 
----
+-   :material-file-code:
+    **Native Schema**
+    Define complex agent behaviors, workflows, and policies in a type-safe, readable `.af` syntax.
 
-## Why Agentform™?
+-   :material-brain:
+    **Multi-Provider**
+    Seamlessly switch between OpenAI, Anthropic, and open-source models without rewriting code.
 
-Most AI agent frameworks require you to write imperative code - managing state, handling retries, wiring up tools. Agentform takes a different approach: **describe your agents declaratively in Agentform native schema, and let the runtime engine handle the rest.**
+-   :material-connection:
+    **MCP First**
+    First-class support for the Model Context Protocol to connect agents with your data and tools.
 
-```hcl
-agent "reviewer" {
-  model        = model.gpt4o
-  instructions = "Review code for security issues"
-  allow        = [capability.read_file, capability.get_diff]
-  policy       = policy.strict
-}
-```
+-   :material-security:
+    **Enterprise Safety**
+    Enforce granular policies, budget limits, and human-in-the-loop approval gates.
 
-**The result:** Your agent configurations become version-controlled artifacts that are easy to review, share, and reproduce. The native `.af` format provides type safety, explicit references, and improved editor support.
+-   :material-chart-timeline-variant:
+    **Full Observability**
+    Trace every step of your agent's execution with built-in logging and debugging tools.
 
----
+-   :material-share-variant:
+    **Modular & Reusable**
+    Share agent configurations via Git-based modules, just like Terraform.
 
-## Quick Start
 
-### 1. Installation
+<div style="margin-top: 4rem;"></div>
 
-```bash
-pip install agentform-cli
-```
+## How It Works
 
-### 2. Set up your API key
+<div style="margin: 4rem auto; max-width: 800px;">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" style="background-color: transparent; width: 100%; height: auto;" aria-labelledby="diagram-title diagram-desc" role="img">
+  <title id="diagram-title">Agentform Architecture Diagram</title>
+  <desc id="diagram-desc">A flowchart showing the process flow from User Request to Form Controller, Router, splitting to Action Agent or Planning Agent, and converging to a Result.</desc>
+  <style>
+    .node { fill: #1e293b; stroke: #6366f1; stroke-width: 2px; }
+    .node-text { fill: #e2e8f0; font-family: sans-serif; font-size: 14px; text-anchor: middle; dominant-baseline: middle; }
+    .edge { stroke: #94a3b8; stroke-width: 2px; fill: none; }
+    .arrow { fill: #94a3b8; }
+  </style>
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" class="arrow" />
+    </marker>
+  </defs>
+  <rect x="50" y="180" width="120" height="50" rx="8" class="node" />
+  <text x="110" y="205" class="node-text">User Request</text>
+  <rect x="230" y="180" width="140" height="50" rx="8" class="node" />
+  <text x="300" y="205" class="node-text">Form Controller</text>
+  <polygon points="450,180 500,205 450,230 400,205" class="node" />
+  <text x="450" y="205" class="node-text">Router</text>
+  <rect x="550" y="100" width="120" height="50" rx="8" class="node" style="stroke: #ec4899;" />
+  <text x="610" y="125" class="node-text">Action Agent</text>
+  <rect x="550" y="300" width="120" height="50" rx="8" class="node" style="stroke: #a855f7;" />
+  <text x="610" y="325" class="node-text">Planning Agent</text>
+  <rect x="700" y="205" width="80" height="40" rx="20" class="node" style="fill: #22c55e; stroke: none;" />
+  <text x="740" y="225" class="node-text" style="fill: #fff; font-weight: bold;">Result</text>
+  <line x1="170" y1="205" x2="220" y2="205" class="edge" marker-end="url(#arrowhead)" />
+  <line x1="370" y1="205" x2="390" y2="205" class="edge" marker-end="url(#arrowhead)" />
+  <path d="M450,180 Q450,125 540,125" class="edge" marker-end="url(#arrowhead)" />
+  <path d="M450,230 Q450,325 540,325" class="edge" marker-end="url(#arrowhead)" />
+  <path d="M670,125 Q740,125 740,195" class="edge" marker-end="url(#arrowhead)" />
+  <path d="M670,325 Q740,325 740,255" class="edge" marker-end="url(#arrowhead)" />
+</svg>
+</div>
 
-```bash
-export OPENAI_API_KEY="your-openai-key"
-```
+<div style="margin-top: 6rem;"></div>
 
-### 3. Create an agent spec
+## Deploy in Seconds
 
-Create a file called `my-agent.af`:
+<div class="terminal-window">
+  <div class="terminal-header">
+    <div class="terminal-dot red"></div>
+    <div class="terminal-dot yellow"></div>
+    <div class="terminal-dot green"></div>
+  </div>
+  <div class="terminal-body">
+    <div class="command-line">
+      <span class="prompt">$</span>
+      <span>agentform init my-agent</span>
+    </div>
+    <div style="color: #666; margin: 5px 0 15px 0;">Created my-agent.af in ./my-agent</div>
+    
+    <div class="command-line">
+      <span class="prompt">$</span>
+      <span>agentform deploy</span>
+    </div>
+    <div style="margin-top: 5px;">
+      <div>> Validating schema... <span style="color: #27c93f">OK</span></div>
+      <div>> Provisioning resources... <span style="color: #27c93f">Done</span></div>
+      <div>> Syncing to edge... <span style="color: #27c93f">Success</span></div>
+      <div style="margin-top: 10px; color: #27c93f;">➜ Agent live at https://api.agentform.com/v1/agents/my-agent</div>
+    </div>
+    
+    <div class="command-line" style="margin-top: 15px;">
+      <span class="prompt">$</span>
+      <span class="cursor"></span>
+    </div>
+  </div>
+</div>
 
-```hcl
-agentform {
-  version = "0.1"
-  project = "my-first-agent"
-}
+<div style="margin-top: 6rem;"></div>
 
-variable "openai_api_key" {
-  type        = string
-  description = "OpenAI API key"
-  sensitive   = true
-}
+## Code that speaks your language
 
-provider "llm.openai" "default" {
-  api_key = var.openai_api_key
-  default_params {
-    temperature = 0.7
-    max_tokens  = 2000
-  }
-}
+=== "Agentform DSL"
 
-policy "default" {
-  budgets { max_cost_usd_per_run = 0.50 }
-  budgets { timeout_seconds = 60 }
-}
+    ```terraform
+    agent "researcher" {
+      model = "gpt-4-turbo"
+      temperature = 0.7
+      
+      system_prompt = "You are a senior research analyst."
+      
+      tools = [
+        "web_search",
+        "summarize_page"
+      ]
 
-model "gpt4o_mini" {
-  provider = provider.llm.openai.default
-  id       = "gpt-4o-mini"
-}
+      limits {
+        budget = "5.00"
+        max_steps = 10
+      }
+    }
+    ```
 
-model "gpt4o" {
-  provider = provider.llm.openai.default
-  id       = "gpt-4o"
-}
+=== "JSON Schema"
 
-agent "assistant" {
-  model           = model.gpt4o_mini
-  fallback_models = [model.gpt4o]
+    ```json
+    {
+      "name": "researcher",
+      "model": "gpt-4-turbo",
+      "temperature": 0.7,
+      "system_prompt": "You are a senior research analyst.",
+      "tools": [
+        "web_search", 
+        "summarize_page"
+      ],
+      "limits": {
+        "budget": "5.00",
+        "max_steps": 10
+      }
+    }
+    ```
 
-  instructions = "You are a helpful assistant. Answer questions clearly and concisely."
+=== "Python SDK (Coming Soon)"
 
-  policy = policy.default
-}
+    ```python
+    # Planned Python SDK example.
+    # The agentform Python package and Agent class are not yet available.
+    # This example illustrates the intended future interface.
+    #
+    # from agentform import Agent
+    #
+    # researcher = Agent(
+    #     name="researcher",
+    #     model="gpt-4-turbo",
+    #     temperature=0.7,
+    #     system_prompt="You are a senior research analyst.",
+    #     tools=["web_search", "summarize_page"],
+    #     limits={
+    #         "budget": "5.00",
+    #         "max_steps": 10
+    #     }
+    # )
+    ```
 
-workflow "ask" {
-  entry = step.process
-
-  step "process" {
-    type  = "llm"
-    agent = agent.assistant
-
-    input { question = input.question }
-
-    output "answer" { from = result.text }
-
-    next = step.end
-  }
-
-  step "end" { type = "end" }
-}
-```
-
-### 4. Run it
-
-```bash
-# Validate your spec
-agentform validate my-agent.af
-
-# Run with input
-agentform run ask --spec my-agent.af --input '{"question": "What is the capital of France?"}'
-```
-
----
-
-## Features
-
-| Feature | Description |
-|---------|-------------|
-| **Native Schema** | Define agents, workflows, and policies in type-safe `.af` format with explicit references |
-| **Modules** | Terraform-style reusable modules for sharing agent configurations via Git |
-| **Multi-Provider** | Use OpenAI, Anthropic, or other LLM providers interchangeably |
-| **Multi-Agent** | Coordinate multiple specialized agents with conditional routing |
-| **MCP Integration** | Connect to external tools via Model Context Protocol servers |
-| **Policy Enforcement** | Set budgets, timeouts, and capability limits per agent |
-| **Human-in-the-Loop** | Built-in approval gates for sensitive operations |
-| **Execution Tracing** | Full visibility into workflow execution for debugging |
-
----
-
-## Next Steps
-
-- [Getting Started Guide](/getting-started/) - Detailed installation and setup
-- [Examples](/examples/) - Learn from real-world examples
-- [Modules](/modules/) - Create and share reusable agent configurations
-- [CLI Reference](/cli-reference/) - Complete command reference
-- [Architecture](/architecture/) - Understand how Agentform works
-
----
-
-<p align="center">
-  <sub>Built with ❤️ for the AI agent community</sub>
-</p>
+<div style="margin-top: 4rem;"></div>
